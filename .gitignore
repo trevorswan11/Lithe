@@ -15,6 +15,7 @@ CMakeUserPresets.json
 # Directories
 .vs
 .vscode
+bin
 bin-int/
 
 # Files
