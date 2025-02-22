@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.35818.85 d17.13
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lithe", "Lithe\Lithe.vcxproj", "{0F15F25B-FB48-4B36-A0D3-2BC3CC3E1BFB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0F15F25B-FB48-4B36-A0D3-2BC3CC3E1BFB}.Debug|x64.ActiveCfg = Debug|x64
+		{0F15F25B-FB48-4B36-A0D3-2BC3CC3E1BFB}.Debug|x64.Build.0 = Debug|x64
+		{0F15F25B-FB48-4B36-A0D3-2BC3CC3E1BFB}.Debug|x86.ActiveCfg = Debug|Win32
+		{0F15F25B-FB48-4B36-A0D3-2BC3CC3E1BFB}.Debug|x86.Build.0 = Debug|Win32
+		{0F15F25B-FB48-4B36-A0D3-2BC3CC3E1BFB}.Release|x64.ActiveCfg = Release|x64
+		{0F15F25B-FB48-4B36-A0D3-2BC3CC3E1BFB}.Release|x64.Build.0 = Release|x64
+		{0F15F25B-FB48-4B36-A0D3-2BC3CC3E1BFB}.Release|x86.ActiveCfg = Release|Win32
+		{0F15F25B-FB48-4B36-A0D3-2BC3CC3E1BFB}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {654731E8-B26C-4BB5-B673-97E32ABBDF12}
+	EndGlobalSection
+EndGlobal
