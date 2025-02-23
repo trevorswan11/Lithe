@@ -10,6 +10,11 @@ workspace "Lithe"
 
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
+IncludeDir = {}
+IncludeDir["GLFW"] = "Lithe/vendor/GLFW/include"
+
+include "Lithe/vendor/GLFW"
+
 project "Lithe"
 	location "Lithe"
 	kind "SharedLib"
@@ -32,7 +37,15 @@ project "Lithe"
 	includedirs
 	{
 		"%{prj.name}/vendor/spdlog/include",
-		"%{prj.name}/src"
+		"%{prj.name}/src",
+		"%{IncludeDir.GLFW}"
+	}
+
+	links
+	{
+		"GLFW",
+		"opengl32.lib",
+		"dwmapi.lib"
 	}
 
 	filter "system:windows"

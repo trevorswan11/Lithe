@@ -3,7 +3,6 @@
 #include "Application.h"
 
 #include "Lithe/Events/ApplicationEvent.h"
-#include "Lithe/Log.h"
 
 namespace Lithe {
 	Application::Application()

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "lipch.h"
+
 #include "Lithe/Core.h"
 
 namespace Lithe {

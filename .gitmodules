@@ -1,3 +1,6 @@
 [submodule "Lithe/vendor/spdlog"]
 	path = Lithe/vendor/spdlog
 	url = https://github.com/gabime/spdlog
+[submodule "Lithe/vendor/GLFW"]
+	path = Lithe/vendor/GLFW
+	url = https://github.com/TheCherno/GLFW

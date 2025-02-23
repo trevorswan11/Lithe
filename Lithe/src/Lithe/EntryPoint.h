@@ -1,5 +1,7 @@
 #pragma once
 
+#include "lipch.h"
+
 #ifdef LI_PLATFORM_WINDOWS
 
 extern Lithe::Application* Lithe::CreateApplication();

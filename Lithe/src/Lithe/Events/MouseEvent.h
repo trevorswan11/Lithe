@@ -1,5 +1,7 @@
 #pragma once
 
+#include "lipch.h"
+
 #include "Event.h"
 
 namespace Lithe {
