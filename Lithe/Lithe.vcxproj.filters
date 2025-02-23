@@ -34,6 +34,7 @@
     <ClInclude Include="src\Lithe\Log.h">
       <Filter>Lithe</Filter>
     </ClInclude>
+    <ClInclude Include="src\lipch.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Lithe\Application.cpp">
@@ -42,5 +43,6 @@
     <ClCompile Include="src\Lithe\Log.cpp">
       <Filter>Lithe</Filter>
     </ClCompile>
+    <ClCompile Include="src\lipch.cpp" />
   </ItemGroup>
 </Project>

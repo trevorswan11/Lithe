@@ -2,9 +2,6 @@
 
 #include "Lithe/Core.h"
 
-#include <string>
-#include <functional>
-
 namespace Lithe {
 	enum class EventType
 	{
@@ -12,7 +9,7 @@ namespace Lithe {
 		WindowClose, WindowResize, WindowFocus, WindowLostFocus, WindowMoved,
 		AppTick, AppUpdate, AppRender,
 		KeyPressed, KeyReleased,
-		MouseBUttonPressed, MouseButtonReleased, MouseMoved, MouseScrolled
+		MouseButtonPressed, MouseButtonReleased, MouseMoved, MouseScrolled
 	};
 
 	// Provides a filter for different events -- acts as a trait
@@ -57,8 +54,10 @@ namespace Lithe {
 	class EventDispatcher
 	{
 		template<typename T>
-		using EventFn = std::_Can_call_function_object<bool(T&)>
+		using EventFn = std::function<bool(T&)>;
 	public:
+		// Will be received as any event
+
 		EventDispatcher(Event& event)
 			: m_Event(event) 
 		{
@@ -77,4 +76,9 @@ namespace Lithe {
 	private:
 		Event& m_Event;
 	};
+
+	inline std::string format_as(const Event& e)
+	{
+		return e.ToString();
+	}
 }

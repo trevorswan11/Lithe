@@ -18,6 +18,8 @@ project "Lithe"
 	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
 	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
 
+	pchheader "lipch.h"
+	pchsource "Lithe/src/lipch.cpp"
 
 	files
 	{

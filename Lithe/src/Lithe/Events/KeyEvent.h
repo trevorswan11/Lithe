@@ -2,8 +2,6 @@
 
 #include "Event.h"
 
-#include "sstream"
-
 // OS will take a key pressed event, and then if the key is still 
 // pressed then it will repeat the key event until key released is called
 
