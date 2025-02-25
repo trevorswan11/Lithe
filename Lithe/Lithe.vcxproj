@@ -79,7 +79,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>lipch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>LI_PLATFORM_WINDOWS;LI_BUILD_DLL;LI_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>LI_PLATFORM_WINDOWS;LI_BUILD_DLL;LI_ENABLE_ASSERTS;LI_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>vendor\spdlog\include;src;vendor\GLFW\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
@@ -103,7 +103,7 @@ copy /B /Y "..\bin\Debug-windows-x86_64\Lithe\Lithe.dll" "$(SolutionDir)\bin\Deb
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>lipch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>LI_PLATFORM_WINDOWS;LI_BUILD_DLL;LI_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>LI_PLATFORM_WINDOWS;LI_BUILD_DLL;LI_ENABLE_ASSERTS;LI_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>vendor\spdlog\include;src;vendor\GLFW\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -131,7 +131,7 @@ copy /B /Y "..\bin\Release-windows-x86_64\Lithe\Lithe.dll" "$(SolutionDir)\bin\R
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>lipch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>LI_PLATFORM_WINDOWS;LI_BUILD_DLL;LI_DIST;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>LI_PLATFORM_WINDOWS;LI_BUILD_DLL;LI_ENABLE_ASSERTS;LI_DIST;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>vendor\spdlog\include;src;vendor\GLFW\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -164,17 +164,17 @@ copy /B /Y "..\bin\Dist-windows-x86_64\Lithe\Lithe.dll" "$(SolutionDir)\bin\Dist
     <ClInclude Include="src\Lithe\Events\KeyEvent.h" />
     <ClInclude Include="src\Lithe\Events\MouseEvent.h" />
     <ClInclude Include="src\Lithe\Log.h" />
-    <ClInclude Include="src\lipch.h" />
     <ClInclude Include="src\Lithe\Window.h" />
     <ClInclude Include="src\Platform\WindowsWindow.h" />
+    <ClInclude Include="src\lipch.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Lithe\Application.cpp" />
     <ClCompile Include="src\Lithe\Log.cpp" />
+    <ClCompile Include="src\Platform\WindowsWindow.cpp" />
     <ClCompile Include="src\lipch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="src\Platform\WindowsWindow.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="vendor\GLFW\GLFW.vcxproj">

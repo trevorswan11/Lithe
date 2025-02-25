@@ -7,6 +7,9 @@
     <Filter Include="Lithe\Events">
       <UniqueIdentifier>{FF28AFBC-EB8B-3E61-9411-771780530AE4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Platform">
+      <UniqueIdentifier>{2AC788B4-1694-E3BF-3FAD-D1672BD9184E}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Lithe.h" />
@@ -34,9 +37,13 @@
     <ClInclude Include="src\Lithe\Log.h">
       <Filter>Lithe</Filter>
     </ClInclude>
+    <ClInclude Include="src\Lithe\Window.h">
+      <Filter>Lithe</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Platform\WindowsWindow.h">
+      <Filter>Platform</Filter>
+    </ClInclude>
     <ClInclude Include="src\lipch.h" />
-    <ClInclude Include="src\Lithe\Window.h" />
-    <ClInclude Include="src\Platform\WindowsWindow.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Lithe\Application.cpp">
@@ -45,7 +52,9 @@
     <ClCompile Include="src\Lithe\Log.cpp">
       <Filter>Lithe</Filter>
     </ClCompile>
+    <ClCompile Include="src\Platform\WindowsWindow.cpp">
+      <Filter>Platform</Filter>
+    </ClCompile>
     <ClCompile Include="src\lipch.cpp" />
-    <ClCompile Include="src\Platform\WindowsWindow.cpp" />
   </ItemGroup>
 </Project>

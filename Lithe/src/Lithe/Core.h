@@ -10,6 +10,8 @@
 	#error Lithe only supports Windows.
 #endif
 
+// Assertions if enabled, specified in premake for debug only
+
 #ifdef LI_ENABLE_ASSERTS
 	#define LI_ASSERT(x, ...) { if(!(x)) { LI_ERROR("Assertion Failed: {0}", __VA_ARGS__); __debugbreak(); } }
 	#define LI_CORE_ASSERT(x, ...) { if(!(x)) { LI_CORE_ERROR("Assertion Failed: {0}", __VA_ARGS__); __debugbreak(); } }
