@@ -68,9 +68,10 @@ namespace Lithe {
 		template<typename T>
 		bool Dispatch(EventFn<T> func)
 		{
+			// Check the inputted event aginst the template type (template types declared as <Type>)
 			if (m_Event.GetEventType() == T::GetStaticType())
 			{
-				m_Event.mHandled = func(*(T*)&m_Event);
+				m_Event.m_Handled = func(*(T*)&m_Event);
 				return true;
 			}
 			return false;
