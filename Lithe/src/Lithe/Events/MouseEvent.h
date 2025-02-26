@@ -15,6 +15,7 @@ namespace Lithe {
 		inline float GetX() const { return m_MouseX; }
 		inline float GetY() const { return m_MouseY; }
 
+		// Formats the event with the mouse's coordinates
 		std::string ToString() const override
 		{
 			std::stringstream ss;
@@ -39,6 +40,7 @@ namespace Lithe {
 		inline float GetXOffset() const { return m_XOffset; }
 		inline float GetYOffset() const { return m_YOffset; }
 
+		// Formats the event with the mouse's coordinate offset
 		std::string ToString() const override
 		{
 			std::stringstream ss;
@@ -52,7 +54,7 @@ namespace Lithe {
 		float m_XOffset, m_YOffset;
 	};
 
-	// Parent class for specifc mouse button events
+	// Abstract class for specifc mouse button events
 	class LITHE_API MouseButtonEvent : public Event
 	{
 	public:
@@ -73,6 +75,7 @@ namespace Lithe {
 		MouseButtonPressedEvent(int button)
 			: MouseButtonEvent(button) {}
 
+		// Formats the event with the buttons qualifier
 		std::string ToString() const override
 		{
 			std::stringstream ss;
@@ -83,6 +86,7 @@ namespace Lithe {
 		EVENT_CLASS_TYPE(MouseButtonPressed)
 	};
 
+	// Handles mouse button releases
 	class LITHE_API MouseButtonReleasedEvent : public MouseButtonEvent
 	{
 	public:
@@ -90,6 +94,7 @@ namespace Lithe {
 			: MouseButtonEvent(button) {
 		}
 
+		// Formats the event with the buttons qualifier
 		std::string ToString() const override
 		{
 			std::stringstream ss;

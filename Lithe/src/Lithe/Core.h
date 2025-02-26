@@ -2,22 +2,30 @@
 
 #ifdef LI_PLATFORM_WINDOWS
 	#ifdef LI_BUILD_DLL
+		// Macro for exports in core engine
 		#define LITHE_API __declspec(dllexport)
 	#else
+		// Macro for imports in derived applications
 		#define LITHE_API __declspec(dllimport)
 	#endif
 #else
+	// For now, Lithe will only be built to support windows
 	#error Lithe only supports Windows.
 #endif
 
 // Assertions if enabled, specified in premake for debug only
 
 #ifdef LI_ENABLE_ASSERTS
+	// CLIENT: Breaks debugging (fatal error) if condition is not met, prints qualifying information
 	#define LI_ASSERT(x, ...) { if(!(x)) { LI_ERROR("Assertion Failed: {0}", __VA_ARGS__); __debugbreak(); } }
+	// CORE: Breaks debugging (fatal error) if condition is not met, prints qualifying information
 	#define LI_CORE_ASSERT(x, ...) { if(!(x)) { LI_CORE_ERROR("Assertion Failed: {0}", __VA_ARGS__); __debugbreak(); } }
 #else
+	// CLIENT: Does nothing without LI_ENABLE_ASSERTS
 	#define LI_ASSERT(x, ...)
+	// CORE: Does nothing without LI_ENABLE_ASSERTS
 	#define LI_CORE_ASSERT(x, ...)
 #endif
 
+// Creates a bitmask with only the x-th bit set
 #define BIT(x) (1 << x)

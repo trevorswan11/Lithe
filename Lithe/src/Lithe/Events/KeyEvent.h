@@ -8,20 +8,20 @@
 // pressed then it will repeat the key event until key released is called
 
 namespace Lithe {
+	// An abstract class to define common KeyEvent behavior
 	class LITHE_API KeyEvent : public Event
 	{
 	public:
 		inline int GetKeyCode() const { return m_KeyCode; }
-		// Any keyboard event is also an input event, so or them together
 
+		// Any keyboard event is also an input event, so or them together
 		EVENT_CLASS_CATEGORY(EventCategoryKeyboard | EventCategoryInput)
 	protected:
-		// Should not be able to make this class (technically an abstract class)
-
 		KeyEvent(int keycode) : m_KeyCode(keycode) {}
 		int m_KeyCode;
 	};
 
+	// Handles Key Pressed and Repeat events as well 
 	class LITHE_API KeyPressedEvent : public KeyEvent
 	{
 	public:
@@ -30,6 +30,7 @@ namespace Lithe {
 
 		inline int GetRepeatCount() const { return m_RepeatCount; }
 
+		// Formats the event with its code followed by the number of repeats
 		std::string ToString() const override
 		{
 			std::stringstream ss;
@@ -42,12 +43,14 @@ namespace Lithe {
 		int m_RepeatCount;
 	};
 
+	// Handles Key Released events
 	class LITHE_API KeyReleasedEvent : public KeyEvent
 	{
 	public:
 		KeyReleasedEvent(int keycode)
 			: KeyEvent(keycode) {}
 
+		// Formats the event to include its keycode
 		std::string ToString() const override
 		{
 			std::stringstream ss;

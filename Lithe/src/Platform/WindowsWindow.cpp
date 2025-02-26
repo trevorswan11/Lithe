@@ -25,9 +25,9 @@ namespace Lithe {
 		Init(props);
 	}
 
+	// Destroys the window, does NOT shutdown the GLFW process as a whole
 	WindowsWindow::~WindowsWindow()
 	{
-		// Destroys the window, does NOT shutdown the GLFW process as a whole
 		Shutdown();
 	}
 

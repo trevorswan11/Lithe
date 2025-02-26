@@ -5,6 +5,8 @@
 #include "Lithe/Events/ApplicationEvent.h"
 
 namespace Lithe {
+#define BIND_EVENT_FN(x) std::bind(&Application::x, this, std::placeholders::_1)
+
 	class LITHE_API Application
 	{
 	public:

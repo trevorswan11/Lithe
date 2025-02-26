@@ -5,6 +5,7 @@
 #include "Event.h"
 
 namespace Lithe {
+	// Handles window Resizing, including minimizing the Application
 	class LITHE_API WindowResizeEvent : public Event
 	{
 	public:
@@ -14,6 +15,7 @@ namespace Lithe {
 		inline unsigned int GetWidth() const { return m_Width; }
 		inline unsigned int GetHeight() const { return m_Height; }
 
+		// Formats the event with the windows new width and height
 		std::string ToString() const override
 		{
 			std::stringstream ss;
@@ -27,6 +29,7 @@ namespace Lithe {
 		unsigned int m_Width, m_Height;
 	};
 
+	// Handles the Close Button on Applications
 	class LITHE_API WindowCloseEvent : public Event
 	{
 	public:
@@ -34,6 +37,8 @@ namespace Lithe {
 
 		EVENT_CLASS_TYPE(WindowClose)
 		EVENT_CLASS_CATEGORY(EventCategoryApplication)
+
+		// ToString not needed, closing the app ends the terminal debug instance
 	};
 
 	// ---May remove implementation in the future---
@@ -44,7 +49,7 @@ namespace Lithe {
 		AppTickEvent() {}
 
 		EVENT_CLASS_TYPE(AppTick)
-			EVENT_CLASS_CATEGORY(EventCategoryApplication)
+		EVENT_CLASS_CATEGORY(EventCategoryApplication)
 	};
 
 	class LITHE_API AppUpdateEvent : public Event

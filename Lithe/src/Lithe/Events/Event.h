@@ -5,6 +5,13 @@
 #include "Lithe/Core.h"
 
 namespace Lithe {
+	// Specifies the exact type of the event, which can be:
+	// - None
+	// - Window Events: WindowClose, WindowResize, WindowFocus, WindowLostFocus, WindowMoved,
+	// - App Events: AppTick, AppUpdate, AppRender,
+	// - Key Events: KeyPressed, KeyReleased,
+	// - Mouse Events: MouseButtonPressed, MouseButtonReleased, MouseMoved, MouseScrolled
+	// All of which have their own specific implementations/uses
 	enum class EventType
 	{
 		None = 0,
@@ -14,7 +21,14 @@ namespace Lithe {
 		MouseButtonPressed, MouseButtonReleased, MouseMoved, MouseScrolled
 	};
 
-	// Provides a filter for different events -- acts as a trait
+	// Provides a filter for different events -- acts as a trait; An event can fall into more than one category:
+	// - None
+	// - EventCategoryApplication
+	// - EventCategoryInput
+	// - EventCategoryKeyboard
+	// - EventCategoryMouse
+	// - EventCategoryMouseButton
+	// These are used as qualifiers for the EVENT_CLASS_CATEGORY macro
 	enum EventCategory
 	{
 		None = 0,
@@ -25,12 +39,15 @@ namespace Lithe {
 		EventCategoryMouseButton =	BIT(4)
 	};
 
+// Macro to initialize usefl getter methods while reducing bloat and code duplication
 #define EVENT_CLASS_TYPE(type) static EventType GetStaticType() { return EventType::##type; }\
 								virtual EventType GetEventType() const override { return GetStaticType(); }\
 								virtual const char* GetName() const override { return #type; }
 
+// Doesn't necessarily need to be a macro, but acts as a common declaration for implementation behavior
 #define EVENT_CLASS_CATEGORY(category) virtual int GetCategoryFlags() const override { return category; }
 
+	// Base class for any event, defining shared behavior and implementation
 	class LITHE_API Event
 	{
 		friend class EventDispatcher;
@@ -53,18 +70,16 @@ namespace Lithe {
 		bool m_Handled = false;
 	};
 
+	// Dispatches any received event through the application
 	class EventDispatcher
 	{
 		template<typename T>
 		using EventFn = std::function<bool(T&)>;
 	public:
-		// Will be received as any event
-
 		EventDispatcher(Event& event)
-			: m_Event(event) 
-		{
-		}
+			: m_Event(event) {}
 
+		// Dispatches any event using a specified function 
 		template<typename T>
 		bool Dispatch(EventFn<T> func)
 		{
@@ -80,6 +95,7 @@ namespace Lithe {
 		Event& m_Event;
 	};
 
+	// Assists in correct logging of events
 	inline std::string format_as(const Event& e)
 	{
 		return e.ToString();

@@ -6,14 +6,14 @@
 #include "Lithe/Events/Event.h"
 
 namespace Lithe {
+	// Defines properties to be defined by any window
 	struct WindowProps
 	{
 		std::string Title;
 		unsigned int Width;
 		unsigned int Height;
 
-		// Set default parameters for properties
-
+		// Sets default parameters for properties
 		WindowProps(const std::string&& title = "Lithe Engine",
 				unsigned int width = 1280,
 				unsigned int height = 720)
