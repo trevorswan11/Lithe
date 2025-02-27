@@ -84,6 +84,7 @@
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <AdditionalOptions>/MDd %(AdditionalOptions)</AdditionalOptions>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <ExternalWarningLevel>Level3</ExternalWarningLevel>
     </ClCompile>
@@ -111,6 +112,7 @@ copy /B /Y "..\bin\Debug-windows-x86_64\Lithe\Lithe.dll" "$(SolutionDir)\bin\Deb
       <MinimalRebuild>false</MinimalRebuild>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <AdditionalOptions>/MD %(AdditionalOptions)</AdditionalOptions>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <ExternalWarningLevel>Level3</ExternalWarningLevel>
     </ClCompile>
@@ -139,6 +141,7 @@ copy /B /Y "..\bin\Release-windows-x86_64\Lithe\Lithe.dll" "$(SolutionDir)\bin\R
       <MinimalRebuild>false</MinimalRebuild>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <AdditionalOptions>/MD %(AdditionalOptions)</AdditionalOptions>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <ExternalWarningLevel>Level3</ExternalWarningLevel>
     </ClCompile>
@@ -163,6 +166,8 @@ copy /B /Y "..\bin\Dist-windows-x86_64\Lithe\Lithe.dll" "$(SolutionDir)\bin\Dist
     <ClInclude Include="src\Lithe\Events\Event.h" />
     <ClInclude Include="src\Lithe\Events\KeyEvent.h" />
     <ClInclude Include="src\Lithe\Events\MouseEvent.h" />
+    <ClInclude Include="src\Lithe\Layer.h" />
+    <ClInclude Include="src\Lithe\LayerStack.h" />
     <ClInclude Include="src\Lithe\Log.h" />
     <ClInclude Include="src\Lithe\Window.h" />
     <ClInclude Include="src\Platform\WindowsWindow.h" />
@@ -170,6 +175,8 @@ copy /B /Y "..\bin\Dist-windows-x86_64\Lithe\Lithe.dll" "$(SolutionDir)\bin\Dist
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Lithe\Application.cpp" />
+    <ClCompile Include="src\Lithe\Layer.cpp" />
+    <ClCompile Include="src\Lithe\LayerStack.cpp" />
     <ClCompile Include="src\Lithe\Log.cpp" />
     <ClCompile Include="src\Platform\WindowsWindow.cpp" />
     <ClCompile Include="src\lipch.cpp">

@@ -1,7 +1,10 @@
 #pragma once
 
-#include "lipch.h"
+#include "Core.h"
 
+#include "Window.h"
+#include "Lithe/LayerStack.h"
+#include "Lithe/Events/Event.h"
 #include "Lithe/Events/ApplicationEvent.h"
 
 namespace Lithe {
@@ -16,11 +19,15 @@ namespace Lithe {
 		void Run();
 
 		void OnEvent(Event& e);
+
+		void PushLayer(Layer* layer);
+		void PushOverlay(Layer* layer);
 	private:
 		bool OnWindowClose(WindowCloseEvent& e);
 
 		std::unique_ptr<Window> m_Window;
 		bool m_Running = true;
+		LayerStack m_LayerStack;
 	};
 
 	// To be defined in CLIENT

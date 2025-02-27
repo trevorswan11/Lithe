@@ -1,6 +1,6 @@
 #pragma once
 
-#include "lipch.h"
+#include "Core.h"
 
 #ifdef LI_PLATFORM_WINDOWS
 

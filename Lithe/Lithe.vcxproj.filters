@@ -34,6 +34,12 @@
     <ClInclude Include="src\Lithe\Events\MouseEvent.h">
       <Filter>Lithe\Events</Filter>
     </ClInclude>
+    <ClInclude Include="src\Lithe\Layer.h">
+      <Filter>Lithe</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Lithe\LayerStack.h">
+      <Filter>Lithe</Filter>
+    </ClInclude>
     <ClInclude Include="src\Lithe\Log.h">
       <Filter>Lithe</Filter>
     </ClInclude>
@@ -47,6 +53,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Lithe\Application.cpp">
+      <Filter>Lithe</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Lithe\Layer.cpp">
+      <Filter>Lithe</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Lithe\LayerStack.cpp">
       <Filter>Lithe</Filter>
     </ClCompile>
     <ClCompile Include="src\Lithe\Log.cpp">
