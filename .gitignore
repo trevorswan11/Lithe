@@ -17,6 +17,7 @@ CMakeUserPresets.json
 .vscode
 bin
 bin-int/
+References/
 
 # Files
 *.user

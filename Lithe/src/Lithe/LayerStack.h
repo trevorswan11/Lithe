@@ -13,7 +13,7 @@ namespace Lithe {
 	{
 	using layer_stack = std::vector<Layer*>;
 	public:
-		LayerStack() = default;
+		LayerStack();
 		~LayerStack();
 
 		void PushLayer(Layer* layer);
@@ -32,7 +32,7 @@ namespace Lithe {
 		layer_stack::const_reverse_iterator rend() const { return m_Layers.rend(); }
 	private:
 		layer_stack m_Layers;
-		unsigned int m_LayerInsertIndex = 0;
+		layer_stack::iterator m_LayerInsert;
 	};
 }
 

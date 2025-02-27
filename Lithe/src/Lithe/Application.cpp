@@ -19,13 +19,11 @@ namespace Lithe {
 	void Application::PushLayer(Layer* layer)
 	{
 		m_LayerStack.PushLayer(layer);
-		layer->OnAttach();
 	}
 
-	void Application::PushOverlay(Layer* overlay)
+	void Application::PushOverlay(Layer* layer)
 	{
-		m_LayerStack.PushOverlay(overlay);
-		overlay->OnAttach();
+		m_LayerStack.PushOverlay(layer);
 	}
 
 	void Application::OnEvent(Event& e)
@@ -35,11 +33,11 @@ namespace Lithe {
 
 		LI_CORE_TRACE("{0}", e);
 
-		for (auto it = m_LayerStack.rbegin(); it != m_LayerStack.rend(); ++it)
+		for (auto it = m_LayerStack.end(); it != m_LayerStack.begin(); )
 		{
+			(*--it)->OnEvent(e);
 			if (e.Handled)
 				break;
-			(*it)->OnEvent(e);
 		}
 	}
 
