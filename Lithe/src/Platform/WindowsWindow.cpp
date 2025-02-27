@@ -5,6 +5,8 @@
 #include "Lithe/Events/MouseEvent.h"
 #include "Lithe/Events/KeyEvent.h"
 
+#include <glad/glad.h>
+
 namespace Lithe {
 	// Only want to initialize GLFW once, but can have multiple windows
 
@@ -56,7 +58,9 @@ namespace Lithe {
 									m_Data.Title.c_str(),
 									nullptr, nullptr);
 		glfwMakeContextCurrent(m_Window);
+		int status = gladLoadGLLoader((GLADloadproc)(glfwGetProcAddress));
 		glfwSetWindowUserPointer(m_Window, &m_Data);
+		LI_CORE_ASSERT(status, "Failed to initialize Glad!");
 
 		// No reason to have VSync off currently, can be altered in SetVSync
 		SetVSync(true);

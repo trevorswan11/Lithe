@@ -12,8 +12,10 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 IncludeDir = {}
 IncludeDir["GLFW"] = "Lithe/vendor/GLFW/include"
+IncludeDir["Glad"] = "Lithe/vendor/Glad/include"
 
 include "Lithe/vendor/GLFW"
+include "Lithe/vendor/Glad"
 
 project "Lithe"
 	location "Lithe"
@@ -38,14 +40,16 @@ project "Lithe"
 	{
 		"%{prj.name}/vendor/spdlog/include",
 		"%{prj.name}/src",
-		"%{IncludeDir.GLFW}"
+		"%{IncludeDir.GLFW}",
+		"%{IncludeDir.Glad}"
 	}
 
 	links
 	{
 		"GLFW",
 		"opengl32.lib",
-		"dwmapi.lib"
+		"dwmapi.lib",
+		"Glad"
 	}
 
 	filter "system:windows"
@@ -57,7 +61,8 @@ project "Lithe"
 		{
 			"LI_PLATFORM_WINDOWS",
 			"LI_BUILD_DLL",
-			"LI_ENABLE_ASSERTS"
+			"LI_ENABLE_ASSERTS",
+			"GLFW_INCLUDE_NONE"
 		}
 
 		postbuildcommands
