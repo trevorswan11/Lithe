@@ -6,6 +6,7 @@
 // pressed then it will repeat the key event until key released is called
 
 namespace Lithe {
+
 	// An abstract class to define common KeyEvent behavior
 	class LITHE_API KeyEvent : public Event
 	{
@@ -58,4 +59,5 @@ namespace Lithe {
 
 		EVENT_CLASS_TYPE(KeyPressed)
 	};
+
 }

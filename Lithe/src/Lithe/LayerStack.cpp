@@ -2,6 +2,7 @@
 #include "LayerStack.h"
 
 namespace Lithe {
+
 	LayerStack::LayerStack()
 	{
 		m_LayerInsert = m_Layers.begin();
@@ -39,4 +40,5 @@ namespace Lithe {
 		if (it != m_Layers.end())
 			m_Layers.erase(it);
 	}
+
 }

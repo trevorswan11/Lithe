@@ -6,6 +6,7 @@
 #include "Lithe/Events/Event.h"
 
 namespace Lithe {
+
 	// Defines properties to be defined by any window
 	struct WindowProps
 	{
@@ -43,4 +44,5 @@ namespace Lithe {
 
 		static Window* Create(const WindowProps& props = WindowProps());
 	};
+
 }

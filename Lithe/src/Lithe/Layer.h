@@ -4,6 +4,7 @@
 #include "Lithe/Events/Event.h"
 
 namespace Lithe {
+
 	class LITHE_API Layer
 	{
 	public:
@@ -20,5 +21,6 @@ namespace Lithe {
 		std::string m_DebugName;
 		bool m_Enabled;
 	};
+
 }
 

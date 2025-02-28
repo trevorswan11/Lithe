@@ -3,6 +3,7 @@
 #include "Event.h"
 
 namespace Lithe {
+
 	// Handles window Resizing, including minimizing the Application
 	class LITHE_API WindowResizeEvent : public Event
 	{
@@ -67,4 +68,5 @@ namespace Lithe {
 		EVENT_CLASS_TYPE(AppRender)
 		EVENT_CLASS_CATEGORY(EventCategoryApplication)
 	};
+
 }

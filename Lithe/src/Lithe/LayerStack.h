@@ -34,5 +34,6 @@ namespace Lithe {
 		layer_stack m_Layers;
 		layer_stack::iterator m_LayerInsert;
 	};
+
 }
 

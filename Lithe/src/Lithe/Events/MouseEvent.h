@@ -3,6 +3,7 @@
 #include "Event.h"
 
 namespace Lithe {
+
 	// Handles Mouse Moving
 	class LITHE_API MouseMovedEvent : public Event
 	{
@@ -102,4 +103,5 @@ namespace Lithe {
 
 		EVENT_CLASS_TYPE(MouseButtonReleased)
 	};
+
 }

@@ -3,6 +3,7 @@
 #include "spdlog/sinks/stdout_color_sinks.h"
 
 namespace Lithe {
+
 	// CORE: Handles all logging events; names LITHE
 	std::shared_ptr<spdlog::logger> Log::s_CoreLogger;
 	// CLEINT: Handles all logging events; named APP
@@ -18,4 +19,5 @@ namespace Lithe {
 		s_ClientLogger = spdlog::stdout_color_mt("APP");
 		s_ClientLogger->set_level(spdlog::level::trace);
 	}
+
 }

@@ -8,6 +8,7 @@
 #include <glad/glad.h>
 
 namespace Lithe {
+
 	// Only want to initialize GLFW once, but can have multiple windows
 
 	static bool s_GLFWInitialized = false;

@@ -3,6 +3,7 @@
 #include "Lithe/Core.h"
 
 namespace Lithe {
+
 	// Specifies the exact type of the event, which can be:
 	// - None
 	// - Window Events: WindowClose, WindowResize, WindowFocus, WindowLostFocus, WindowMoved,
@@ -97,4 +98,5 @@ namespace Lithe {
 	{
 		return e.ToString();
 	}
+
 }

@@ -4,3 +4,6 @@
 [submodule "Lithe/vendor/GLFW"]
 	path = Lithe/vendor/GLFW
 	url = https://github.com/TheCherno/GLFW
+[submodule "Lithe/vendor/imgui"]
+	path = Lithe/vendor/imgui
+	url = https://github.com/trevorswan11/imgui

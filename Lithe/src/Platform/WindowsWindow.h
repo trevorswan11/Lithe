@@ -5,6 +5,7 @@
 #include <GLFW/glfw3.h>
 
 namespace Lithe {
+
 	// Base class for Widndow's Widnows
 	class WindowsWindow : public Window
 	{
