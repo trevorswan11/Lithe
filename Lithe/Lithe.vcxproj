@@ -173,7 +173,7 @@ copy /B /Y "..\bin\Dist-windows-x86_64\Lithe\Lithe.dll" "$(SolutionDir)\bin\Dist
     <ClInclude Include="src\Lithe\Log.h" />
     <ClInclude Include="src\Lithe\Window.h" />
     <ClInclude Include="src\Platform\OpenGL\ImGuiOpenGLRenderer.h" />
-    <ClInclude Include="src\Platform\WindowsWindow.h" />
+    <ClInclude Include="src\Platform\Windows\WindowsWindow.h" />
     <ClInclude Include="src\lipch.h" />
   </ItemGroup>
   <ItemGroup>
@@ -183,7 +183,7 @@ copy /B /Y "..\bin\Dist-windows-x86_64\Lithe\Lithe.dll" "$(SolutionDir)\bin\Dist
     <ClCompile Include="src\Lithe\LayerStack.cpp" />
     <ClCompile Include="src\Lithe\Log.cpp" />
     <ClCompile Include="src\Platform\OpenGL\ImGuiOpenGLRenderer.cpp" />
-    <ClCompile Include="src\Platform\WindowsWindow.cpp" />
+    <ClCompile Include="src\Platform\Windows\WindowsWindow.cpp" />
     <ClCompile Include="src\lipch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
