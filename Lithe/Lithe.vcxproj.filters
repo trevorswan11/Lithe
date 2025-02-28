@@ -7,8 +7,14 @@
     <Filter Include="Lithe\Events">
       <UniqueIdentifier>{FF28AFBC-EB8B-3E61-9411-771780530AE4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Lithe\ImGui">
+      <UniqueIdentifier>{E53A29C0-51F0-A1B5-DAE4-9B8C469998B9}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Platform">
       <UniqueIdentifier>{2AC788B4-1694-E3BF-3FAD-D1672BD9184E}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Platform\OpenGL">
+      <UniqueIdentifier>{1E7D2C1D-8A08-9AE1-9319-1DD6FF23F6E1}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -34,6 +40,9 @@
     <ClInclude Include="src\Lithe\Events\MouseEvent.h">
       <Filter>Lithe\Events</Filter>
     </ClInclude>
+    <ClInclude Include="src\Lithe\ImGui\ImGuiLayer.h">
+      <Filter>Lithe\ImGui</Filter>
+    </ClInclude>
     <ClInclude Include="src\Lithe\Layer.h">
       <Filter>Lithe</Filter>
     </ClInclude>
@@ -46,6 +55,9 @@
     <ClInclude Include="src\Lithe\Window.h">
       <Filter>Lithe</Filter>
     </ClInclude>
+    <ClInclude Include="src\Platform\OpenGL\ImGuiOpenGLRenderer.h">
+      <Filter>Platform\OpenGL</Filter>
+    </ClInclude>
     <ClInclude Include="src\Platform\WindowsWindow.h">
       <Filter>Platform</Filter>
     </ClInclude>
@@ -55,6 +67,9 @@
     <ClCompile Include="src\Lithe\Application.cpp">
       <Filter>Lithe</Filter>
     </ClCompile>
+    <ClCompile Include="src\Lithe\ImGui\ImGuiLayer.cpp">
+      <Filter>Lithe\ImGui</Filter>
+    </ClCompile>
     <ClCompile Include="src\Lithe\Layer.cpp">
       <Filter>Lithe</Filter>
     </ClCompile>
@@ -63,6 +78,9 @@
     </ClCompile>
     <ClCompile Include="src\Lithe\Log.cpp">
       <Filter>Lithe</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Platform\OpenGL\ImGuiOpenGLRenderer.cpp">
+      <Filter>Platform\OpenGL</Filter>
     </ClCompile>
     <ClCompile Include="src\Platform\WindowsWindow.cpp">
       <Filter>Platform</Filter>
