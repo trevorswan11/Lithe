@@ -9,9 +9,8 @@ extern Lithe::Application* Lithe::CreateApplication();
 int main(int argc, char** argv)
 {
 	Lithe::Log::Init();
-	LI_CORE_WARN("Initialized Log");
-	int a = 5;
-	LI_INFO("Heyo! Var={0}", a);
+	LI_CORE_INFO("Initialized Log");
+	LI_INFO("Initialized Log");
 
 	auto app = Lithe::CreateApplication();
 	app->Run();

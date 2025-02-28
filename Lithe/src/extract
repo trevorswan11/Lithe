@@ -1,0 +1,20 @@
+
+import os
+
+def write_all_files_to_one(output_file="output.txt"):
+    with open(output_file, "w", encoding="utf-8") as f:
+        for root, _, files in os.walk("."):
+            for file in files:
+                file_path = os.path.join(root, file)
+                if file_path == os.path.abspath(output_file):
+                    continue  # Skip the output file itself
+                try:
+                    with open(file_path, "r", encoding="utf-8", errors="ignore") as current_file:
+                        f.write(f"=== {file_path} ===\n")
+                        f.write(current_file.read())
+                        f.write("\n\n")
+                except Exception as e:
+                    print(f"Could not read {file_path}: {e}")
+
+if __name__ == "__main__":
+    write_all_files_to_one()

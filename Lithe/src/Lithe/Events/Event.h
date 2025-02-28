@@ -8,7 +8,7 @@ namespace Lithe {
 	// - None
 	// - Window Events: WindowClose, WindowResize, WindowFocus, WindowLostFocus, WindowMoved,
 	// - App Events: AppTick, AppUpdate, AppRender,
-	// - Key Events: KeyPressed, KeyReleased,
+	// - Key Events: KeyPressed, KeyReleased, KeyTyped
 	// - Mouse Events: MouseButtonPressed, MouseButtonReleased, MouseMoved, MouseScrolled
 	// All of which have their own specific implementations/uses
 	enum class EventType
@@ -16,7 +16,7 @@ namespace Lithe {
 		None = 0,
 		WindowClose, WindowResize, WindowFocus, WindowLostFocus, WindowMoved,
 		AppTick, AppUpdate, AppRender,
-		KeyPressed, KeyReleased,
+		KeyPressed, KeyReleased, KeyTyped,
 		MouseButtonPressed, MouseButtonReleased, MouseMoved, MouseScrolled
 	};
 

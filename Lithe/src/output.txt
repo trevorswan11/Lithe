@@ -1,0 +1,1863 @@
+=== .\extract ===
+
+import os
+
+def write_all_files_to_one(output_file="output.txt"):
+    with open(output_file, "w", encoding="utf-8") as f:
+        for root, _, files in os.walk("."):
+            for file in files:
+                file_path = os.path.join(root, file)
+                if file_path == os.path.abspath(output_file):
+                    continue  # Skip the output file itself
+                try:
+                    with open(file_path, "r", encoding="utf-8", errors="ignore") as current_file:
+                        f.write(f"=== {file_path} ===\n")
+                        f.write(current_file.read())
+                        f.write("\n\n")
+                except Exception as e:
+                    print(f"Could not read {file_path}: {e}")
+
+if __name__ == "__main__":
+    write_all_files_to_one()
+
+
+=== .\lipch.cpp ===
+#include "lipch.h"
+
+=== .\lipch.h ===
+#pragma once
+
+// Include this header file as the first import in any project cpp files!
+
+#include <iostream>
+#include <memory>
+#include <utility>
+#include <algorithm>
+#include <functional>
+
+#include <string>
+#include <sstream>
+#include <vector>
+#include <unordered_map>
+#include <unordered_set>
+
+#include "Lithe/Log.h"
+#include "Lithe/Core.h"
+#include "Lithe/Window.h"
+#include "Lithe/Application.h"
+
+#ifdef LI_PLATFORM_WINDOWS
+	#include <Windows.h>
+#endif
+
+
+=== .\Lithe.h ===
+#pragma once
+
+// For use by Lithe applications
+
+#include "Lithe/Application.h"
+#include "Lithe/Layer.h"
+#include "Lithe/Log.h"
+#include "Lithe/ImGui/ImGuiLayer.h"
+
+// ---Entry Point---
+#include "Lithe/EntryPoint.h"
+// -----------------
+
+=== .\output.txt ===
+
+
+=== .\Lithe\Application.cpp ===
+#include "lipch.h"
+#include "Application.h"
+
+#include <glad/glad.h>
+
+namespace Lithe {
+
+	Application* Application::s_Instance = nullptr;
+
+	Application::Application()
+	{
+		LI_CORE_ASSERT(!s_Instance, "Application already exists!");
+		s_Instance = this;
+
+		m_Window = std::unique_ptr<Window>(Window::Create());
+		m_Window->SetEventCallback(LI_BIND_EVENT_FN(Application::OnEvent));
+	}
+
+	Application::~Application()
+	{
+
+	}
+
+	void Application::PushLayer(Layer* layer)
+	{
+		m_LayerStack.PushLayer(layer);
+		layer->OnAttach();
+	}
+
+	void Application::PushOverlay(Layer* layer)
+	{
+		m_LayerStack.PushOverlay(layer);
+		layer->OnAttach();
+	}
+
+	void Application::OnEvent(Event& e)
+	{
+		EventDispatcher dispatcher(e);
+		dispatcher.Dispatch<WindowCloseEvent>(LI_BIND_EVENT_FN(Application::OnWindowClose));
+
+		LI_CORE_TRACE("{0}", e);
+
+		for (auto it = m_LayerStack.end(); it != m_LayerStack.begin(); )
+		{
+			(*--it)->OnEvent(e);
+			if (e.Handled)
+				break;
+		}
+	}
+
+	void Application::Run()
+	{
+		while (m_Running)
+		{
+			glClearColor(1, 0, 1, 1);
+			glClear(GL_COLOR_BUFFER_BIT);
+
+			for (Layer* l : m_LayerStack) l->OnUpdate();
+
+			m_Window->OnUpdate();
+		}
+	}
+
+	bool Application::OnWindowClose(WindowCloseEvent& e)
+	{
+		m_Running = false;
+		return true;
+	}
+
+}
+
+=== .\Lithe\Application.h ===
+#pragma once
+
+#include "Core.h"
+
+#include "Window.h"
+#include "Lithe/LayerStack.h"
+#include "Lithe/Events/Event.h"
+#include "Lithe/Events/ApplicationEvent.h"
+
+namespace Lithe {
+
+	class LITHE_API Application
+	{
+	public:
+		Application();
+		virtual ~Application();
+
+		void Run();
+
+		void OnEvent(Event& e);
+
+		void PushLayer(Layer* layer);
+		void PushOverlay(Layer* layer);
+
+		inline static Application& Get() { return *s_Instance; }
+		inline Window& GetWindow() { return *m_Window; }
+	private:
+		bool OnWindowClose(WindowCloseEvent& e);
+
+		std::unique_ptr<Window> m_Window;
+		bool m_Running = true;
+		LayerStack m_LayerStack;
+	private:
+		static Application* s_Instance;
+	};
+
+	// To be defined in CLIENT
+	Application* CreateApplication();
+
+}
+
+
+
+
+=== .\Lithe\Core.h ===
+#pragma once
+
+#ifdef LI_PLATFORM_WINDOWS
+	#ifdef LI_BUILD_DLL
+		// Macro for exports in core engine
+		#define LITHE_API __declspec(dllexport)
+	#else
+		// Macro for imports in derived applications
+		#define LITHE_API __declspec(dllimport)
+	#endif
+#else
+	// For now, Lithe will only be built to support windows
+	#error Lithe only supports Windows.
+#endif
+
+// Assertions if enabled, specified in premake for debug only
+
+#ifdef LI_ENABLE_ASSERTS
+	// CLIENT: Breaks debugging (fatal error) if condition is not met, prints qualifying information
+	#define LI_ASSERT(x, ...) { if(!(x)) { LI_ERROR("Assertion Failed: {0}", __VA_ARGS__); __debugbreak(); } }
+	// CORE: Breaks debugging (fatal error) if condition is not met, prints qualifying information
+	#define LI_CORE_ASSERT(x, ...) { if(!(x)) { LI_CORE_ERROR("Assertion Failed: {0}", __VA_ARGS__); __debugbreak(); } }
+#else
+	// CLIENT: Does nothing without LI_ENABLE_ASSERTS
+	#define LI_ASSERT(x, ...)
+	// CORE: Does nothing without LI_ENABLE_ASSERTS
+	#define LI_CORE_ASSERT(x, ...)
+#endif
+
+// Creates a bitmask with only the x-th bit set
+#define BIT(x) (1 << x)
+
+#define LI_BIND_EVENT_FN(fn) std::bind(&fn, this, std::placeholders::_1)
+
+=== .\Lithe\EntryPoint.h ===
+#pragma once
+
+#include "Core.h"
+
+#ifdef LI_PLATFORM_WINDOWS
+
+extern Lithe::Application* Lithe::CreateApplication();
+
+int main(int argc, char** argv)
+{
+	Lithe::Log::Init();
+	LI_CORE_INFO("Initialized Log");
+	LI_INFO("Initialized Log");
+
+	auto app = Lithe::CreateApplication();
+	app->Run();
+	delete app;
+}
+
+#endif
+
+=== .\Lithe\Layer.cpp ===
+#include "lipch.h"
+#include "Layer.h"
+
+namespace Lithe {
+
+	Layer::Layer(const std::string& debugName)
+		: m_DebugName(debugName) {}
+
+	Layer::~Layer() {}
+
+}
+
+=== .\Lithe\Layer.h ===
+#pragma once
+
+#include "Lithe/Core.h"
+#include "Lithe/Events/Event.h"
+
+namespace Lithe {
+
+	class LITHE_API Layer
+	{
+	public:
+		Layer(const std::string& name = "Layer");
+		virtual ~Layer();
+
+		virtual void OnAttach() {}
+		virtual void OnDetach() {}
+		virtual void OnUpdate() {}
+		virtual void OnEvent(Event& event) {}
+
+		inline const std::string& GetName() const { return m_DebugName; }
+	protected:
+		std::string m_DebugName;
+		bool m_Enabled;
+	};
+
+}
+
+
+
+=== .\Lithe\LayerStack.cpp ===
+#include "lipch.h"
+#include "LayerStack.h"
+
+namespace Lithe {
+
+	LayerStack::LayerStack()
+	{
+		m_LayerInsert = m_Layers.begin();
+	}
+
+	LayerStack::~LayerStack()
+	{
+		for (Layer* l : m_Layers)
+			delete l;
+	}
+
+	void LayerStack::PushLayer(Layer* layer)
+	{
+		m_LayerInsert = m_Layers.emplace(m_LayerInsert, layer);
+	}
+
+	void LayerStack::PushOverlay(Layer* overlay)
+	{
+		m_Layers.emplace_back(overlay);
+	}
+
+	void LayerStack::PopLayer(Layer* layer)
+	{
+		auto it = std::find(m_Layers.begin(), m_Layers.end(), layer);
+		if (it != m_Layers.end())
+		{
+			m_Layers.erase(it);
+			m_LayerInsert--;
+		}
+	}
+
+	void LayerStack::PopOverlay(Layer* overlay)
+	{
+		auto it = std::find(m_Layers.begin(), m_Layers.end(), overlay);
+		if (it != m_Layers.end())
+			m_Layers.erase(it);
+	}
+
+}
+
+=== .\Lithe\LayerStack.h ===
+#pragma once
+
+#include  "Lithe/Core.h"
+#include "Layer.h"
+
+#include <vector>
+
+namespace Lithe {
+
+	// LayerStack is owned by the applcaiton, layers should live for a long long time
+
+	class LITHE_API LayerStack
+	{
+	using layer_stack = std::vector<Layer*>;
+	public:
+		LayerStack();
+		~LayerStack();
+
+		void PushLayer(Layer* layer);
+		void PushOverlay(Layer* overlay);
+		void PopLayer(Layer* layer);
+		void PopOverlay(Layer* overlay);
+
+		layer_stack::iterator begin() { return m_Layers.begin(); }
+		layer_stack::iterator end() { return m_Layers.end(); }
+		layer_stack::reverse_iterator rbegin() { return m_Layers.rbegin(); }
+		layer_stack::reverse_iterator rend() { return m_Layers.rend(); }
+
+		layer_stack::const_iterator begin() const { return m_Layers.begin(); }
+		layer_stack::const_iterator end()	const { return m_Layers.end(); }
+		layer_stack::const_reverse_iterator rbegin() const { return m_Layers.rbegin(); }
+		layer_stack::const_reverse_iterator rend() const { return m_Layers.rend(); }
+	private:
+		layer_stack m_Layers;
+		layer_stack::iterator m_LayerInsert;
+	};
+
+}
+
+
+
+=== .\Lithe\Log.cpp ===
+#include "lipch.h"
+
+#include "spdlog/sinks/stdout_color_sinks.h"
+
+namespace Lithe {
+
+	// CORE: Handles all logging events; names LITHE
+	std::shared_ptr<spdlog::logger> Log::s_CoreLogger;
+	// CLEINT: Handles all logging events; named APP
+	std::shared_ptr<spdlog::logger> Log::s_ClientLogger;
+
+	// Initializes the Loggers with their format specifiers and names
+	void Log::Init()
+	{
+		spdlog::set_pattern("%^[%T] %n: %v%$");
+		s_CoreLogger = spdlog::stdout_color_mt("LITHE");
+		s_CoreLogger->set_level(spdlog::level::trace);
+
+		s_ClientLogger = spdlog::stdout_color_mt("APP");
+		s_ClientLogger->set_level(spdlog::level::trace);
+	}
+
+}
+
+=== .\Lithe\Log.h ===
+#pragma once
+
+#include "Core.h"
+
+#include "spdlog/spdlog.h"
+#include "spdlog/fmt/ostr.h"
+
+namespace Lithe {
+
+	// Handles applciation wide logging
+	class LITHE_API Log
+	{
+	public:
+		static void Init();
+
+		inline static std::shared_ptr<spdlog::logger>& GetCoreLogger() { return s_CoreLogger; }
+		inline static std::shared_ptr<spdlog::logger>& GetClientLogger() { return s_ClientLogger; }
+	private:
+		static std::shared_ptr<spdlog::logger> s_CoreLogger;
+		static std::shared_ptr<spdlog::logger> s_ClientLogger;
+	};
+
+}
+
+// Core log macros
+
+#define LI_CORE_TRACE(...)		::Lithe::Log::GetCoreLogger()->trace(__VA_ARGS__)
+#define LI_CORE_INFO(...)		::Lithe::Log::GetCoreLogger()->info(__VA_ARGS__)
+#define LI_CORE_WARN(...)		::Lithe::Log::GetCoreLogger()->warn(__VA_ARGS__)
+#define LI_CORE_ERROR(...)		::Lithe::Log::GetCoreLogger()->error(__VA_ARGS__)
+#define LI_CORE_CRTITICAL(...)	::Lithe::Log::GetCoreLogger()->critical(__VA_ARGS__)
+
+// Client log macros
+
+#define LI_TRACE(...)			::Lithe::Log::GetClientLogger()->trace(__VA_ARGS__)
+#define LI_INFO(...)			::Lithe::Log::GetClientLogger()->info(__VA_ARGS__)
+#define LI_WARN(...)			::Lithe::Log::GetClientLogger()->warn(__VA_ARGS__)
+#define LI_ERROR(...)			::Lithe::Log::GetClientLogger()->error(__VA_ARGS__)
+#define LI_CRTITICAL(...)		::Lithe::Log::GetClientLogger()->critical(__VA_ARGS__)
+
+// if dist build -- Prevents core logging
+// 
+//#define LI_CORE_TRACE(...)
+//#define LI_CORE_INFO(...)
+//#define LI_CORE_WARN(...)
+//#define LI_CORE_ERROR(...)
+//#define LI_CORE_CRTITICAL(...)
+
+=== .\Lithe\Window.h ===
+#pragma once
+
+#include "lipch.h"
+
+#include "Lithe/Core.h"
+#include "Lithe/Events/Event.h"
+
+namespace Lithe {
+
+	// Defines properties to be defined by any window
+	struct WindowProps
+	{
+		std::string Title;
+		unsigned int Width;
+		unsigned int Height;
+
+		// Sets default parameters for properties
+		WindowProps(const std::string&& title = "Lithe Engine",
+				unsigned int width = 1280,
+				unsigned int height = 720)
+			: Title(title), Width(width), Height(height)
+		{
+		}
+	};
+
+	// Interface represeting desktop system based Window
+	class LITHE_API Window
+	{
+	public:
+		using EventCallbackFn = std::function<void(Event&)>;
+
+		virtual ~Window() {};
+
+		virtual void OnUpdate() = 0;
+
+		virtual unsigned int GetWidth() const = 0;
+		virtual unsigned int GetHeight() const = 0;
+
+		// Window attributes
+
+		virtual void SetEventCallback(const EventCallbackFn& callback) = 0;
+		virtual void SetVSync(bool enabled) = 0;
+		virtual bool IsVSync() const = 0;
+
+		static Window* Create(const WindowProps& props = WindowProps());
+	};
+
+}
+
+=== .\Lithe\Events\ApplicationEvent.h ===
+#pragma once
+
+#include "Event.h"
+
+namespace Lithe {
+
+	// Handles window Resizing, including minimizing the Application
+	class LITHE_API WindowResizeEvent : public Event
+	{
+	public:
+		WindowResizeEvent(unsigned int width, unsigned int height)
+			: m_Width(width), m_Height(height) {}
+
+		inline unsigned int GetWidth() const { return m_Width; }
+		inline unsigned int GetHeight() const { return m_Height; }
+
+		// Formats the event with the windows new width and height
+		std::string ToString() const override
+		{
+			std::stringstream ss;
+			ss << "WindowResizeEvent: " << m_Width << ", " << m_Height;
+			return ss.str();
+		}
+
+		EVENT_CLASS_TYPE(WindowResize)
+		EVENT_CLASS_CATEGORY(EventCategoryApplication)
+	private:
+		unsigned int m_Width, m_Height;
+	};
+
+	// Handles the Close Button on Applications
+	class LITHE_API WindowCloseEvent : public Event
+	{
+	public:
+		WindowCloseEvent() {}
+
+		EVENT_CLASS_TYPE(WindowClose)
+		EVENT_CLASS_CATEGORY(EventCategoryApplication)
+
+		// ToString not needed, closing the app ends the terminal debug instance
+	};
+
+	// ---May remove implementation in the future---
+
+	class LITHE_API AppTickEvent : public Event
+	{
+	public:
+		AppTickEvent() {}
+
+		EVENT_CLASS_TYPE(AppTick)
+		EVENT_CLASS_CATEGORY(EventCategoryApplication)
+	};
+
+	class LITHE_API AppUpdateEvent : public Event
+	{
+	public:
+		AppUpdateEvent() {}
+
+		EVENT_CLASS_TYPE(AppUpdate)
+		EVENT_CLASS_CATEGORY(EventCategoryApplication)
+	};
+
+	class LITHE_API AppRenderEvent : public Event
+	{
+	public:
+		AppRenderEvent() {}
+
+		EVENT_CLASS_TYPE(AppRender)
+		EVENT_CLASS_CATEGORY(EventCategoryApplication)
+	};
+
+}
+
+=== .\Lithe\Events\Event.h ===
+#pragma once
+
+#include "Lithe/Core.h"
+
+namespace Lithe {
+
+	// Specifies the exact type of the event, which can be:
+	// - None
+	// - Window Events: WindowClose, WindowResize, WindowFocus, WindowLostFocus, WindowMoved,
+	// - App Events: AppTick, AppUpdate, AppRender,
+	// - Key Events: KeyPressed, KeyReleased, KeyTyped
+	// - Mouse Events: MouseButtonPressed, MouseButtonReleased, MouseMoved, MouseScrolled
+	// All of which have their own specific implementations/uses
+	enum class EventType
+	{
+		None = 0,
+		WindowClose, WindowResize, WindowFocus, WindowLostFocus, WindowMoved,
+		AppTick, AppUpdate, AppRender,
+		KeyPressed, KeyReleased, KeyTyped,
+		MouseButtonPressed, MouseButtonReleased, MouseMoved, MouseScrolled
+	};
+
+	// Provides a filter for different events -- acts as a trait; An event can fall into more than one category:
+	// - None
+	// - EventCategoryApplication
+	// - EventCategoryInput
+	// - EventCategoryKeyboard
+	// - EventCategoryMouse
+	// - EventCategoryMouseButton
+	// These are used as qualifiers for the EVENT_CLASS_CATEGORY macro
+	enum EventCategory
+	{
+		None = 0,
+		EventCategoryApplication =	BIT(0),
+		EventCategoryInput =		BIT(1),
+		EventCategoryKeyboard =		BIT(2),
+		EventCategoryMouse =		BIT(3),
+		EventCategoryMouseButton =	BIT(4)
+	};
+
+// Macro to initialize usefl getter methods while reducing bloat and code duplication
+#define EVENT_CLASS_TYPE(type) static EventType GetStaticType() { return EventType::##type; }\
+								virtual EventType GetEventType() const override { return GetStaticType(); }\
+								virtual const char* GetName() const override { return #type; }
+
+// Doesn't necessarily need to be a macro, but acts as a common declaration for implementation behavior
+#define EVENT_CLASS_CATEGORY(category) virtual int GetCategoryFlags() const override { return category; }
+
+	// Base class for any event, defining shared behavior and implementation
+	class LITHE_API Event
+	{
+		friend class EventDispatcher;
+	public:
+		bool Handled = false;
+		// Pure virtual functions, like GetEventType, GetName, and GetCategoryFlags MUST be implemented
+
+		virtual EventType GetEventType() const = 0;
+		virtual const char* GetName() const = 0;
+		virtual int GetCategoryFlags() const = 0;
+		// ToString is going to be purely debug, performance will not be considered
+
+		virtual std::string ToString() const { return GetName(); } // Can override to print special information
+
+		// Determines if an event is part of a given category, but does not guarantee ownership by a single category
+		inline bool IsInCategory(EventCategory category)
+		{
+			return GetCategoryFlags() & category;
+		}
+	};
+
+	// Dispatches any received event through the application
+	class EventDispatcher
+	{
+		template<typename T>
+		using EventFn = std::function<bool(T&)>;
+	public:
+		EventDispatcher(Event& event)
+			: m_Event(event) {}
+
+		// Dispatches any event using a specified function 
+		template<typename T>
+		bool Dispatch(EventFn<T> func)
+		{
+			// Check the inputted event aginst the template type (template types declared as <Type>)
+			if (m_Event.GetEventType() == T::GetStaticType())
+			{
+				m_Event.Handled = func(*(T*)&m_Event);
+				return true;
+			}
+			return false;
+		}
+	private:
+		Event& m_Event;
+	};
+
+	// Assists in correct logging of events
+	inline std::string format_as(const Event& e)
+	{
+		return e.ToString();
+	}
+
+}
+
+=== .\Lithe\Events\KeyEvent.h ===
+#pragma once
+
+#include "Event.h"
+
+// OS will take a key pressed event, and then if the key is still 
+// pressed then it will repeat the key event until key released is called
+
+namespace Lithe {
+
+	// An abstract class to define common KeyEvent behavior
+	class LITHE_API KeyEvent : public Event
+	{
+	public:
+		inline int GetKeyCode() const { return m_KeyCode; }
+
+		// Any keyboard event is also an input event, so or them together
+		EVENT_CLASS_CATEGORY(EventCategoryKeyboard | EventCategoryInput)
+	protected:
+		KeyEvent(int keycode) : m_KeyCode(keycode) {}
+		int m_KeyCode;
+	};
+
+	// Handles Key Pressed and Repeat events as well 
+	class LITHE_API KeyPressedEvent : public KeyEvent
+	{
+	public:
+		KeyPressedEvent(int keycode, int repeatCount)
+			: KeyEvent(keycode), m_RepeatCount(repeatCount) {}
+
+		inline int GetRepeatCount() const { return m_RepeatCount; }
+
+		// Formats the event with its code followed by the number of repeats
+		std::string ToString() const override
+		{
+			std::stringstream ss;
+			ss << "KeyPressedEvent: " << m_KeyCode << " (" << m_RepeatCount << " repeats)";
+			return ss.str();
+		}
+
+		EVENT_CLASS_TYPE(KeyPressed)
+	private:
+		int m_RepeatCount;
+	};
+
+	// Handles Key Released events
+	class LITHE_API KeyReleasedEvent : public KeyEvent
+	{
+	public:
+		KeyReleasedEvent(int keycode)
+			: KeyEvent(keycode) {}
+
+		// Formats the event to include its keycode
+		std::string ToString() const override
+		{
+			std::stringstream ss;
+			ss << "KeyReleasedEvent: " << m_KeyCode;
+			return ss.str();
+		}
+
+		EVENT_CLASS_TYPE(KeyPressed)
+	};
+
+	// Handles Key Typed Events - required by ImGui
+	class LITHE_API KeyTypedEvent : public KeyEvent
+	{
+	public:
+		KeyTypedEvent(int keycode)
+			: KeyEvent(keycode) {
+		}
+
+		std::string ToString() const override
+		{
+			std::stringstream ss;
+			ss << "KeyTypedEvent: " << m_KeyCode;
+			return ss.str();
+		}
+
+		EVENT_CLASS_TYPE(KeyTyped)
+	};
+
+}
+
+=== .\Lithe\Events\MouseEvent.h ===
+#pragma once
+
+#include "Event.h"
+
+namespace Lithe {
+
+	// Handles Mouse Moving
+	class LITHE_API MouseMovedEvent : public Event
+	{
+	public:
+		MouseMovedEvent(float x, float y)
+			: m_MouseX(x), m_MouseY(y) {}
+
+		inline float GetX() const { return m_MouseX; }
+		inline float GetY() const { return m_MouseY; }
+
+		// Formats the event with the mouse's coordinates
+		std::string ToString() const override
+		{
+			std::stringstream ss;
+			ss << "MouseMovedEvent: " << GetX() << ", " << GetY();
+			return ss.str();
+		}
+
+		EVENT_CLASS_TYPE(MouseMoved)
+		EVENT_CLASS_CATEGORY(EventCategoryMouse | EventCategoryInput)
+	private:
+		float m_MouseX, m_MouseY;
+	};
+
+	// Handles Mouse Scrolling
+	class LITHE_API MouseScrolledEvent : public Event
+	{
+	public:
+		MouseScrolledEvent(float x, float y)
+			: m_XOffset(x), m_YOffset(y) {
+		}
+
+		inline float GetXOffset() const { return m_XOffset; }
+		inline float GetYOffset() const { return m_YOffset; }
+
+		// Formats the event with the mouse's coordinate offset
+		std::string ToString() const override
+		{
+			std::stringstream ss;
+			ss << "MouseMovedEvent: " << GetXOffset() << ", " << GetYOffset();
+			return ss.str();
+		}
+
+		EVENT_CLASS_TYPE(MouseMoved)
+		EVENT_CLASS_CATEGORY(EventCategoryMouse | EventCategoryInput)
+	private:
+		float m_XOffset, m_YOffset;
+	};
+
+	// Abstract class for specifc mouse button events
+	class LITHE_API MouseButtonEvent : public Event
+	{
+	public:
+		inline int GetMouseButton() const { return m_Button; }
+
+		EVENT_CLASS_CATEGORY(EventCategoryMouse | EventCategoryInput)
+	protected:
+		MouseButtonEvent(int button)
+			: m_Button(button) {}
+
+		int m_Button;
+	};
+
+	// Handles mouse button presses
+	class LITHE_API MouseButtonPressedEvent : public MouseButtonEvent
+	{
+	public:
+		MouseButtonPressedEvent(int button)
+			: MouseButtonEvent(button) {}
+
+		// Formats the event with the buttons qualifier
+		std::string ToString() const override
+		{
+			std::stringstream ss;
+			ss << "MouseButtonPressedEvent: " << m_Button;
+			return ss.str();
+		}
+
+		EVENT_CLASS_TYPE(MouseButtonPressed)
+	};
+
+	// Handles mouse button releases
+	class LITHE_API MouseButtonReleasedEvent : public MouseButtonEvent
+	{
+	public:
+		MouseButtonReleasedEvent(int button)
+			: MouseButtonEvent(button) {
+		}
+
+		// Formats the event with the buttons qualifier
+		std::string ToString() const override
+		{
+			std::stringstream ss;
+			ss << "MouseButtonReleasedEvent: " << m_Button;
+			return ss.str();
+		}
+
+		EVENT_CLASS_TYPE(MouseButtonReleased)
+	};
+
+}
+
+=== .\Lithe\ImGui\ImGuiLayer.cpp ===
+#include "lipch.h"
+#include "ImGuiLayer.h"
+
+#include "Platform/OpenGL/ImGuiOpenGLRenderer.h"
+#include "Lithe/Application.h"
+
+// TEMPORARY: should not include glfw here
+#include <GLFW/glfw3.h>
+
+namespace Lithe {
+
+	ImGuiLayer::ImGuiLayer()
+		: Layer("ImGuiLayer") {}
+
+	ImGuiLayer::~ImGuiLayer()
+	{
+
+	}
+
+	void ImGuiLayer::OnAttach()
+	{
+		ImGui::CreateContext();
+		ImGui::StyleColorsDark();
+
+		ImGuiIO& io = ImGui::GetIO();
+		io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;
+		io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;
+
+		// TEMPORARY: should eventually use Hazel key codes
+		io.KeyMap[ImGuiKey_Tab] = GLFW_KEY_TAB;
+		io.KeyMap[ImGuiKey_LeftArrow] = GLFW_KEY_LEFT;
+		io.KeyMap[ImGuiKey_RightArrow] = GLFW_KEY_RIGHT;
+		io.KeyMap[ImGuiKey_UpArrow] = GLFW_KEY_UP;
+		io.KeyMap[ImGuiKey_DownArrow] = GLFW_KEY_DOWN;
+		io.KeyMap[ImGuiKey_PageUp] = GLFW_KEY_PAGE_UP;
+		io.KeyMap[ImGuiKey_PageDown] = GLFW_KEY_PAGE_DOWN;
+		io.KeyMap[ImGuiKey_Home] = GLFW_KEY_HOME;
+		io.KeyMap[ImGuiKey_End] = GLFW_KEY_END;
+		io.KeyMap[ImGuiKey_Insert] = GLFW_KEY_INSERT;
+		io.KeyMap[ImGuiKey_Delete] = GLFW_KEY_DELETE;
+		io.KeyMap[ImGuiKey_Backspace] = GLFW_KEY_BACKSPACE;
+		io.KeyMap[ImGuiKey_Space] = GLFW_KEY_SPACE;
+		io.KeyMap[ImGuiKey_Enter] = GLFW_KEY_ENTER;
+		io.KeyMap[ImGuiKey_Escape] = GLFW_KEY_ESCAPE;
+		io.KeyMap[ImGuiKey_A] = GLFW_KEY_A;
+		io.KeyMap[ImGuiKey_C] = GLFW_KEY_C;
+		io.KeyMap[ImGuiKey_V] = GLFW_KEY_V;
+		io.KeyMap[ImGuiKey_X] = GLFW_KEY_X;
+		io.KeyMap[ImGuiKey_Y] = GLFW_KEY_Y;
+		io.KeyMap[ImGuiKey_Z] = GLFW_KEY_Z;
+
+
+		ImGui_ImplOpenGL3_Init("#version 410");
+	}
+
+	void ImGuiLayer::OnDetach()
+	{
+
+	}
+
+	void ImGuiLayer::OnUpdate()
+	{
+
+		ImGuiIO& io = ImGui::GetIO();
+		Application& app = Application::Get();
+		io.DisplaySize = ImVec2(app.GetWindow().GetWidth(), app.GetWindow().GetHeight());
+
+		float time = (float)glfwGetTime();
+		io.DeltaTime = m_Time > 0.0 ? (time - m_Time) : (1.0f / 60.0f);
+		m_Time = time;
+
+		ImGui_ImplOpenGL3_NewFrame();
+		ImGui::NewFrame();
+
+		static bool show = true;
+		ImGui::ShowDemoWindow(&show);
+
+		ImGui::Render();
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+	}
+
+	void ImGuiLayer::OnEvent(Event& event)
+	{
+		EventDispatcher dispatcher(event);
+		dispatcher.Dispatch<MouseButtonPressedEvent>(LI_BIND_EVENT_FN(ImGuiLayer::OnMouseButtonPressedEvent));
+		dispatcher.Dispatch<MouseButtonReleasedEvent>(LI_BIND_EVENT_FN(ImGuiLayer::OnMouseButtonReleasedEvent));
+		dispatcher.Dispatch<MouseMovedEvent>(LI_BIND_EVENT_FN(ImGuiLayer::OnMouseMovedEvent));
+		dispatcher.Dispatch<MouseScrolledEvent>(LI_BIND_EVENT_FN(ImGuiLayer::OnMouseScrolledEvent));
+		
+		dispatcher.Dispatch<KeyPressedEvent>(LI_BIND_EVENT_FN(ImGuiLayer::OnKeyPressedEvent));
+		dispatcher.Dispatch<KeyReleasedEvent>(LI_BIND_EVENT_FN(ImGuiLayer::OnKeyReleasedEvent));
+		//dispatcher.Dispatch<KeyTypedEvent>(LI_BIND_EVENT_FN(ImGuiLayer::OnKeyTypedEvent));
+
+		dispatcher.Dispatch<WindowResizeEvent>(LI_BIND_EVENT_FN(ImGuiLayer::OnWindowResizeEvent));
+	}
+
+	bool ImGuiLayer::OnMouseButtonPressedEvent(MouseButtonPressedEvent& e)
+	{
+		ImGuiIO& io = ImGui::GetIO();
+		io.AddMouseButtonEvent(e.GetMouseButton(), true);
+
+		return false;
+	}
+
+	bool ImGuiLayer::OnMouseButtonReleasedEvent(MouseButtonReleasedEvent& e)
+	{
+		ImGuiIO& io = ImGui::GetIO();
+		io.AddMouseButtonEvent(e.GetMouseButton(), false);
+
+		return false;
+	}
+
+	bool ImGuiLayer::OnMouseMovedEvent(MouseMovedEvent& e)
+	{
+		ImGuiIO& io = ImGui::GetIO();
+		io.AddMousePosEvent(e.GetX(), e.GetY());
+
+		return false;
+	}
+
+	bool ImGuiLayer::OnMouseScrolledEvent(MouseScrolledEvent& e)
+	{
+		ImGuiIO& io = ImGui::GetIO();
+		io.AddMouseWheelEvent(e.GetXOffset(), e.GetYOffset());
+		io.MouseWheelH += e.GetXOffset();
+		io.MouseWheel += e.GetYOffset();
+
+		return false;
+	}
+
+	bool ImGuiLayer::OnKeyPressedEvent(KeyPressedEvent& e)
+	{
+		return false;
+	}
+
+	bool ImGuiLayer::OnKeyReleasedEvent(KeyReleasedEvent& e)
+	{
+		return false;
+	}
+
+	/*bool ImGuiLayer::OnKeyTypedEvent(KeyTypedEvent& e)
+	{
+	}*/
+
+	bool ImGuiLayer::OnWindowResizeEvent(WindowResizeEvent& e)
+	{
+		return false;
+	}
+
+}
+
+=== .\Lithe\ImGui\ImGuiLayer.h ===
+#pragma once
+
+#include "Lithe/Layer.h"
+#include "Lithe/Events/MouseEvent.h"
+#include "Lithe/Events/KeyEvent.h"
+#include "Lithe/Events/ApplicationEvent.h"
+
+namespace Lithe {
+
+	class LITHE_API ImGuiLayer : public Layer
+	{
+	public:
+		ImGuiLayer();
+		~ImGuiLayer();
+
+		void OnAttach();
+		void OnDetach();
+		void OnUpdate();
+		void OnEvent(Event& event);
+	private:
+		bool OnMouseButtonPressedEvent(MouseButtonPressedEvent& e);
+		bool OnMouseButtonReleasedEvent(MouseButtonReleasedEvent& e);
+		bool OnMouseMovedEvent(MouseMovedEvent& e);
+		bool OnMouseScrolledEvent(MouseScrolledEvent& e);
+		
+		bool OnKeyPressedEvent(KeyPressedEvent& e);
+		bool OnKeyReleasedEvent(KeyReleasedEvent& e);
+		//bool OnKeyTypedEvent(KeyTypedEvent& e);
+		
+		bool OnWindowResizeEvent(WindowResizeEvent& e);
+	private:
+		float m_Time = 0.0f;
+	};
+
+}
+
+=== .\Platform\WindowsWindow.cpp ===
+#include "lipch.h"
+#include "WindowsWindow.h"
+
+#include "Lithe/Events/ApplicationEvent.h"
+#include "Lithe/Events/MouseEvent.h"
+#include "Lithe/Events/KeyEvent.h"
+
+#include <glad/glad.h>
+
+namespace Lithe {
+
+	// Only want to initialize GLFW once, but can have multiple windows
+
+	static bool s_GLFWInitialized = false;
+
+	static void GLFWErrorCallback(int error, const char* description)
+	{
+		LI_CORE_ERROR("GLFW Error ({0}): {1}", error, description);
+	}
+
+	Window* Window::Create(const WindowProps& props)
+	{
+		return new WindowsWindow(props);
+	}
+
+	WindowsWindow::WindowsWindow(const WindowProps& props)
+	{
+		Init(props);
+	}
+
+	// Destroys the window, does NOT shutdown the GLFW process as a whole
+	WindowsWindow::~WindowsWindow()
+	{
+		Shutdown();
+	}
+
+	void WindowsWindow::Init(const WindowProps& props)
+	{
+		m_Data.Title = props.Title;
+		m_Data.Width = props.Width;
+		m_Data.Height = props.Height;
+
+		LI_CORE_INFO("Creating Window {0}, ({1}, {2})", props.Title, props.Width, props.Height);
+
+		if (!s_GLFWInitialized)
+		{
+			// TODO: glfwTerminate on system shutdown
+			int success = glfwInit();
+
+			// This can only trigger if assertions are enabled, otherwise nothing happens
+			LI_CORE_ASSERT(success, "Could not initialize GLFW!");
+
+			glfwSetErrorCallback(GLFWErrorCallback);
+			s_GLFWInitialized = true;
+		}
+
+		m_Window = glfwCreateWindow(static_cast<int>(props.Width), 
+									static_cast<int>(props.Height),
+									m_Data.Title.c_str(),
+									nullptr, nullptr);
+		glfwMakeContextCurrent(m_Window);
+		int status = gladLoadGLLoader((GLADloadproc)(glfwGetProcAddress));
+		glfwSetWindowUserPointer(m_Window, &m_Data);
+		LI_CORE_ASSERT(status, "Failed to initialize Glad!");
+
+		// No reason to have VSync off currently, can be altered in SetVSync
+		SetVSync(true);
+
+		// Set GLFW callbacks
+		glfwSetWindowSizeCallback(m_Window, [](GLFWwindow* window, int width, int height)
+			{
+				WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
+
+				// Update the windows properties
+				data.Width = width;
+				data.Height = height;
+
+				// Dispatch the event
+				WindowResizeEvent event(width, height);
+				data.EventCallback(event);
+			});
+
+		glfwSetWindowCloseCallback(m_Window, [](GLFWwindow* window) 
+			{
+				WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
+				WindowCloseEvent event;
+				data.EventCallback(event);
+			});
+
+		glfwSetKeyCallback(m_Window, [](GLFWwindow* window, int key, int scancode, int action, int mods)
+			{
+				WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
+				
+				// GLFW provides different actions we can use
+				switch (action)
+				{
+					case GLFW_PRESS:
+					{
+						KeyPressedEvent event(key, 0);
+						data.EventCallback(event);
+						break;
+					}
+					case GLFW_RELEASE:
+					{
+						KeyReleasedEvent event(key);
+						data.EventCallback(event);
+						break;
+					}
+					case GLFW_REPEAT:
+					{
+						KeyPressedEvent event(key, 1);
+						data.EventCallback(event);
+						break;
+					}
+				}
+			});
+
+		glfwSetMouseButtonCallback(m_Window, [](GLFWwindow* window, int button, int action, int mods) 
+			{
+				WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
+
+				// Very similar to the Key press event, but no repeating
+				switch (action)
+				{
+					case GLFW_PRESS:
+					{
+						MouseButtonPressedEvent event(button);
+						data.EventCallback(event);
+						break;
+					}
+					case GLFW_RELEASE:
+					{
+						MouseButtonReleasedEvent event(button);
+						data.EventCallback(event);
+						break;
+					}
+				}
+			});
+
+		glfwSetScrollCallback(m_Window, [](GLFWwindow* window, double xOffset, double yOffset) 
+			{
+				WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
+
+				MouseScrolledEvent event(static_cast<float>(xOffset), static_cast<float>(yOffset));
+				data.EventCallback(event);
+			});
+
+		glfwSetCursorPosCallback(m_Window, [](GLFWwindow* window, double xPos, double yPos)
+			{
+				WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
+
+				MouseMovedEvent event(static_cast<float>(xPos), static_cast<float>(yPos));
+				data.EventCallback(event);
+			});
+	}
+
+	void WindowsWindow::Shutdown()
+	{
+		glfwDestroyWindow(m_Window);
+	}
+
+	void WindowsWindow::OnUpdate()
+	{
+		glfwPollEvents();
+		glfwSwapBuffers(m_Window);
+	}
+
+	void WindowsWindow::SetVSync(bool enabled)
+	{
+		if (enabled)
+			glfwSwapInterval(1);
+		else
+			glfwSwapInterval(0);
+
+		m_Data.VSync = enabled;
+	}
+
+	bool WindowsWindow::IsVSync() const
+	{
+		return m_Data.VSync;
+	}
+}
+
+=== .\Platform\WindowsWindow.h ===
+#pragma once
+
+#include "Lithe/Window.h"
+
+#include <GLFW/glfw3.h>
+
+namespace Lithe {
+
+	// Base class for Widndow's Widnows
+	class WindowsWindow : public Window
+	{
+	public:
+		WindowsWindow(const WindowProps& props);
+		virtual ~WindowsWindow();
+
+		void OnUpdate() override;
+
+		inline unsigned int GetWidth() const override { return m_Data.Width; }
+		inline unsigned int GetHeight() const override { return m_Data.Height;  }
+
+		// Window attributes
+
+		inline void SetEventCallback(const EventCallbackFn& callback) override { m_Data.EventCallback = callback; }
+		void SetVSync(bool enabled) override;
+		bool IsVSync() const override;
+	private:
+		virtual void Init(const WindowProps& props);
+		virtual void Shutdown();
+	private:
+		GLFWwindow* m_Window;
+
+		struct WindowData 
+		{
+			std::string Title;
+			unsigned int Width, Height;
+			bool VSync;
+
+			EventCallbackFn EventCallback;
+		};
+
+		WindowData m_Data;
+	};
+}
+
+
+
+=== .\Platform\OpenGL\ImGuiOpenGLRenderer.cpp ===
+// dear imgui: Renderer for OpenGL3 / OpenGL ES2 / OpenGL ES3 (modern OpenGL with shaders / programmatic pipeline)
+// This needs to be used along with a Platform Binding (e.g. GLFW, SDL, Win32, custom..)
+// (Note: We are using GL3W as a helper library to access OpenGL functions since there is no standard header to access modern OpenGL functions easily. Alternatives are GLEW, Glad, etc..)
+
+// Implemented features:
+//  [X] Renderer: User texture binding. Use 'GLuint' OpenGL texture identifier as void*/ImTextureID. Read the FAQ about ImTextureID in imgui.cpp.
+
+// You can copy and use unmodified imgui_impl_* files in your project. See main.cpp for an example of using this.
+// If you are new to dear imgui, read examples/README.txt and read the documentation at the top of imgui.cpp.
+// https://github.com/ocornut/imgui
+
+// CHANGELOG
+// (minor and older changes stripped away, please see git history for details)
+//  2018-11-30: Misc: Setting up io.BackendRendererName so it can be displayed in the About Window.
+//  2018-11-13: OpenGL: Support for GL 4.5's glClipControl(GL_UPPER_LEFT).
+//  2018-08-29: OpenGL: Added support for more OpenGL loaders: glew and glad, with comments indicative that any loader can be used.
+//  2018-08-09: OpenGL: Default to OpenGL ES 3 on iOS and Android. GLSL version default to "#version 300 ES".
+//  2018-07-30: OpenGL: Support for GLSL 300 ES and 410 core. Fixes for Emscripten compilation.
+//  2018-07-10: OpenGL: Support for more GLSL versions (based on the GLSL version string). Added error output when shaders fail to compile/link.
+//  2018-06-08: Misc: Extracted imgui_impl_opengl3.cpp/.h away from the old combined GLFW/SDL+OpenGL3 examples.
+//  2018-06-08: OpenGL: Use draw_data->DisplayPos and draw_data->DisplaySize to setup projection matrix and clipping rectangle.
+//  2018-05-25: OpenGL: Removed unnecessary backup/restore of GL_ELEMENT_ARRAY_BUFFER_BINDING since this is part of the VAO state.
+//  2018-05-14: OpenGL: Making the call to glBindSampler() optional so 3.2 context won't fail if the function is a NULL pointer.
+//  2018-03-06: OpenGL: Added const char* glsl_version parameter to ImGui_ImplOpenGL3_Init() so user can override the GLSL version e.g. "#version 150".
+//  2018-02-23: OpenGL: Create the VAO in the render function so the setup can more easily be used with multiple shared GL context.
+//  2018-02-16: Misc: Obsoleted the io.RenderDrawListsFn callback and exposed ImGui_ImplSdlGL3_RenderDrawData() in the .h file so you can call it yourself.
+//  2018-01-07: OpenGL: Changed GLSL shader version from 330 to 150.
+//  2017-09-01: OpenGL: Save and restore current bound sampler. Save and restore current polygon mode.
+//  2017-05-01: OpenGL: Fixed save and restore of current blend func state.
+//  2017-05-01: OpenGL: Fixed save and restore of current GL_ACTIVE_TEXTURE.
+//  2016-09-05: OpenGL: Fixed save and restore of current scissor rectangle.
+//  2016-07-29: OpenGL: Explicitly setting GL_UNPACK_ROW_LENGTH to reduce issues because SDL changes it. (#752)
+
+//----------------------------------------
+// OpenGL    GLSL      GLSL
+// version   version   string
+//----------------------------------------
+//  2.0       110       "#version 110"
+//  2.1       120
+//  3.0       130
+//  3.1       140
+//  3.2       150       "#version 150"
+//  3.3       330
+//  4.0       400
+//  4.1       410       "#version 410 core"
+//  4.2       420
+//  4.3       430
+//  ES 2.0    100       "#version 100"
+//  ES 3.0    300       "#version 300 es"
+//----------------------------------------
+
+#if defined(_MSC_VER) && !defined(_CRT_SECURE_NO_WARNINGS)
+#define _CRT_SECURE_NO_WARNINGS
+#endif
+
+#include "lipch.h"
+#include "imgui.h"
+#include "ImGuiOpenGLRenderer.h"
+#include "glad/glad.h"
+#include <stdio.h>
+#if defined(_MSC_VER) && _MSC_VER <= 1500 // MSVC 2008 or earlier
+#include <stddef.h>     // intptr_t
+#else
+#include <stdint.h>     // intptr_t
+#endif
+#if defined(__APPLE__)
+#include "TargetConditionals.h"
+#endif
+
+// iOS, Android and Emscripten can use GL ES 3
+// Call ImGui_ImplOpenGL3_Init() with "#version 300 es"
+#if (defined(__APPLE__) && TARGET_OS_IOS) || (defined(__ANDROID__)) || (defined(__EMSCRIPTEN__))
+#define USE_GL_ES3
+#endif
+
+// OpenGL Data
+static char         g_GlslVersionString[32] = "";
+static GLuint       g_FontTexture = 0;
+static GLuint       g_ShaderHandle = 0, g_VertHandle = 0, g_FragHandle = 0;
+static int          g_AttribLocationTex = 0, g_AttribLocationProjMtx = 0;
+static int          g_AttribLocationPosition = 0, g_AttribLocationUV = 0, g_AttribLocationColor = 0;
+static unsigned int g_VboHandle = 0, g_ElementsHandle = 0;
+
+// Functions
+bool    ImGui_ImplOpenGL3_Init(const char* glsl_version)
+{
+    ImGuiIO& io = ImGui::GetIO();
+    io.BackendRendererName = "imgui_impl_opengl3";
+
+    // Store GLSL version string so we can refer to it later in case we recreate shaders. Note: GLSL version is NOT the same as GL version. Leave this to NULL if unsure.
+#ifdef USE_GL_ES3
+    if (glsl_version == NULL)
+        glsl_version = "#version 300 es";
+#else
+    if (glsl_version == NULL)
+        glsl_version = "#version 130";
+#endif
+    IM_ASSERT((int)strlen(glsl_version) + 2 < IM_ARRAYSIZE(g_GlslVersionString));
+    strcpy(g_GlslVersionString, glsl_version);
+    strcat(g_GlslVersionString, "\n");
+
+    return true;
+}
+
+void    ImGui_ImplOpenGL3_Shutdown()
+{
+    ImGui_ImplOpenGL3_DestroyDeviceObjects();
+}
+
+void    ImGui_ImplOpenGL3_NewFrame()
+{
+    if (!g_FontTexture)
+        ImGui_ImplOpenGL3_CreateDeviceObjects();
+}
+
+// OpenGL3 Render function.
+// (this used to be set in io.RenderDrawListsFn and called by ImGui::Render(), but you can now call this directly from your main loop)
+// Note that this implementation is little overcomplicated because we are saving/setting up/restoring every OpenGL state explicitly, in order to be able to run within any OpenGL engine that doesn't do so.
+void    ImGui_ImplOpenGL3_RenderDrawData(ImDrawData* draw_data)
+{
+    // Avoid rendering when minimized, scale coordinates for retina displays (screen coordinates != framebuffer coordinates)
+    ImGuiIO& io = ImGui::GetIO();
+    int fb_width = (int)(draw_data->DisplaySize.x * io.DisplayFramebufferScale.x);
+    int fb_height = (int)(draw_data->DisplaySize.y * io.DisplayFramebufferScale.y);
+    if (fb_width <= 0 || fb_height <= 0)
+        return;
+    draw_data->ScaleClipRects(io.DisplayFramebufferScale);
+
+    // Backup GL state
+    GLenum last_active_texture; glGetIntegerv(GL_ACTIVE_TEXTURE, (GLint*)&last_active_texture);
+    glActiveTexture(GL_TEXTURE0);
+    GLint last_program; glGetIntegerv(GL_CURRENT_PROGRAM, &last_program);
+    GLint last_texture; glGetIntegerv(GL_TEXTURE_BINDING_2D, &last_texture);
+#ifdef GL_SAMPLER_BINDING
+    GLint last_sampler; glGetIntegerv(GL_SAMPLER_BINDING, &last_sampler);
+#endif
+    GLint last_array_buffer; glGetIntegerv(GL_ARRAY_BUFFER_BINDING, &last_array_buffer);
+    GLint last_vertex_array; glGetIntegerv(GL_VERTEX_ARRAY_BINDING, &last_vertex_array);
+#ifdef GL_POLYGON_MODE
+    GLint last_polygon_mode[2]; glGetIntegerv(GL_POLYGON_MODE, last_polygon_mode);
+#endif
+    GLint last_viewport[4]; glGetIntegerv(GL_VIEWPORT, last_viewport);
+    GLint last_scissor_box[4]; glGetIntegerv(GL_SCISSOR_BOX, last_scissor_box);
+    GLenum last_blend_src_rgb; glGetIntegerv(GL_BLEND_SRC_RGB, (GLint*)&last_blend_src_rgb);
+    GLenum last_blend_dst_rgb; glGetIntegerv(GL_BLEND_DST_RGB, (GLint*)&last_blend_dst_rgb);
+    GLenum last_blend_src_alpha; glGetIntegerv(GL_BLEND_SRC_ALPHA, (GLint*)&last_blend_src_alpha);
+    GLenum last_blend_dst_alpha; glGetIntegerv(GL_BLEND_DST_ALPHA, (GLint*)&last_blend_dst_alpha);
+    GLenum last_blend_equation_rgb; glGetIntegerv(GL_BLEND_EQUATION_RGB, (GLint*)&last_blend_equation_rgb);
+    GLenum last_blend_equation_alpha; glGetIntegerv(GL_BLEND_EQUATION_ALPHA, (GLint*)&last_blend_equation_alpha);
+    GLboolean last_enable_blend = glIsEnabled(GL_BLEND);
+    GLboolean last_enable_cull_face = glIsEnabled(GL_CULL_FACE);
+    GLboolean last_enable_depth_test = glIsEnabled(GL_DEPTH_TEST);
+    GLboolean last_enable_scissor_test = glIsEnabled(GL_SCISSOR_TEST);
+    bool clip_origin_lower_left = true;
+#ifdef GL_CLIP_ORIGIN
+    GLenum last_clip_origin = 0; glGetIntegerv(GL_CLIP_ORIGIN, (GLint*)&last_clip_origin); // Support for GL 4.5's glClipControl(GL_UPPER_LEFT)
+    if (last_clip_origin == GL_UPPER_LEFT)
+        clip_origin_lower_left = false;
+#endif
+
+    // Setup render state: alpha-blending enabled, no face culling, no depth testing, scissor enabled, polygon fill
+    glEnable(GL_BLEND);
+    glBlendEquation(GL_FUNC_ADD);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glDisable(GL_CULL_FACE);
+    glDisable(GL_DEPTH_TEST);
+    glEnable(GL_SCISSOR_TEST);
+#ifdef GL_POLYGON_MODE
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+#endif
+
+    // Setup viewport, orthographic projection matrix
+    // Our visible imgui space lies from draw_data->DisplayPos (top left) to draw_data->DisplayPos+data_data->DisplaySize (bottom right). DisplayMin is typically (0,0) for single viewport apps.
+    glViewport(0, 0, (GLsizei)fb_width, (GLsizei)fb_height);
+    float L = draw_data->DisplayPos.x;
+    float R = draw_data->DisplayPos.x + draw_data->DisplaySize.x;
+    float T = draw_data->DisplayPos.y;
+    float B = draw_data->DisplayPos.y + draw_data->DisplaySize.y;
+    const float ortho_projection[4][4] =
+    {
+        { 2.0f / (R - L),   0.0f,         0.0f,   0.0f },
+        { 0.0f,         2.0f / (T - B),   0.0f,   0.0f },
+        { 0.0f,         0.0f,        -1.0f,   0.0f },
+        { (R + L) / (L - R),  (T + B) / (B - T),  0.0f,   1.0f },
+    };
+    glUseProgram(g_ShaderHandle);
+    glUniform1i(g_AttribLocationTex, 0);
+    glUniformMatrix4fv(g_AttribLocationProjMtx, 1, GL_FALSE, &ortho_projection[0][0]);
+#ifdef GL_SAMPLER_BINDING
+    glBindSampler(0, 0); // We use combined texture/sampler state. Applications using GL 3.3 may set that otherwise.
+#endif
+    // Recreate the VAO every time
+    // (This is to easily allow multiple GL contexts. VAO are not shared among GL contexts, and we don't track creation/deletion of windows so we don't have an obvious key to use to cache them.)
+    GLuint vao_handle = 0;
+    glGenVertexArrays(1, &vao_handle);
+    glBindVertexArray(vao_handle);
+    glBindBuffer(GL_ARRAY_BUFFER, g_VboHandle);
+    glEnableVertexAttribArray(g_AttribLocationPosition);
+    glEnableVertexAttribArray(g_AttribLocationUV);
+    glEnableVertexAttribArray(g_AttribLocationColor);
+    glVertexAttribPointer(g_AttribLocationPosition, 2, GL_FLOAT, GL_FALSE, sizeof(ImDrawVert), (GLvoid*)IM_OFFSETOF(ImDrawVert, pos));
+    glVertexAttribPointer(g_AttribLocationUV, 2, GL_FLOAT, GL_FALSE, sizeof(ImDrawVert), (GLvoid*)IM_OFFSETOF(ImDrawVert, uv));
+    glVertexAttribPointer(g_AttribLocationColor, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(ImDrawVert), (GLvoid*)IM_OFFSETOF(ImDrawVert, col));
+
+    // Draw
+    ImVec2 pos = draw_data->DisplayPos;
+    for (int n = 0; n < draw_data->CmdListsCount; n++)
+    {
+        const ImDrawList* cmd_list = draw_data->CmdLists[n];
+        const ImDrawIdx* idx_buffer_offset = 0;
+
+        glBindBuffer(GL_ARRAY_BUFFER, g_VboHandle);
+        glBufferData(GL_ARRAY_BUFFER, (GLsizeiptr)cmd_list->VtxBuffer.Size * sizeof(ImDrawVert), (const GLvoid*)cmd_list->VtxBuffer.Data, GL_STREAM_DRAW);
+
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, g_ElementsHandle);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, (GLsizeiptr)cmd_list->IdxBuffer.Size * sizeof(ImDrawIdx), (const GLvoid*)cmd_list->IdxBuffer.Data, GL_STREAM_DRAW);
+
+        for (int cmd_i = 0; cmd_i < cmd_list->CmdBuffer.Size; cmd_i++)
+        {
+            const ImDrawCmd* pcmd = &cmd_list->CmdBuffer[cmd_i];
+            if (pcmd->UserCallback)
+            {
+                // User callback (registered via ImDrawList::AddCallback)
+                pcmd->UserCallback(cmd_list, pcmd);
+            }
+            else
+            {
+                ImVec4 clip_rect = ImVec4(pcmd->ClipRect.x - pos.x, pcmd->ClipRect.y - pos.y, pcmd->ClipRect.z - pos.x, pcmd->ClipRect.w - pos.y);
+                if (clip_rect.x < fb_width && clip_rect.y < fb_height && clip_rect.z >= 0.0f && clip_rect.w >= 0.0f)
+                {
+                    // Apply scissor/clipping rectangle
+                    if (clip_origin_lower_left)
+                        glScissor((int)clip_rect.x, (int)(fb_height - clip_rect.w), (int)(clip_rect.z - clip_rect.x), (int)(clip_rect.w - clip_rect.y));
+                    else
+                        glScissor((int)clip_rect.x, (int)clip_rect.y, (int)clip_rect.z, (int)clip_rect.w); // Support for GL 4.5's glClipControl(GL_UPPER_LEFT)
+
+                    // Bind texture, Draw
+                    glBindTexture(GL_TEXTURE_2D, (GLuint)(intptr_t)pcmd->TextureId);
+                    glDrawElements(GL_TRIANGLES, (GLsizei)pcmd->ElemCount, sizeof(ImDrawIdx) == 2 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT, idx_buffer_offset);
+                }
+            }
+            idx_buffer_offset += pcmd->ElemCount;
+        }
+    }
+    glDeleteVertexArrays(1, &vao_handle);
+
+    // Restore modified GL state
+    glUseProgram(last_program);
+    glBindTexture(GL_TEXTURE_2D, last_texture);
+#ifdef GL_SAMPLER_BINDING
+    glBindSampler(0, last_sampler);
+#endif
+    glActiveTexture(last_active_texture);
+    glBindVertexArray(last_vertex_array);
+    glBindBuffer(GL_ARRAY_BUFFER, last_array_buffer);
+    glBlendEquationSeparate(last_blend_equation_rgb, last_blend_equation_alpha);
+    glBlendFuncSeparate(last_blend_src_rgb, last_blend_dst_rgb, last_blend_src_alpha, last_blend_dst_alpha);
+    if (last_enable_blend) glEnable(GL_BLEND); else glDisable(GL_BLEND);
+    if (last_enable_cull_face) glEnable(GL_CULL_FACE); else glDisable(GL_CULL_FACE);
+    if (last_enable_depth_test) glEnable(GL_DEPTH_TEST); else glDisable(GL_DEPTH_TEST);
+    if (last_enable_scissor_test) glEnable(GL_SCISSOR_TEST); else glDisable(GL_SCISSOR_TEST);
+#ifdef GL_POLYGON_MODE
+    glPolygonMode(GL_FRONT_AND_BACK, (GLenum)last_polygon_mode[0]);
+#endif
+    glViewport(last_viewport[0], last_viewport[1], (GLsizei)last_viewport[2], (GLsizei)last_viewport[3]);
+    glScissor(last_scissor_box[0], last_scissor_box[1], (GLsizei)last_scissor_box[2], (GLsizei)last_scissor_box[3]);
+}
+
+bool ImGui_ImplOpenGL3_CreateFontsTexture()
+{
+    // Build texture atlas
+    ImGuiIO& io = ImGui::GetIO();
+    unsigned char* pixels;
+    int width, height;
+    io.Fonts->GetTexDataAsRGBA32(&pixels, &width, &height);   // Load as RGBA 32-bits (75% of the memory is wasted, but default font is so small) because it is more likely to be compatible with user's existing shaders. If your ImTextureId represent a higher-level concept than just a GL texture id, consider calling GetTexDataAsAlpha8() instead to save on GPU memory.
+
+    // Upload texture to graphics system
+    GLint last_texture;
+    glGetIntegerv(GL_TEXTURE_BINDING_2D, &last_texture);
+    glGenTextures(1, &g_FontTexture);
+    glBindTexture(GL_TEXTURE_2D, g_FontTexture);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+
+    // Store our identifier
+    io.Fonts->TexID = (ImTextureID)(intptr_t)g_FontTexture;
+
+    // Restore state
+    glBindTexture(GL_TEXTURE_2D, last_texture);
+
+    return true;
+}
+
+void ImGui_ImplOpenGL3_DestroyFontsTexture()
+{
+    if (g_FontTexture)
+    {
+        ImGuiIO& io = ImGui::GetIO();
+        glDeleteTextures(1, &g_FontTexture);
+        io.Fonts->TexID = 0;
+        g_FontTexture = 0;
+    }
+}
+
+// If you get an error please report on github. You may try different GL context version or GLSL version. See GL<>GLSL version table at the top of this file.
+static bool CheckShader(GLuint handle, const char* desc)
+{
+    GLint status = 0, log_length = 0;
+    glGetShaderiv(handle, GL_COMPILE_STATUS, &status);
+    glGetShaderiv(handle, GL_INFO_LOG_LENGTH, &log_length);
+    if ((GLboolean)status == GL_FALSE)
+        fprintf(stderr, "ERROR: ImGui_ImplOpenGL3_CreateDeviceObjects: failed to compile %s!\n", desc);
+    if (log_length > 0)
+    {
+        ImVector<char> buf;
+        buf.resize((int)(log_length + 1));
+        glGetShaderInfoLog(handle, log_length, NULL, (GLchar*)buf.begin());
+        fprintf(stderr, "%s\n", buf.begin());
+    }
+    return (GLboolean)status == GL_TRUE;
+}
+
+// If you get an error please report on GitHub. You may try different GL context version or GLSL version.
+static bool CheckProgram(GLuint handle, const char* desc)
+{
+    GLint status = 0, log_length = 0;
+    glGetProgramiv(handle, GL_LINK_STATUS, &status);
+    glGetProgramiv(handle, GL_INFO_LOG_LENGTH, &log_length);
+    if ((GLboolean)status == GL_FALSE)
+        fprintf(stderr, "ERROR: ImGui_ImplOpenGL3_CreateDeviceObjects: failed to link %s! (with GLSL '%s')\n", desc, g_GlslVersionString);
+    if (log_length > 0)
+    {
+        ImVector<char> buf;
+        buf.resize((int)(log_length + 1));
+        glGetProgramInfoLog(handle, log_length, NULL, (GLchar*)buf.begin());
+        fprintf(stderr, "%s\n", buf.begin());
+    }
+    return (GLboolean)status == GL_TRUE;
+}
+
+bool    ImGui_ImplOpenGL3_CreateDeviceObjects()
+{
+    // Backup GL state
+    GLint last_texture, last_array_buffer, last_vertex_array;
+    glGetIntegerv(GL_TEXTURE_BINDING_2D, &last_texture);
+    glGetIntegerv(GL_ARRAY_BUFFER_BINDING, &last_array_buffer);
+    glGetIntegerv(GL_VERTEX_ARRAY_BINDING, &last_vertex_array);
+
+    // Parse GLSL version string
+    int glsl_version = 130;
+    sscanf(g_GlslVersionString, "#version %d", &glsl_version);
+
+    const GLchar* vertex_shader_glsl_120 =
+        "uniform mat4 ProjMtx;\n"
+        "attribute vec2 Position;\n"
+        "attribute vec2 UV;\n"
+        "attribute vec4 Color;\n"
+        "varying vec2 Frag_UV;\n"
+        "varying vec4 Frag_Color;\n"
+        "void main()\n"
+        "{\n"
+        "    Frag_UV = UV;\n"
+        "    Frag_Color = Color;\n"
+        "    gl_Position = ProjMtx * vec4(Position.xy,0,1);\n"
+        "}\n";
+
+    const GLchar* vertex_shader_glsl_130 =
+        "uniform mat4 ProjMtx;\n"
+        "in vec2 Position;\n"
+        "in vec2 UV;\n"
+        "in vec4 Color;\n"
+        "out vec2 Frag_UV;\n"
+        "out vec4 Frag_Color;\n"
+        "void main()\n"
+        "{\n"
+        "    Frag_UV = UV;\n"
+        "    Frag_Color = Color;\n"
+        "    gl_Position = ProjMtx * vec4(Position.xy,0,1);\n"
+        "}\n";
+
+    const GLchar* vertex_shader_glsl_300_es =
+        "precision mediump float;\n"
+        "layout (location = 0) in vec2 Position;\n"
+        "layout (location = 1) in vec2 UV;\n"
+        "layout (location = 2) in vec4 Color;\n"
+        "uniform mat4 ProjMtx;\n"
+        "out vec2 Frag_UV;\n"
+        "out vec4 Frag_Color;\n"
+        "void main()\n"
+        "{\n"
+        "    Frag_UV = UV;\n"
+        "    Frag_Color = Color;\n"
+        "    gl_Position = ProjMtx * vec4(Position.xy,0,1);\n"
+        "}\n";
+
+    const GLchar* vertex_shader_glsl_410_core =
+        "layout (location = 0) in vec2 Position;\n"
+        "layout (location = 1) in vec2 UV;\n"
+        "layout (location = 2) in vec4 Color;\n"
+        "uniform mat4 ProjMtx;\n"
+        "out vec2 Frag_UV;\n"
+        "out vec4 Frag_Color;\n"
+        "void main()\n"
+        "{\n"
+        "    Frag_UV = UV;\n"
+        "    Frag_Color = Color;\n"
+        "    gl_Position = ProjMtx * vec4(Position.xy,0,1);\n"
+        "}\n";
+
+    const GLchar* fragment_shader_glsl_120 =
+        "#ifdef GL_ES\n"
+        "    precision mediump float;\n"
+        "#endif\n"
+        "uniform sampler2D Texture;\n"
+        "varying vec2 Frag_UV;\n"
+        "varying vec4 Frag_Color;\n"
+        "void main()\n"
+        "{\n"
+        "    gl_FragColor = Frag_Color * texture2D(Texture, Frag_UV.st);\n"
+        "}\n";
+
+    const GLchar* fragment_shader_glsl_130 =
+        "uniform sampler2D Texture;\n"
+        "in vec2 Frag_UV;\n"
+        "in vec4 Frag_Color;\n"
+        "out vec4 Out_Color;\n"
+        "void main()\n"
+        "{\n"
+        "    Out_Color = Frag_Color * texture(Texture, Frag_UV.st);\n"
+        "}\n";
+
+    const GLchar* fragment_shader_glsl_300_es =
+        "precision mediump float;\n"
+        "uniform sampler2D Texture;\n"
+        "in vec2 Frag_UV;\n"
+        "in vec4 Frag_Color;\n"
+        "layout (location = 0) out vec4 Out_Color;\n"
+        "void main()\n"
+        "{\n"
+        "    Out_Color = Frag_Color * texture(Texture, Frag_UV.st);\n"
+        "}\n";
+
+    const GLchar* fragment_shader_glsl_410_core =
+        "in vec2 Frag_UV;\n"
+        "in vec4 Frag_Color;\n"
+        "uniform sampler2D Texture;\n"
+        "layout (location = 0) out vec4 Out_Color;\n"
+        "void main()\n"
+        "{\n"
+        "    Out_Color = Frag_Color * texture(Texture, Frag_UV.st);\n"
+        "}\n";
+
+    // Select shaders matching our GLSL versions
+    const GLchar* vertex_shader = NULL;
+    const GLchar* fragment_shader = NULL;
+    if (glsl_version < 130)
+    {
+        vertex_shader = vertex_shader_glsl_120;
+        fragment_shader = fragment_shader_glsl_120;
+    }
+    else if (glsl_version == 410)
+    {
+        vertex_shader = vertex_shader_glsl_410_core;
+        fragment_shader = fragment_shader_glsl_410_core;
+    }
+    else if (glsl_version == 300)
+    {
+        vertex_shader = vertex_shader_glsl_300_es;
+        fragment_shader = fragment_shader_glsl_300_es;
+    }
+    else
+    {
+        vertex_shader = vertex_shader_glsl_130;
+        fragment_shader = fragment_shader_glsl_130;
+    }
+
+    // Create shaders
+    const GLchar* vertex_shader_with_version[2] = { g_GlslVersionString, vertex_shader };
+    g_VertHandle = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(g_VertHandle, 2, vertex_shader_with_version, NULL);
+    glCompileShader(g_VertHandle);
+    CheckShader(g_VertHandle, "vertex shader");
+
+    const GLchar* fragment_shader_with_version[2] = { g_GlslVersionString, fragment_shader };
+    g_FragHandle = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(g_FragHandle, 2, fragment_shader_with_version, NULL);
+    glCompileShader(g_FragHandle);
+    CheckShader(g_FragHandle, "fragment shader");
+
+    g_ShaderHandle = glCreateProgram();
+    glAttachShader(g_ShaderHandle, g_VertHandle);
+    glAttachShader(g_ShaderHandle, g_FragHandle);
+    glLinkProgram(g_ShaderHandle);
+    CheckProgram(g_ShaderHandle, "shader program");
+
+    g_AttribLocationTex = glGetUniformLocation(g_ShaderHandle, "Texture");
+    g_AttribLocationProjMtx = glGetUniformLocation(g_ShaderHandle, "ProjMtx");
+    g_AttribLocationPosition = glGetAttribLocation(g_ShaderHandle, "Position");
+    g_AttribLocationUV = glGetAttribLocation(g_ShaderHandle, "UV");
+    g_AttribLocationColor = glGetAttribLocation(g_ShaderHandle, "Color");
+
+    // Create buffers
+    glGenBuffers(1, &g_VboHandle);
+    glGenBuffers(1, &g_ElementsHandle);
+
+    ImGui_ImplOpenGL3_CreateFontsTexture();
+
+    // Restore modified GL state
+    glBindTexture(GL_TEXTURE_2D, last_texture);
+    glBindBuffer(GL_ARRAY_BUFFER, last_array_buffer);
+    glBindVertexArray(last_vertex_array);
+
+    return true;
+}
+
+void    ImGui_ImplOpenGL3_DestroyDeviceObjects()
+{
+    if (g_VboHandle) glDeleteBuffers(1, &g_VboHandle);
+    if (g_ElementsHandle) glDeleteBuffers(1, &g_ElementsHandle);
+    g_VboHandle = g_ElementsHandle = 0;
+
+    if (g_ShaderHandle && g_VertHandle) glDetachShader(g_ShaderHandle, g_VertHandle);
+    if (g_VertHandle) glDeleteShader(g_VertHandle);
+    g_VertHandle = 0;
+
+    if (g_ShaderHandle && g_FragHandle) glDetachShader(g_ShaderHandle, g_FragHandle);
+    if (g_FragHandle) glDeleteShader(g_FragHandle);
+    g_FragHandle = 0;
+
+    if (g_ShaderHandle) glDeleteProgram(g_ShaderHandle);
+    g_ShaderHandle = 0;
+
+    ImGui_ImplOpenGL3_DestroyFontsTexture();
+}
+
+=== .\Platform\OpenGL\ImGuiOpenGLRenderer.h ===
+// dear imgui: Renderer for OpenGL3 / OpenGL ES2 / OpenGL ES3 (modern OpenGL with shaders / programmatic pipeline)
+// This needs to be used along with a Platform Binding (e.g. GLFW, SDL, Win32, custom..)
+// (Note: We are using GL3W as a helper library to access OpenGL functions since there is no standard header to access modern OpenGL functions easily. Alternatives are GLEW, Glad, etc..)
+
+// Implemented features:
+//  [X] Renderer: User texture binding. Use 'GLuint' OpenGL texture identifier as void*/ImTextureID. Read the FAQ about ImTextureID in imgui.cpp.
+
+// You can copy and use unmodified imgui_impl_* files in your project. See main.cpp for an example of using this.
+// If you are new to dear imgui, read examples/README.txt and read the documentation at the top of imgui.cpp.
+// https://github.com/ocornut/imgui
+
+// About OpenGL function loaders: 
+// About OpenGL function loaders: modern OpenGL doesn't have a standard header file and requires individual function pointers to be loaded manually. 
+// Helper libraries are often used for this purpose! Here we are supporting a few common ones: gl3w, glew, glad. 
+// You may use another loader/header of your choice (glext, glLoadGen, etc.), or chose to manually implement your own.
+
+// About GLSL version:
+// The 'glsl_version' initialization parameter should be NULL (default) or a "#version XXX" string.
+// On computer platform the GLSL version default to "#version 130". On OpenGL ES 3 platform it defaults to "#version 300 es"
+// Only override if your GL version doesn't handle this GLSL version. See GLSL version table at the top of imgui_impl_opengl3.cpp.
+
+#pragma once
+
+#include "imgui.h"
+
+IMGUI_IMPL_API bool     ImGui_ImplOpenGL3_Init(const char* glsl_version = NULL);
+IMGUI_IMPL_API void     ImGui_ImplOpenGL3_Shutdown();
+IMGUI_IMPL_API void     ImGui_ImplOpenGL3_NewFrame();
+IMGUI_IMPL_API void     ImGui_ImplOpenGL3_RenderDrawData(ImDrawData* draw_data);
+
+// Called by Init/NewFrame/Shutdown
+IMGUI_IMPL_API bool     ImGui_ImplOpenGL3_CreateFontsTexture();
+IMGUI_IMPL_API void     ImGui_ImplOpenGL3_DestroyFontsTexture();
+IMGUI_IMPL_API bool     ImGui_ImplOpenGL3_CreateDeviceObjects();
+IMGUI_IMPL_API void     ImGui_ImplOpenGL3_DestroyDeviceObjects();
+
