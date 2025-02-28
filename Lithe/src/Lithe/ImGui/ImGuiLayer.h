@@ -25,9 +25,14 @@ namespace Lithe {
 		
 		bool OnKeyPressedEvent(KeyPressedEvent& e);
 		bool OnKeyReleasedEvent(KeyReleasedEvent& e);
-		//bool OnKeyTypedEvent(KeyTypedEvent& e);
+		bool OnKeyTypedEvent(KeyTypedEvent& e);
 		
 		bool OnWindowResizeEvent(WindowResizeEvent& e);
+
+		// Code from @ DaveKobrin on GitHub
+
+		static int Key2ImGuiKey(const int key);
+		static void UpdateMods(const int key, const bool isPressed);
 	private:
 		float m_Time = 0.0f;
 	};

@@ -62,6 +62,7 @@
       <Filter>Platform</Filter>
     </ClInclude>
     <ClInclude Include="src\lipch.h" />
+    <ClInclude Include="src\Lithe\InputCodes.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Lithe\Application.cpp">
