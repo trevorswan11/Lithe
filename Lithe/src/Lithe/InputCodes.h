@@ -1,5 +1,5 @@
 #pragma once
-// Lithe engine Keycodes. Adapted frm @DaveKobrin on GitHub
+// Lithe engine Keycodes. Adapted from @DaveKobrin on GitHub
 
 /* The unknown key */
 #define LI_KEY_UNKNOWN            -1

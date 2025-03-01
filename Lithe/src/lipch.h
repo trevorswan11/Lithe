@@ -15,9 +15,6 @@
 #include <unordered_set>
 
 #include "Lithe/Log.h"
-#include "Lithe/Core.h"
-#include "Lithe/Window.h"
-#include "Lithe/Application.h"
 
 #ifdef LI_PLATFORM_WINDOWS
 	#include <Windows.h>

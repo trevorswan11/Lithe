@@ -8,12 +8,12 @@ public:
 
 	void OnUpdate() override
 	{
-		//LI_INFO("Example::Update");
+		LI_INFO("Example::Update");
 	}
 
 	void OnEvent(Lithe::Event& event) override
 	{
-		//LI_TRACE("{0}", event);
+		LI_TRACE("{0}", event);
 	}
 };
 
