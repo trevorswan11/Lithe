@@ -8,12 +8,19 @@ public:
 
 	void OnUpdate() override
 	{
-		LI_INFO("Example::Update");
 	}
 
 	void OnEvent(Lithe::Event& event) override
 	{
-		LI_TRACE("{0}", event);
+		// LI_TRACE("{0}", event);
+
+		if (event.GetEventType() == Lithe::EventType::KeyPressed)
+		{
+			Lithe::KeyPressedEvent& e = (Lithe::KeyPressedEvent&)event;
+			if (e.GetKeyCode() == LI_KEY_TAB)
+				LI_TRACE("TAB HELP ME!");
+			LI_TRACE("{0}", (char)e.GetKeyCode());
+		}
 	}
 };
 

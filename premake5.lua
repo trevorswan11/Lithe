@@ -69,7 +69,6 @@ project "Lithe"
 		{
 			"LI_PLATFORM_WINDOWS",
 			"LI_BUILD_DLL",
-			"LI_ENABLE_ASSERTS",
 			"GLFW_INCLUDE_NONE"
 		}
 

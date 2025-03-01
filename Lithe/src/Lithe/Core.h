@@ -14,6 +14,10 @@
 #endif
 
 // Assertions if enabled, specified in premake for debug only
+#ifdef LI_DEBUG
+	#define LI_ENABLE_ASSERTS
+#endif
+
 
 #ifdef LI_ENABLE_ASSERTS
 	// CLIENT: Breaks debugging (fatal error) if condition is not met, prints qualifying information

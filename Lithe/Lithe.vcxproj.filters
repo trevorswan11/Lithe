@@ -62,7 +62,10 @@
       <Filter>Platform</Filter>
     </ClInclude>
     <ClInclude Include="src\lipch.h" />
-    <ClInclude Include="src\Lithe\InputCodes.h" />
+    <ClInclude Include="src\Lithe\KeyCodes.h" />
+    <ClInclude Include="src\Lithe\Input.h" />
+    <ClInclude Include="src\Platform\Windows\WindowsInput.h" />
+    <ClInclude Include="src\Lithe\MouseButtonCodes.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Lithe\Application.cpp">
@@ -87,5 +90,6 @@
       <Filter>Platform</Filter>
     </ClCompile>
     <ClCompile Include="src\lipch.cpp" />
+    <ClCompile Include="src\Platform\Windows\WindowsInput.cpp" />
   </ItemGroup>
 </Project>

@@ -1,10 +1,6 @@
 #pragma once
-// Lithe engine Keycodes. Adapted from @DaveKobrin on GitHub
 
-/* The unknown key */
-#define LI_KEY_UNKNOWN            -1
-
-/* Printable keys */
+// From glfw3.h
 #define LI_KEY_SPACE              32
 #define LI_KEY_APOSTROPHE         39  /* ' */
 #define LI_KEY_COMMA              44  /* , */
@@ -127,19 +123,3 @@
 #define LI_KEY_RIGHT_ALT          346
 #define LI_KEY_RIGHT_SUPER        347
 #define LI_KEY_MENU               348
-
-#define LI_KEY_LAST               LI_KEY_MENU
-
-// Hazel Mouse Button Codes. Abstracted from glfw3.h
-#define LI_MOUSE_BUTTON_1         0
-#define LI_MOUSE_BUTTON_2         1
-#define LI_MOUSE_BUTTON_3         2
-#define LI_MOUSE_BUTTON_4         3
-#define LI_MOUSE_BUTTON_5         4
-#define LI_MOUSE_BUTTON_6         5
-#define LI_MOUSE_BUTTON_7         6
-#define LI_MOUSE_BUTTON_8         7
-#define LI_MOUSE_BUTTON_LAST      LI_MOUSE_BUTTON_8
-#define LI_MOUSE_BUTTON_LEFT      LI_MOUSE_BUTTON_1
-#define LI_MOUSE_BUTTON_RIGHT     LI_MOUSE_BUTTON_2
-#define LI_MOUSE_BUTTON_MIDDLE    LI_MOUSE_BUTTON_3

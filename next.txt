@@ -1,2 +1,0 @@
-See diff from Cherno Commit -- chnage project wide issues causing performance and memory issues NOW
-https://github.com/TheCherno/Hazel/tree/709b40de15b6c46db7746c7feb4b2dd98397df99
