@@ -7,6 +7,8 @@
 #include "Lithe/Events/Event.h"
 #include "Lithe/Events/ApplicationEvent.h"
 
+#include "Lithe/ImGui/ImGuiLayer.h"
+
 namespace Lithe {
 
 	class LITHE_API Application
@@ -28,6 +30,7 @@ namespace Lithe {
 		bool OnWindowClose(WindowCloseEvent& e);
 
 		std::unique_ptr<Window> m_Window;
+		ImGuiLayer* m_ImGuiLayer;
 		bool m_Running = true;
 		LayerStack m_LayerStack;
 	private:

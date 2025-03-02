@@ -25,7 +25,7 @@ namespace Lithe {
 		layer_stack::iterator end() { return m_Layers.end(); }
 	private:
 		layer_stack m_Layers;
-		layer_stack::iterator m_LayerInsert;
+		unsigned int m_LayerInsertIndex = 0;
 	};
 
 }

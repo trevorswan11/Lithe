@@ -23,8 +23,10 @@ include "Lithe/vendor/imgui"
 
 project "Lithe"
 	location "Lithe"
-	kind "SharedLib"
+	kind "StaticLib"
 	language "C++"
+	cppdialect "C++17"
+	staticruntime "on"
 
 	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
 	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
@@ -45,6 +47,11 @@ project "Lithe"
 		"${prj.name}/vendor/glm/glm/**.inl"
 	}
 
+	defines
+	{
+		"_CRT_SECURE_NO_WARNINGS"
+	}
+
 	includedirs
 	{
 		"%{prj.name}/vendor/spdlog/include",
@@ -59,14 +66,12 @@ project "Lithe"
 	{
 		"GLFW",
 		"opengl32.lib",
-		"dwmapi.lib",
+		-- "dwmapi.lib",
 		"Glad",
 		"ImGui"
 	}
 
 	filter "system:windows"
-		cppdialect "C++17"
-		staticruntime "On"
 		systemversion "latest"
 
 		defines
@@ -76,26 +81,26 @@ project "Lithe"
 			"GLFW_INCLUDE_NONE"
 		}
 
-		postbuildcommands
-		{
-			("IF NOT EXIST \"%{wks.location}/bin/" .. outputdir .. "/Sandbox\" (mkdir \"%{wks.location}/bin/" .. outputdir .. "/Sandbox\")"),
-			("{COPYFILE} \"%{cfg.buildtarget.abspath}\" \"%{wks.location}/bin/" .. outputdir .. "/Sandbox/Lithe.dll\"")
-		}
+		-- postbuildcommands
+		-- {
+		-- 	("IF NOT EXIST \"%{wks.location}/bin/" .. outputdir .. "/Sandbox\" (mkdir \"%{wks.location}/bin/" .. outputdir .. "/Sandbox\")"),
+		-- 	("{COPYFILE} \"%{cfg.buildtarget.abspath}\" \"%{wks.location}/bin/" .. outputdir .. "/Sandbox/Lithe.dll\"")
+		-- }
 
 	filter "configurations:Debug"
 		defines "LI_DEBUG"
-		buildoptions "/MDd"
-		symbols "On"
+		runtime "Debug"
+		symbols "on"
 
 	filter "configurations:Release"
 		defines "LI_RELEASE"
-		buildoptions "/MD"
-		optimize "On"
+		runtime "Release"
+		optimize "on"
 
 	filter "configurations:Dist"
 		defines "LI_DIST"
-		buildoptions "/MD"
-		optimize "On"
+		runtime "Release"
+		optimize "on"
 		
 project "GLFW"
 	kind "StaticLib"
@@ -167,6 +172,8 @@ project "Sandbox"
 	location "Sandbox"
 	kind "ConsoleApp"
 	language "C++"
+	cppdialect "C++17"
+	staticruntime "on"
 
 	dependson { "Lithe" }
 
@@ -188,6 +195,7 @@ project "Sandbox"
 	{
 		"Lithe/vendor/spdlog/include",
 		"Lithe/src",
+		"Lithe/vendor",
 		"%{IncludeDir.glm}"
 	}
 
@@ -197,7 +205,6 @@ project "Sandbox"
 	}
 
 	filter "system:windows"
-		cppdialect "C++17"
 		staticruntime "On"
 		systemversion "latest"
 
@@ -208,15 +215,15 @@ project "Sandbox"
 
 	filter "configurations:Debug"
 		defines "LI_DEBUG"
-		buildoptions "/MDd"
-		symbols "On"
+		runtime "Debug"
+		symbols "on"
 
 	filter "configurations:Release"
 		defines "LI_RELEASE"
-		buildoptions "/MD"
-		optimize "On"
+		runtime "Release"
+		optimize "on"
 
 	filter "configurations:Dist"
 		defines "LI_DIST"
-		buildoptions "/MD"
-		optimize "On"
+		runtime "Release"
+		optimize "on"

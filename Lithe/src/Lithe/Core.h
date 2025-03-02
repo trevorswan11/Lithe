@@ -1,6 +1,7 @@
 #pragma once
 
 #ifdef LI_PLATFORM_WINDOWS
+#if LI_DYNAMIC_LINK
 	#ifdef LI_BUILD_DLL
 		// Macro for exports in core engine
 		#define LITHE_API __declspec(dllexport)
@@ -8,6 +9,9 @@
 		// Macro for imports in derived applications
 		#define LITHE_API __declspec(dllimport)
 	#endif
+#else
+	#define LITHE_API
+#endif
 #else
 	// For now, Lithe will only be built to support windows
 	#error Lithe only supports Windows.

@@ -1,5 +1,7 @@
 #include <Lithe.h>
 
+#include "imgui/imgui.h"
+
 class ExampleLayer : public Lithe::Layer
 {
 public:
@@ -30,7 +32,6 @@ public:
 	Sandbox()
 	{
 		PushLayer(new ExampleLayer());
-		PushOverlay(new Lithe::ImGuiLayer());
 	}
 
 	~Sandbox()
