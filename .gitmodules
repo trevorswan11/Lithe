@@ -1,12 +1,12 @@
 [submodule "Lithe/vendor/spdlog"]
 	path = Lithe/vendor/spdlog
-	url = https://github.com/gabime/spdlog
+	url = https://github.com/trevorswan11/spdlog
 [submodule "Lithe/vendor/GLFW"]
 	path = Lithe/vendor/GLFW
-	url = https://github.com/TheCherno/GLFW
+	url = https://github.com/trevorswan11/GLFW
 [submodule "Lithe/vendor/imgui"]
 	path = Lithe/vendor/imgui
 	url = https://github.com/trevorswan11/imgui
 [submodule "Lithe/vendor/glm"]
 	path = Lithe/vendor/glm
-	url = https://github.com/g-truc/glm
+	url = https://github.com/trevorswan11/glm
