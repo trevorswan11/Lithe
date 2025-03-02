@@ -15,6 +15,7 @@ IncludeDir = {}
 IncludeDir["GLFW"] = "Lithe/vendor/GLFW/include"
 IncludeDir["Glad"] = "Lithe/vendor/Glad/include"
 IncludeDir["ImGui"] = "Lithe/vendor/imgui"
+IncludeDir["glm"] = "Lithe/vendor/glm"
 
 include "Lithe/vendor/GLFW"
 include "Lithe/vendor/Glad"
@@ -39,7 +40,9 @@ project "Lithe"
 		"%{prj.name}/src/**.h",
 		"%{prj.name}/src/**.hpp",
 		"%{prj.name}/src/**.c",
-		"%{prj.name}/src/**.cpp"
+		"%{prj.name}/src/**.cpp",
+		"${prj.name}/vendor/glm/glm/**.hpp",
+		"${prj.name}/vendor/glm/glm/**.inl"
 	}
 
 	includedirs
@@ -48,7 +51,8 @@ project "Lithe"
 		"%{prj.name}/src",
 		"%{IncludeDir.GLFW}",
 		"%{IncludeDir.Glad}",
-		"%{IncludeDir.ImGui}"
+		"%{IncludeDir.ImGui}",
+		"%{IncludeDir.glm}"
 	}
 
 	links
@@ -183,7 +187,8 @@ project "Sandbox"
 	includedirs
 	{
 		"Lithe/vendor/spdlog/include",
-		"Lithe/src"
+		"Lithe/src",
+		"%{IncludeDir.glm}"
 	}
 
 	links

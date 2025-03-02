@@ -7,3 +7,6 @@
 [submodule "Lithe/vendor/imgui"]
 	path = Lithe/vendor/imgui
 	url = https://github.com/trevorswan11/imgui
+[submodule "Lithe/vendor/glm"]
+	path = Lithe/vendor/glm
+	url = https://github.com/g-truc/glm
