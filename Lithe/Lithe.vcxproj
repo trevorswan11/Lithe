@@ -161,7 +161,9 @@
     <ClInclude Include="src\Lithe\LayerStack.h" />
     <ClInclude Include="src\Lithe\Log.h" />
     <ClInclude Include="src\Lithe\MouseButtonCodes.h" />
+    <ClInclude Include="src\Lithe\Renderer\GraphicsContext.h" />
     <ClInclude Include="src\Lithe\Window.h" />
+    <ClInclude Include="src\Platform\OpenGL\OpenGLContext.h" />
     <ClInclude Include="src\Platform\Windows\WindowsInput.h" />
     <ClInclude Include="src\Platform\Windows\WindowsWindow.h" />
     <ClInclude Include="src\lipch.h" />
@@ -173,6 +175,7 @@
     <ClCompile Include="src\Lithe\Layer.cpp" />
     <ClCompile Include="src\Lithe\LayerStack.cpp" />
     <ClCompile Include="src\Lithe\Log.cpp" />
+    <ClCompile Include="src\Platform\OpenGL\OpenGLContext.cpp" />
     <ClCompile Include="src\Platform\Windows\WindowsInput.cpp" />
     <ClCompile Include="src\Platform\Windows\WindowsWindow.cpp" />
     <ClCompile Include="src\lipch.cpp">

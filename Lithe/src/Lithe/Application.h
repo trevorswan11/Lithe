@@ -34,6 +34,8 @@ namespace Lithe {
 		bool m_Running = true;
 		LayerStack m_LayerStack;
 	private:
+		unsigned int m_VertexArray, m_VertexBuffer, m_IndexBuffer;
+	private:
 		static Application* s_Instance;
 	};
 
