@@ -10,3 +10,6 @@
 [submodule "Lithe/vendor/glm"]
 	path = Lithe/vendor/glm
 	url = https://github.com/trevorswan11/glm
+[submodule "Lithe/vendor/Glad"]
+	path = Lithe/vendor/Glad
+	url = https://github.com/trevorswan11/glad
