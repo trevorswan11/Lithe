@@ -22,7 +22,7 @@ namespace Lithe {
 		m_ImGuiLayer = new ImGuiLayer();
 		PushOverlay(m_ImGuiLayer);
 
-		// TEMPORARY: HACK OpenGL Triangle Needs
+		// TEMPORARY: HACK OpenGL Triangle/Other Shape Needs
 		// Vertex Array
 		glGenVertexArrays(1, &m_VertexArray);
 		glBindVertexArray(m_VertexArray);
@@ -31,10 +31,19 @@ namespace Lithe {
 		glGenBuffers(1, &m_VertexBuffer);
 		glBindBuffer(GL_ARRAY_BUFFER, m_VertexBuffer);
 
-		float vertices[3 * 3] = {
-			-0.5f, -0.5f, 0.0f,
-			0.5f, -0.5f, 0.0f,
-			0.0f, 0.5f, 0.0f
+		// Vertex Data (Triangle)
+		//float vertices[3 * 3] = {
+		//	-0.5f, -0.5f, 0.0f,	// Bottom-left
+		//	0.5f, -0.5f, 0.0f,	// Bottom-right
+		//	0.0f, 0.5f, 0.0f	// Top
+		//};
+
+		// Vertex Data (Square)
+		float vertices[4 * 3] = {
+			-0.5f, -0.5f, 0.0f,  // Bottom-left
+			 0.5f, -0.5f, 0.0f,  // Bottom-right
+			 0.5f,  0.5f, 0.0f,  // Top-right
+			-0.5f,  0.5f, 0.0f   // Top-left
 		};
 
 		// Statically draw -- only one set up of triangle w no updating
@@ -47,7 +56,8 @@ namespace Lithe {
 		glGenBuffers(1, &m_IndexBuffer);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_IndexBuffer);
 
-		unsigned int indices[3] = { 0, 1, 2 };
+		//unsigned int indices[3] = { 0, 1, 2 }; // Triangle
+		unsigned int indices[6] = { 0, 1, 2, 2, 3, 0 }; // Square
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
 		// Shader -- a lot of code, to be done later -> relies on built in graphics drivers
@@ -91,7 +101,7 @@ namespace Lithe {
 			glClear(GL_COLOR_BUFFER_BIT);
 
 			glBindVertexArray(m_VertexArray);
-			glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, nullptr);
+			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 			
 			for (Layer* l : m_LayerStack) l->OnUpdate();
 
