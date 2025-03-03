@@ -24,6 +24,13 @@ public:
 			LI_TRACE("{0}", (char)e.GetKeyCode());
 		}
 	}
+
+	virtual void OnImGuiRender() override
+	{
+		ImGui::Begin("Test");
+		ImGui::Text("Hello, World!");
+		ImGui::End();
+	}
 };
 
 class Sandbox : public Lithe::Application
