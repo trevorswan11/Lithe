@@ -10,7 +10,6 @@ namespace Lithe {
 #define BIND_EVENT_FN(x) std::bind(&Application::x, this, std::placeholders::_1)
 
 	Application* Application::s_Instance = nullptr;
-
 	Application::Application()
 	{
 		LI_CORE_ASSERT(!s_Instance, "Application already exists!");
@@ -32,19 +31,19 @@ namespace Lithe {
 		glBindBuffer(GL_ARRAY_BUFFER, m_VertexBuffer);
 
 		// Vertex Data (Triangle)
-		//float vertices[3 * 3] = {
-		//	-0.5f, -0.5f, 0.0f,	// Bottom-left
-		//	0.5f, -0.5f, 0.0f,	// Bottom-right
-		//	0.0f, 0.5f, 0.0f	// Top
-		//};
-
-		// Vertex Data (Square)
-		float vertices[4 * 3] = {
-			-0.5f, -0.5f, 0.0f,  // Bottom-left
-			 0.5f, -0.5f, 0.0f,  // Bottom-right
-			 0.5f,  0.5f, 0.0f,  // Top-right
-			-0.5f,  0.5f, 0.0f   // Top-left
+		float vertices[3 * 3] = {
+			-0.5f, -0.5f, 0.0f,	// Bottom-left
+			0.5f, -0.5f, 0.0f,	// Bottom-right
+			0.0f, 0.5f, 0.0f	// Top
 		};
+		
+		// Vertex Data (Square)
+		//float vertices[4 * 3] = {
+		//	-0.5f, -0.5f, 0.0f,  // Bottom-left
+		//	 0.5f, -0.5f, 0.0f,  // Bottom-right
+		//	 0.5f,  0.5f, 0.0f,  // Top-right
+		//	-0.5f,  0.5f, 0.0f   // Top-left
+		//};
 
 		// Statically draw -- only one set up of triangle w no updating
 		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
@@ -56,11 +55,39 @@ namespace Lithe {
 		glGenBuffers(1, &m_IndexBuffer);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_IndexBuffer);
 
-		//unsigned int indices[3] = { 0, 1, 2 }; // Triangle
-		unsigned int indices[6] = { 0, 1, 2, 2, 3, 0 }; // Square
+		unsigned int indices[3] = { 0, 1, 2 }; // Triangle
+		//unsigned int indices[6] = { 0, 1, 2, 2, 3, 0 }; // Square
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+		
+		// Shader source code to use -- Use R"()" for ease multi-line strings
+		std::string vertexSrc = R"(
+			#version 330 core
 
-		// Shader -- a lot of code, to be done later -> relies on built in graphics drivers
+			layout(location = 0) in vec3 a_Position;	
+
+			out vec3 v_Position;		
+
+			void main()
+			{
+				v_Position = a_Position;
+				gl_Position = vec4(a_Position, 1.0);
+			}
+		)";
+
+		std::string fragmentSrc = R"(
+			#version 330 core
+
+			layout(location = 0) out vec4 color;
+
+			in vec3 v_Position;				
+
+			void main()
+			{
+				color = vec4(v_Position * 0.5 + 0.5, 1.0);
+			}
+		)";
+
+		m_Shader.reset(new Shader(vertexSrc, fragmentSrc));
 	}
 
 	Application::~Application()
@@ -100,8 +127,9 @@ namespace Lithe {
 			glClearColor(0.1f, 0.1f, 0.1f, 1);
 			glClear(GL_COLOR_BUFFER_BIT);
 
+			m_Shader->Bind();
 			glBindVertexArray(m_VertexArray);
-			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+			glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, nullptr);
 			
 			for (Layer* l : m_LayerStack) l->OnUpdate();
 

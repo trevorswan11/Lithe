@@ -9,6 +9,9 @@
 
 #include "Lithe/ImGui/ImGuiLayer.h"
 
+// TEMPORARY
+#include "Lithe/Renderer/Shader.h"
+
 namespace Lithe {
 
 	class LITHE_API Application
@@ -35,6 +38,7 @@ namespace Lithe {
 		LayerStack m_LayerStack;
 	private:
 		unsigned int m_VertexArray, m_VertexBuffer, m_IndexBuffer;
+		std::unique_ptr<Shader> m_Shader;
 	private:
 		static Application* s_Instance;
 	};
