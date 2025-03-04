@@ -74,6 +74,9 @@
     <ClInclude Include="src\Lithe\Renderer\GraphicsContext.h" />
     <ClInclude Include="src\Platform\OpenGL\OpenGLContext.h" />
     <ClInclude Include="src\Lithe\Renderer\Shader.h" />
+    <ClInclude Include="src\Lithe\Renderer\Buffer.h" />
+    <ClInclude Include="src\Platform\OpenGL\OpenGLBuffer.h" />
+    <ClInclude Include="src\Lithe\Renderer\Renderer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Lithe\Application.cpp">
@@ -103,5 +106,8 @@
     <ClCompile Include="src\lipch.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLContext.cpp" />
     <ClCompile Include="src\Lithe\Renderer\Shader.cpp" />
+    <ClCompile Include="src\Lithe\Renderer\Buffer.cpp" />
+    <ClCompile Include="src\Platform\OpenGL\OpenGLBuffer.cpp" />
+    <ClCompile Include="src\Lithe\Renderer\Renderer.cpp" />
   </ItemGroup>
 </Project>

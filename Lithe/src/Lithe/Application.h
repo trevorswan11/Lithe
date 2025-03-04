@@ -9,8 +9,8 @@
 
 #include "Lithe/ImGui/ImGuiLayer.h"
 
-// TEMPORARY
 #include "Lithe/Renderer/Shader.h"
+#include "Lithe/Renderer/Buffer.h"
 
 namespace Lithe {
 
@@ -37,8 +37,10 @@ namespace Lithe {
 		bool m_Running = true;
 		LayerStack m_LayerStack;
 	private:
-		unsigned int m_VertexArray, m_VertexBuffer, m_IndexBuffer;
+		unsigned int m_VertexArray;
 		std::unique_ptr<Shader> m_Shader;
+		std::unique_ptr<VertexBuffer> m_VertexBuffer;
+		std::unique_ptr<IndexBuffer> m_IndexBuffer;
 	private:
 		static Application* s_Instance;
 	};

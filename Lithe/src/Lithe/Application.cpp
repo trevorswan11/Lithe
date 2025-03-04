@@ -27,39 +27,22 @@ namespace Lithe {
 		glBindVertexArray(m_VertexArray);
 
 		// Vertex Buffer
-		glGenBuffers(1, &m_VertexBuffer);
-		glBindBuffer(GL_ARRAY_BUFFER, m_VertexBuffer);
-
-		// Vertex Data (Triangle)
 		float vertices[3 * 3] = {
 			-0.5f, -0.5f, 0.0f,	// Bottom-left
 			0.5f, -0.5f, 0.0f,	// Bottom-right
 			0.0f, 0.5f, 0.0f	// Top
 		};
-		
-		// Vertex Data (Square)
-		//float vertices[4 * 3] = {
-		//	-0.5f, -0.5f, 0.0f,  // Bottom-left
-		//	 0.5f, -0.5f, 0.0f,  // Bottom-right
-		//	 0.5f,  0.5f, 0.0f,  // Top-right
-		//	-0.5f,  0.5f, 0.0f   // Top-left
-		//};
 
-		// Statically draw -- only one set up of triangle w no updating
-		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+		m_VertexBuffer.reset(VertexBuffer::Create(vertices, sizeof(vertices)));
 
 		glEnableVertexAttribArray(0);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
 		
 		// Index Buffer
-		glGenBuffers(1, &m_IndexBuffer);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_IndexBuffer);
+		uint32_t indices[3] = { 0, 1, 2 };
+		m_IndexBuffer.reset(IndexBuffer::Create(indices, 3));
 
-		unsigned int indices[3] = { 0, 1, 2 }; // Triangle
-		//unsigned int indices[6] = { 0, 1, 2, 2, 3, 0 }; // Square
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-		
-		// Shader source code to use -- Use R"()" for ease multi-line strings
+		// Shader source code to use -- Use R"()" for easy multi-line strings
 		std::string vertexSrc = R"(
 			#version 330 core
 
@@ -90,10 +73,7 @@ namespace Lithe {
 		m_Shader.reset(new Shader(vertexSrc, fragmentSrc));
 	}
 
-	Application::~Application()
-	{
-
-	}
+	Application::~Application() {}
 
 	void Application::PushLayer(Layer* layer)
 	{
@@ -109,8 +89,6 @@ namespace Lithe {
 	{
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(OnWindowClose));
-
-		//LI_CORE_TRACE("{0}", e);
 
 		for (auto it = m_LayerStack.end(); it != m_LayerStack.begin(); )
 		{
@@ -129,7 +107,7 @@ namespace Lithe {
 
 			m_Shader->Bind();
 			glBindVertexArray(m_VertexArray);
-			glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, nullptr);
+			glDrawElements(GL_TRIANGLES, m_IndexBuffer->GetCount(), GL_UNSIGNED_INT, nullptr);
 			
 			for (Layer* l : m_LayerStack) l->OnUpdate();
 
