@@ -7,7 +7,7 @@ struct GLFWwindow;
 
 namespace Lithe {
 
-	class LITHE_API OpenGLContext : public GraphicsContext
+	class OpenGLContext : public GraphicsContext
 	{
 	public:
 		OpenGLContext(GLFWwindow* windowHandle);

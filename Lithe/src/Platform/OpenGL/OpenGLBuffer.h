@@ -6,7 +6,7 @@ namespace Lithe {
 
 	// --------------------------- VERTEX BUFFER ---------------------------
 
-	class LITHE_API OpenGLVertexBuffer : public VertexBuffer
+	class OpenGLVertexBuffer : public VertexBuffer
 	{
 	public:
 		OpenGLVertexBuffer(float* vertices, uint32_t size);

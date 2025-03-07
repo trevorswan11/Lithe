@@ -13,6 +13,17 @@
 
 #include "Lithe/ImGui/ImGuiLayer.h"
 
+// ---Rendering---
+#include "Lithe/Renderer/Renderer.h"
+#include "Lithe/Renderer/RenderCommand.h"
+
+#include "Lithe/Renderer/Shader.h"
+#include "Lithe/Renderer/Buffer.h"
+#include "Lithe/Renderer/VertexArray.h"
+
+#include "Lithe/Renderer/OrthographicCamera.h"
+// -----------------
+
 // ---Entry Point---
 #include "Lithe/EntryPoint.h"
 // -----------------

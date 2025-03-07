@@ -2,22 +2,27 @@
 
 #include "Lithe/Core.h"
 
-namespace Lithe {
+#include "RenderCommand.h"
+#include "Shader.h"
+#include "OrthographicCamera.h"
 
-	enum class LITHE_API RendererAPI
-	{
-		None = 0,
-		OpenGL = 1,
-		DirectX = 2,
-		Vulcan = 3
-	};
+namespace Lithe {
 
 	class LITHE_API Renderer
 	{
 	public:
-		inline static RendererAPI GetAPI() { return s_RendererAPI; }
-		inline static RendererAPI SetAPI(RendererAPI API) { s_RendererAPI = API; }
+		static void BeginScene(OrthographicCamera& camera);
+		static void EndScene();
+
+		static void Submit(const std::shared_ptr<Shader>& shader, const std::shared_ptr<VertexArray>& vertexArray);
+
+		inline static RendererAPI::API GetAPI() { return RendererAPI::GetAPI(); }
 	private:
-		static RendererAPI s_RendererAPI;
+		struct SceneData
+		{
+			glm::mat4 ViewProjectionMatrix;
+		};
+
+		static SceneData* m_SceneData;
 	};
 }

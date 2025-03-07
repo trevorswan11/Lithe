@@ -79,6 +79,10 @@
     <ClInclude Include="src\Lithe\Renderer\Renderer.h" />
     <ClInclude Include="src\Lithe\Renderer\VertexArray.h" />
     <ClInclude Include="src\Platform\OpenGL\OpenGLVertexArray.h" />
+    <ClInclude Include="src\Lithe\Renderer\RendererAPI.h" />
+    <ClInclude Include="src\Lithe\Renderer\RenderCommand.h" />
+    <ClInclude Include="src\Platform\OpenGL\OpenGLRendererAPI.h" />
+    <ClInclude Include="src\Lithe\Renderer\OrthographicCamera.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Lithe\Application.cpp">
@@ -113,5 +117,9 @@
     <ClCompile Include="src\Lithe\Renderer\Renderer.cpp" />
     <ClCompile Include="src\Lithe\Renderer\VertexArray.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLVertexArray.cpp" />
+    <ClCompile Include="src\Lithe\Renderer\RendererAPI.cpp" />
+    <ClCompile Include="src\Lithe\Renderer\RenderCommand.cpp" />
+    <ClCompile Include="src\Platform\OpenGL\OpenGLRendererAPI.cpp" />
+    <ClCompile Include="src\Lithe\Renderer\OrthographicCamera.cpp" />
   </ItemGroup>
 </Project>

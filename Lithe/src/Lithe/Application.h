@@ -9,10 +9,6 @@
 
 #include "Lithe/ImGui/ImGuiLayer.h"
 
-#include "Lithe/Renderer/Shader.h"
-#include "Lithe/Renderer/Buffer.h"
-#include "Lithe/Renderer/VertexArray.h"
-
 namespace Lithe {
 
 	class LITHE_API Application
@@ -37,12 +33,6 @@ namespace Lithe {
 		ImGuiLayer* m_ImGuiLayer;
 		bool m_Running = true;
 		LayerStack m_LayerStack;
-	private:
-		std::shared_ptr<Shader> m_Shader;
-		std::shared_ptr<VertexArray> m_VertexArray;
-
-		std::shared_ptr<VertexArray> m_SquareVA;
-		std::shared_ptr<Shader> m_BlueShader;
 	private:
 		static Application* s_Instance;
 	};
