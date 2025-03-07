@@ -3,6 +3,8 @@
 
 #include "Input.h"
 
+#include <GLFW/glfw3.h>
+
 namespace Lithe {
 
 #define BIND_EVENT_FN(x) std::bind(&Application::x, this, std::placeholders::_1)
@@ -50,7 +52,11 @@ namespace Lithe {
 	{
 		while (m_Running)
 		{
-			for (Layer* l : m_LayerStack) l->OnUpdate();
+			float time = (float)glfwGetTime(); // Will change to platform independent
+			Timestep timestep = time - m_LastFrameTime;
+			m_LastFrameTime = time;
+
+			for (Layer* l : m_LayerStack) l->OnUpdate(timestep);
 
 			m_ImGuiLayer->Begin();
 			for (Layer* l : m_LayerStack)

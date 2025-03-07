@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Lithe/Core.h"
+#include "Lithe/Base.h"
 #include "Lithe/Renderer/GraphicsContext.h"
 
 struct GLFWwindow;

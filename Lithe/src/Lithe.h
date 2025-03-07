@@ -6,6 +6,8 @@
 #include "Lithe/Layer.h"
 #include "Lithe/Log.h"
 
+#include "Lithe/Core/Timestep.h"
+
 // You need to change keycodes if NOT using glfw
 #include "Lithe/Input.h"
 #include "Lithe/MouseButtonCodes.h"

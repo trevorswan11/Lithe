@@ -1,7 +1,8 @@
 #pragma once
 
-#include "Lithe/Core.h"
+#include "Lithe/Base.h"
 #include "Lithe/Events/Event.h"
+#include "Lithe/Core/Timestep.h"
 
 namespace Lithe {
 
@@ -13,7 +14,7 @@ namespace Lithe {
 
 		virtual void OnAttach() {}
 		virtual void OnDetach() {}
-		virtual void OnUpdate() {}
+		virtual void OnUpdate(Timestep ts) {}
 		virtual void OnImGuiRender() {}
 		virtual void OnEvent(Event& event) {}
 
