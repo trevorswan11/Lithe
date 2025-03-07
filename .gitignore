@@ -12,12 +12,17 @@ CTestTestfile.cmake
 _deps
 CMakeUserPresets.json
 
-# Directories
-.vs
-.vscode
+# Lithe Directories
 bin
 bin-int/
 Reference/
 
-# Files
-*.user
+# Visual Studio Files
+.vs
+.vscode
+**.sln
+**.vcxproj
+**.vcxproj.filters
+**.vcxproj.user
+**.csproj
+**.user
