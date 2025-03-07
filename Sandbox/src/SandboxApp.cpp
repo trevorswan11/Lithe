@@ -178,12 +178,14 @@ public:
 		glm::vec4 redColor(0.8f, 0.2f, 0.3f, 1.0f);
 		glm::vec4 blueColor(0.2f, 0.3f, 0.8f, 1.0f);
 
-		/*Lithe::MaterialRef material = new Lithe::Material(m_FlatColorShader);
+		/*
+		Lithe::MaterialRef material = new Lithe::Material(m_FlatColorShader);
 		Lithe::MaterialInstanceRef mi = new Lithe::MaterialInstance(material);
 		
 		mi->Set("u_Color", redColor);
 		mi->
-		squareMesh->SetMaterial(mi);*/
+		squareMesh->SetMaterial(mi);
+		*/
 		for (int y = 0; y < 20; y++)
 		{
 			for (int x = 0; x < 20; x++)
