@@ -17,9 +17,11 @@ IncludeDir["Glad"] = "Lithe/vendor/Glad/include"
 IncludeDir["ImGui"] = "Lithe/vendor/imgui"
 IncludeDir["glm"] = "Lithe/vendor/glm"
 
-include "Lithe/vendor/GLFW"
-include "Lithe/vendor/Glad"
-include "Lithe/vendor/imgui"
+group "Dependencies"
+    include "Lithe/vendor/GLFW"
+    include "Lithe/vendor/Glad"
+    include "Lithe/vendor/imgui"
+group ""
 
 project "Lithe"
 	location "Lithe"
@@ -99,72 +101,6 @@ project "Lithe"
 
 	filter "configurations:Dist"
 		defines "LI_DIST"
-		runtime "Release"
-		optimize "on"
-		
-project "GLFW"
-	kind "StaticLib"
-	language "C"
-
-	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
-	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
-
-	files
-	{
-		"Lithe/vendor/GLFW/include/GLFW/glfw3.h",
-		"Lithe/vendor/GLFW/include/GLFW/glfw3native.h",
-		"Lithe/vendor/GLFW/src/internal.h",
-		"Lithe/vendor/GLFW/src/platform.h",
-		"Lithe/vendor/GLFW/src/mappings.h",
-		"Lithe/vendor/GLFW/src/context.c",
-		"Lithe/vendor/GLFW/src/init.c",
-		"Lithe/vendor/GLFW/src/input.c",
-		"Lithe/vendor/GLFW/src/monitor.c",
-		"Lithe/vendor/GLFW/src/platform.c",
-		"Lithe/vendor/GLFW/src/vulkan.c",
-		"Lithe/vendor/GLFW/src/window.c",
-		"Lithe/vendor/GLFW/src/egl_context.c",
-		"Lithe/vendor/GLFW/src/osmesa_context.c",
-		"Lithe/vendor/GLFW/src/null_platform.h",
-		"Lithe/vendor/GLFW/src/null_joystick.h",
-		"Lithe/vendor/GLFW/src/null_init.c",
-
-		"Lithe/vendor/GLFW/src/null_monitor.c",
-		"Lithe/vendor/GLFW/src/null_window.c",
-		"Lithe/vendor/GLFW/src/null_joystick.c"
-	}
-
-	filter "system:windows"
-		systemversion "latest"
-		staticruntime "On"
-
-		files
-		{
-			"Lithe/vendor/GLFW/src/win32_init.c",
-			"Lithe/vendor/GLFW/src/win32_module.c",
-			"Lithe/vendor/GLFW/src/win32_joystick.c",
-			"Lithe/vendor/GLFW/src/win32_monitor.c",
-			"Lithe/vendor/GLFW/src/win32_time.h",
-			"Lithe/vendor/GLFW/src/win32_time.c",
-			"Lithe/vendor/GLFW/src/win32_thread.h",
-			"Lithe/vendor/GLFW/src/win32_thread.c",
-			"Lithe/vendor/GLFW/src/win32_window.c",
-			"Lithe/vendor/GLFW/src/wgl_context.c",
-			"Lithe/vendor/GLFW/src/egl_context.c",
-			"Lithe/vendor/GLFW/src/osmesa_context.c"
-		}
-
-		defines
-		{
-			"_GLFW_WIN32",
-			"_CRT_SECURE_NO_WARNINGS"
-		}
-
-	filter "configurations:Debug"
-		runtime "Debug"
-		symbols "on"
-
-	filter "configurations:Release"
 		runtime "Release"
 		optimize "on"
 
