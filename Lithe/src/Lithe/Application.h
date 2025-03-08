@@ -7,6 +7,8 @@
 #include "Lithe/Events/Event.h"
 #include "Lithe/Events/ApplicationEvent.h"
 
+#include "Lithe/Renderer/Renderer.h"
+
 #include "Lithe/Core/Timestep.h"
 
 #include "Lithe/ImGui/ImGuiLayer.h"
