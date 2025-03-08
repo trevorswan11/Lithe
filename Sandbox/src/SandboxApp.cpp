@@ -44,18 +44,19 @@ public:
 
 		m_SquareVA.reset(Lithe::VertexArray::Create());
 
-		float squareVertices[3 * 4] = {
-			-0.5f, -0.5f, 0.0f,
-			0.5f, -0.5f, 0.0f,
-			0.5f, 0.5f, 0.0f,
-			-0.5f, 0.5f, 0.0f,
+		float squareVertices[5 * 4] = {
+			-0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
+			0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
+			0.5f, 0.5f, 0.0f, 1.0f, 1.0f,
+			- 0.5f, 0.5f, 0.0f, 0.0f, 1.0f
 		};
 
 		Lithe::Ref<Lithe::VertexBuffer> squareVB;
 		squareVB.reset(Lithe::VertexBuffer::Create(squareVertices, sizeof(squareVertices)));
 		squareVB->SetLayout({
-			{ Lithe::ShaderDataType::Float3, "a_Position" }
-			});
+			{ Lithe::ShaderDataType::Float3, "a_Position" },
+			{ Lithe::ShaderDataType::Float2, "a_TexCoord" }
+		});
 		m_SquareVA->AddVertexBuffer(squareVB);
 
 		uint32_t squareIndices[6] = { 0, 1, 2, 2, 3, 0 };
@@ -134,6 +135,46 @@ public:
 		)";
 
 		m_FlatColorShader.reset(Lithe::Shader::Create(flatColorShaderVertexSrc, flatColorShaderFragmentSrc));
+
+		std::string textureShaderVertexSrc = R"(
+			#version 330 core
+
+			layout(location = 0) in vec3 a_Position;
+			layout(location = 1) in vec2 a_TexCoord;
+
+			uniform mat4 u_ViewProjection;
+			uniform mat4 u_Transform;
+
+			out vec2 v_TexCoord;
+
+			void main()
+			{
+				v_TexCoord = a_TexCoord;
+				gl_Position = u_ViewProjection * u_Transform * vec4(a_Position, 1.0);
+			}
+		)";
+
+		std::string textureShaderFragmentSrc = R"(
+			#version 330 core
+
+			layout(location = 0) out vec4 color;
+
+			in vec2 v_TexCoord;	
+
+			uniform sampler2D u_Texture;			
+
+			void main()
+			{
+				color = texture(u_Texture, v_TexCoord);
+			}
+		)";
+
+		m_TextureShader.reset(Lithe::Shader::Create(textureShaderVertexSrc, textureShaderFragmentSrc));
+
+		m_Texture = Lithe::Texture2D::Create("assets/textures/CheckerboardExample.png");
+		
+		std::dynamic_pointer_cast<Lithe::OpenGLShader>(m_TextureShader)->Bind();
+		std::dynamic_pointer_cast<Lithe::OpenGLShader>(m_TextureShader)->UploadUniformInt("u_Texture", 0);
 	}
 
 	void OnUpdate(Lithe::Timestep ts) override
@@ -190,7 +231,12 @@ public:
 				Lithe::Renderer::Submit(m_FlatColorShader, m_SquareVA, transform);
 			}
 		}
-		Lithe::Renderer::Submit(m_Shader, m_VertexArray);
+
+		m_Texture->Bind();
+		Lithe::Renderer::Submit(m_TextureShader, m_SquareVA, glm::scale(glm::mat4(1.0f), glm::vec3(1.5f)));
+
+		// Triangle
+		//Lithe::Renderer::Submit(m_Shader, m_VertexArray);
 			  
 		Lithe::Renderer::EndScene();
 	}
@@ -211,7 +257,9 @@ private:
 	Lithe::Ref<Lithe::VertexArray> m_VertexArray;
 
 	Lithe::Ref<Lithe::VertexArray> m_SquareVA;
-	Lithe::Ref<Lithe::Shader> m_FlatColorShader;
+	Lithe::Ref<Lithe::Shader> m_FlatColorShader, m_TextureShader;
+
+	Lithe::Ref<Lithe::Texture2D> m_Texture;
 
 	Lithe::OrthographicCamera m_Camera;
 	glm::vec3 m_CameraPosition;

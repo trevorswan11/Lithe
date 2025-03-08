@@ -16,6 +16,7 @@ IncludeDir["GLFW"] = "Lithe/vendor/GLFW/include"
 IncludeDir["Glad"] = "Lithe/vendor/Glad/include"
 IncludeDir["ImGui"] = "Lithe/vendor/imgui"
 IncludeDir["glm"] = "Lithe/vendor/glm"
+IncludeDir["stb_image"] = "Lithe/vendor/stb_image"
 
 group "Dependencies"
     include "Lithe/vendor/GLFW"
@@ -45,8 +46,10 @@ project "Lithe"
 		"%{prj.name}/src/**.hpp",
 		"%{prj.name}/src/**.c",
 		"%{prj.name}/src/**.cpp",
-		"${prj.name}/vendor/glm/glm/**.hpp",
-		"${prj.name}/vendor/glm/glm/**.inl"
+		"%{prj.name}/vendor/glm/glm/**.hpp",
+		"%{prj.name}/vendor/glm/glm/**.inl",
+		"%{prj.name}/vendor/stb_image/**.h",
+		"%{prj.name}/vendor/stb_image/**.cpp"
 	}
 
 	defines
@@ -61,7 +64,8 @@ project "Lithe"
 		"%{IncludeDir.GLFW}",
 		"%{IncludeDir.Glad}",
 		"%{IncludeDir.ImGui}",
-		"%{IncludeDir.glm}"
+		"%{IncludeDir.glm}",
+		"%{IncludeDir.stb_image}"
 	}
 
 	links
