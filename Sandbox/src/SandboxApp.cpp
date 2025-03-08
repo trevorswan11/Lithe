@@ -24,7 +24,7 @@ public:
 			0.0f, 0.5f, 0.0f, 0.8f, 0.8f, 0.2f, 1.0f
 		};
 
-		std::shared_ptr<Lithe::VertexBuffer> vertexBuffer;
+		Lithe::Ref<Lithe::VertexBuffer> vertexBuffer;
 		vertexBuffer.reset(Lithe::VertexBuffer::Create(vertices, sizeof(vertices)));
 		vertexBuffer.reset(Lithe::VertexBuffer::Create(vertices, sizeof(vertices)));
 
@@ -38,7 +38,7 @@ public:
 
 		// Index Buffer
 		uint32_t indices[3] = { 0, 1, 2 };
-		std::shared_ptr<Lithe::IndexBuffer> indexBuffer;
+		Lithe::Ref<Lithe::IndexBuffer> indexBuffer;
 		indexBuffer.reset(Lithe::IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint32_t)));
 		m_VertexArray->SetIndexBuffer(indexBuffer);
 
@@ -51,7 +51,7 @@ public:
 			-0.5f, 0.5f, 0.0f,
 		};
 
-		std::shared_ptr<Lithe::VertexBuffer> squareVB;
+		Lithe::Ref<Lithe::VertexBuffer> squareVB;
 		squareVB.reset(Lithe::VertexBuffer::Create(squareVertices, sizeof(squareVertices)));
 		squareVB->SetLayout({
 			{ Lithe::ShaderDataType::Float3, "a_Position" }
@@ -59,7 +59,7 @@ public:
 		m_SquareVA->AddVertexBuffer(squareVB);
 
 		uint32_t squareIndices[6] = { 0, 1, 2, 2, 3, 0 };
-		std::shared_ptr<Lithe::IndexBuffer> squareIB;
+		Lithe::Ref<Lithe::IndexBuffer> squareIB;
 		squareIB.reset(Lithe::IndexBuffer::Create(squareIndices, sizeof(squareIndices) / sizeof(uint32_t)));
 		m_SquareVA->SetIndexBuffer(squareIB);
 
@@ -207,11 +207,11 @@ public:
 	}
 
 private:
-	std::shared_ptr<Lithe::Shader> m_Shader;
-	std::shared_ptr<Lithe::VertexArray> m_VertexArray;
+	Lithe::Ref<Lithe::Shader> m_Shader;
+	Lithe::Ref<Lithe::VertexArray> m_VertexArray;
 
-	std::shared_ptr<Lithe::VertexArray> m_SquareVA;
-	std::shared_ptr<Lithe::Shader> m_FlatColorShader;
+	Lithe::Ref<Lithe::VertexArray> m_SquareVA;
+	Lithe::Ref<Lithe::Shader> m_FlatColorShader;
 
 	Lithe::OrthographicCamera m_Camera;
 	glm::vec3 m_CameraPosition;

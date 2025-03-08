@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Lithe/Base.h"
 #include "Lithe/Renderer/RendererAPI.h"
 
 namespace Lithe {
@@ -10,7 +11,7 @@ namespace Lithe {
 		virtual void SetClearColor(const glm::vec4& color) override;
 		virtual void Clear() override;
 
-		virtual void DrawIndexed(const std::shared_ptr<VertexArray>& vertexArray) override;
+		virtual void DrawIndexed(const Ref<VertexArray>& vertexArray) override;
 	};
 
 }
