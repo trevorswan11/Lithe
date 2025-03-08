@@ -100,7 +100,7 @@ public:
 			}
 		)";
 
-		m_Shader.reset(Lithe::Shader::Create(vertexSrc, fragmentSrc));
+		m_Shader = Lithe::Shader::Create("vertexShader", vertexSrc, fragmentSrc);
 
 		std::string flatColorShaderVertexSrc = R"(
 			#version 330 core
@@ -134,15 +134,15 @@ public:
 			}
 		)";
 
-		m_FlatColorShader.reset(Lithe::Shader::Create(flatColorShaderVertexSrc, flatColorShaderFragmentSrc));
+		m_FlatColorShader = Lithe::Shader::Create("flatColorShader", flatColorShaderVertexSrc, flatColorShaderFragmentSrc);
 
-		m_TextureShader.reset(Lithe::Shader::Create("assets/shaders/Texture.glsl"));
+		auto textureShader = m_ShaderLibrary.Load("assets/shaders/Texture.glsl");
 
 		m_Texture = Lithe::Texture2D::Create("assets/textures/CheckerboardExample.png");
 		m_YellowBalloonTexture = Lithe::Texture2D::Create("assets/textures/BTD6_YellowBalloon.png");
 		
-		std::dynamic_pointer_cast<Lithe::OpenGLShader>(m_TextureShader)->Bind();
-		std::dynamic_pointer_cast<Lithe::OpenGLShader>(m_TextureShader)->UploadUniformInt("u_Texture", 0);
+		std::dynamic_pointer_cast<Lithe::OpenGLShader>(textureShader)->Bind();
+		std::dynamic_pointer_cast<Lithe::OpenGLShader>(textureShader)->UploadUniformInt("u_Texture", 0);
 	}
 
 	void OnUpdate(Lithe::Timestep ts) override
@@ -200,10 +200,12 @@ public:
 			}
 		}
 
+		auto textureShader = m_ShaderLibrary.Get("Texture");
+
 		m_Texture->Bind();
-		Lithe::Renderer::Submit(m_TextureShader, m_SquareVA, glm::scale(glm::mat4(1.0f), glm::vec3(1.5f)));
+		Lithe::Renderer::Submit(textureShader, m_SquareVA, glm::scale(glm::mat4(1.0f), glm::vec3(1.5f)));
 		m_YellowBalloonTexture->Bind();
-		Lithe::Renderer::Submit(m_TextureShader, m_SquareVA, glm::scale(glm::mat4(1.0f), glm::vec3(1.5f)));
+		Lithe::Renderer::Submit(textureShader, m_SquareVA, glm::scale(glm::mat4(1.0f), glm::vec3(1.5f)));
 
 		// Triangle
 		//Lithe::Renderer::Submit(m_Shader, m_VertexArray);
@@ -223,11 +225,12 @@ public:
 	}
 
 private:
+	Lithe::ShaderLibrary m_ShaderLibrary;
 	Lithe::Ref<Lithe::Shader> m_Shader;
 	Lithe::Ref<Lithe::VertexArray> m_VertexArray;
 
 	Lithe::Ref<Lithe::VertexArray> m_SquareVA;
-	Lithe::Ref<Lithe::Shader> m_FlatColorShader, m_TextureShader;
+	Lithe::Ref<Lithe::Shader> m_FlatColorShader;
 
 	Lithe::Ref<Lithe::Texture2D> m_Texture, m_YellowBalloonTexture;
 
