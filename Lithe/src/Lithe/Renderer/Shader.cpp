@@ -1,7 +1,7 @@
 #include "lipch.h"
 #include "Shader.h"
 
-#include "Renderer.h"
+#include "Lithe/Renderer/Renderer.h"
 #include "Platform/OpenGL/OpenGLShader.h"
 
 namespace Lithe {

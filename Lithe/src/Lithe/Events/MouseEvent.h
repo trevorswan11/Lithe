@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Event.h"
+#include "Lithe/Events/Event.h"
 
 namespace Lithe {
 

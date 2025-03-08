@@ -1,7 +1,7 @@
 #include "lipch.h"
 #include "Buffer.h"
 
-#include "Renderer.h"
+#include "Lithe/Renderer/Renderer.h"
 
 #include "Platform/OpenGL/OpenGLBuffer.h"
 

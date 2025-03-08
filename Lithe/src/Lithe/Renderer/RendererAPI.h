@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Lithe/Base.h"
-#include "VertexArray.h"
+#include "Lithe/Core/Base.h"
+#include "Lithe/Renderer/VertexArray.h"
 
 #include <glm/glm.hpp>
 

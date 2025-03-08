@@ -26,3 +26,6 @@ Reference/
 **.vcxproj.user
 **.csproj
 **.user
+
+# MISC
+GenerateProjects.bat

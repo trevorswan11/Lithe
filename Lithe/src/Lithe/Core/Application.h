@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Base.h"
+#include "Lithe/Core/Base.h"
 
-#include "Window.h"
-#include "Lithe/LayerStack.h"
+#include "Lithe/Core/Window.h"
+#include "Lithe/Core/LayerStack.h"
 #include "Lithe/Events/Event.h"
 #include "Lithe/Events/ApplicationEvent.h"
 

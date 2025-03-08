@@ -2,17 +2,16 @@
 
 // For use by Lithe applications
 
-#include "Lithe/Application.h"
-#include "Lithe/Layer.h"
-#include "Lithe/Log.h"
+#include "Lithe/Core/Application.h"
+#include "Lithe/Core/Layer.h"
+#include "Lithe/Core/Log.h"
 
 #include "Lithe/Core/Timestep.h"
 
 // You need to change keycodes if NOT using glfw
-#include "Lithe/Input.h"
-#include "Lithe/MouseButtonCodes.h"
-#include "Lithe/KeyCodes.h"
-#include "Lithe/OrthographicCameraController.h"
+#include "Lithe/Core/Input.h"
+#include "Lithe/Core/MouseButtonCodes.h"
+#include "Lithe/Core/KeyCodes.h"
 
 #include "Lithe/ImGui/ImGuiLayer.h"
 
@@ -26,8 +25,9 @@
 #include "Lithe/Renderer/VertexArray.h"
 
 #include "Lithe/Renderer/OrthographicCamera.h"
+#include "Lithe/Renderer/OrthographicCameraController.h"
 // -----------------
 
 // ---Entry Point---
-#include "Lithe/EntryPoint.h"
+#include "Lithe/Core/EntryPoint.h"
 // -----------------

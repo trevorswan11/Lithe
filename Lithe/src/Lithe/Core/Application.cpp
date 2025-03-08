@@ -1,7 +1,7 @@
 #include "lipch.h"
 #include "Application.h"
 
-#include "Input.h"
+#include "Lithe/Core/Input.h"
 
 #include <GLFW/glfw3.h>
 

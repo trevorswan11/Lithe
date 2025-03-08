@@ -2,7 +2,7 @@
 
 #include "lipch.h"
 
-#include "Lithe/Base.h"
+#include "Lithe/Core/Base.h"
 #include "Lithe/Events/Event.h"
 
 namespace Lithe {

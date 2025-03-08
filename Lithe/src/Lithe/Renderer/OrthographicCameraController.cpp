@@ -1,8 +1,8 @@
 #include "lipch.h"
 #include "OrthographicCameraController.h"
 
-#include "Lithe/Input.h"
-#include "Lithe/KeyCodes.h"
+#include "Lithe/Core/Input.h"
+#include "Lithe/Core/KeyCodes.h"
 
 namespace Lithe {
 	

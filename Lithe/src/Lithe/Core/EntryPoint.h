@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Base.h"
+#include "Lithe/Core/Base.h"
 
 #ifdef LI_PLATFORM_WINDOWS
 

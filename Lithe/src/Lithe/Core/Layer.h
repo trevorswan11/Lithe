@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Lithe/Base.h"
+#include "Lithe/Core/Base.h"
 #include "Lithe/Events/Event.h"
 #include "Lithe/Core/Timestep.h"
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Lithe/Layer.h"
+#include "Lithe/Core/Layer.h"
 
 #include "Lithe/Events/MouseEvent.h"
 #include "Lithe/Events/KeyEvent.h"

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Lithe/Base.h"
-#include "RendererAPI.h"
+#include "Lithe/Core/Base.h"
+#include "Lithe/Renderer/RendererAPI.h"
 
 namespace Lithe {
 

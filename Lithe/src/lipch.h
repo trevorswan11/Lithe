@@ -16,7 +16,7 @@
 #include <unordered_map>
 #include <unordered_set>
 
-#include "Lithe/Log.h"
+#include "Lithe/Core/Log.h"
 
 #ifdef LI_PLATFORM_WINDOWS
 	#include <Windows.h>

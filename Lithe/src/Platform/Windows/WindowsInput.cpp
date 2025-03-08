@@ -2,7 +2,7 @@
 #include "WindowsInput.h"
 
 #include <GLFW/glfw3.h>
-#include "Lithe/Application.h"
+#include "Lithe/Core/Application.h"
 
 namespace Lithe {
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Lithe/Base.h"
+#include "Lithe/Core/Base.h"
 
 #include "spdlog/spdlog.h"
 #include "spdlog/fmt/ostr.h"

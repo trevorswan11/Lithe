@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Lithe/Input.h"
+#include "Lithe/Core/Input.h"
 
 namespace Lithe {
 
