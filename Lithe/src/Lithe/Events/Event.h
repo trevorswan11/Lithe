@@ -71,15 +71,13 @@ namespace Lithe {
 	// Dispatches any received event through the application
 	class EventDispatcher
 	{
-		template<typename T>
-		using EventFn = std::function<bool(T&)>;
 	public:
 		EventDispatcher(Event& event)
 			: m_Event(event) {}
 
 		// Dispatches any event using a specified function 
-		template<typename T>
-		bool Dispatch(EventFn<T> func)
+		template<typename T, typename F>
+		bool Dispatch(const F& func)
 		{
 			// Check the inputted event aginst the template type (template types declared as <Type>)
 			if (m_Event.GetEventType() == T::GetStaticType())

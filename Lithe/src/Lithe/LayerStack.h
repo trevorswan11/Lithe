@@ -1,7 +1,7 @@
 #pragma once
 
-#include  "Lithe/Base.h"
-#include "Layer.h"
+#include "Lithe/Base.h"
+#include "Lithe/Layer.h"
 
 #include <vector>
 

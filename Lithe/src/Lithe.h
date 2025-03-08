@@ -12,6 +12,7 @@
 #include "Lithe/Input.h"
 #include "Lithe/MouseButtonCodes.h"
 #include "Lithe/KeyCodes.h"
+#include "Lithe/OrthographicCameraController.h"
 
 #include "Lithe/ImGui/ImGuiLayer.h"
 
