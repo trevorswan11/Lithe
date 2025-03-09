@@ -2,28 +2,58 @@
 
 #include <memory>
 
-#ifdef LI_PLATFORM_WINDOWS
-#if LI_DYNAMIC_LINK
-	#ifdef LI_BUILD_DLL
-		// Macro for exports in core engine
-		#define LITHE_API __declspec(dllexport)
+// Platform detection using predefined macros
+#ifdef _WIN32
+	/* Windows x64/x86 */
+	#ifdef _WIN64
+		/* Windows x64  */
+		#define LI_PLATFORM_WINDOWS
 	#else
-		// Macro for imports in derived applications
-		#define LITHE_API __declspec(dllimport)
+		/* Windows x86 */
+		#error "x86 Builds are not supported!"
+	#endif
+#elif defined(__APPLE__) || defined(__MACH__)
+	#include <TargetConditionals.h>
+	#if TARGET_IPHONE_SIMULATOR == 1
+		#error "IOS simulator is not supported!"
+	#elif TARGET_OS_IPHONE == 1
+		#define LI_PLATFORM_IOS
+		#error "IOS is not supported!"
+	#elif TARGET_OS_MAC == 1
+		#define LI_PLATFORM_MACOS
+		#error "MacOS is not supported!"
+	#else
+		#error "Unknown Apple platform!"
+	#endif
+#elif defined(__ANDROID__)
+	#define LI_PLATFORM_ANDROID
+	#error "Android is not supported!"
+#elif defined(__linux__)
+	#define LI_PLATFORM_LINUX
+	#error "Linux is not supported!"
+#else
+	#error "Unknown platform!"
+#endif // End of platform detection
+
+// DLL support
+#ifdef LI_PLATFORM_WINDOWS
+	#if LI_DYNAMIC_LINK
+		#ifdef LI_BUILD_DLL
+			#define LITHE_API __declspec(dllexport)
+		#else
+			#define LITHE_API __declspec(dllimport)
+		#endif
+	#else
+		#define LITHE_API
 	#endif
 #else
-	#define LITHE_API
-#endif
-#else
-	// For now, Lithe will only be built to support windows
-	#error Lithe only supports Windows.
-#endif
+	#error Lithe only supports Windows!
+#endif // End of DLL support
 
 // Assertions if enabled, specified in premake for debug only
 #ifdef LI_DEBUG
 	#define LI_ENABLE_ASSERTS
 #endif
-
 
 #ifdef LI_ENABLE_ASSERTS
 	// CLIENT: Breaks debugging (fatal error) if condition is not met, prints qualifying information
@@ -46,8 +76,18 @@ namespace Lithe {
 
 	template<typename T>
 	using Scope = std::unique_ptr<T>;
+	template<typename T, typename ... Args>
+	constexpr Scope<T> CreateScope(Args&& ... args)
+	{
+		return std::make_unique<T>(std::forward<Args>(args)...);
+	}
 
 	template<typename T>
 	using Ref = std::shared_ptr<T>;
+	template<typename T, typename ... Args>
+	constexpr Ref<T> CreateRef(Args&& ... args)
+	{
+		return std::make_shared<T>(std::forward<Args>(args)...);
+	}
 
 }

@@ -82,8 +82,9 @@ namespace Lithe {
 			LI_CORE_ASSERT(ShaderTypeFromString(type), "Invalid shader type specified");
 
 			size_t nextLinePos = source.find_first_not_of("\r\n", eol);
+			LI_CORE_ASSERT(nextLinePos != std::string::npos, "Syntax error");
 			pos = source.find(typeToken, nextLinePos);
-			shaderSources[ShaderTypeFromString(type)] = source.substr(nextLinePos, pos - (nextLinePos == std::string::npos ? source.size() - 1 : nextLinePos));
+			shaderSources[ShaderTypeFromString(type)] = (pos == std::string::npos) ? source.substr(nextLinePos) : source.substr(nextLinePos, pos - nextLinePos);
 		}
 
 		return shaderSources;
@@ -102,7 +103,7 @@ namespace Lithe {
 			const std::string& source = kv.second;
 
 			GLuint shader = glCreateShader(type);
-		
+
 			const GLchar* sourceCStr = source.c_str();
 			glShaderSource(shader, 1, &sourceCStr, 0);
 
@@ -141,8 +142,8 @@ namespace Lithe {
 			glGetProgramInfoLog(program, maxLength, &maxLength, &infoLog[0]);
 
 			glDeleteProgram(program);
-			
-			for (auto id :glShaderIDs)
+
+			for (auto id : glShaderIDs)
 				glDeleteShader(id);
 
 			LI_CORE_ERROR("{0}", infoLog.data());
@@ -151,7 +152,10 @@ namespace Lithe {
 		}
 
 		for (auto id : glShaderIDs)
+		{
+			glDetachShader(program, id);
 			glDeleteShader(id);
+		}
 
 		m_RendererID = program;
 	}
@@ -169,25 +173,34 @@ namespace Lithe {
 	void OpenGLShader::UploadUniformInt(const std::string& name, int value)
 	{
 		GLint location = glGetUniformLocation(m_RendererID, name.c_str());
-		glUniform1i(location, value);
+		glUniform1i(location, static_cast<GLint>(value));
 	}
 
 	void OpenGLShader::UploadUniformInt2(const std::string& name, const glm::vec2& values)
 	{
 		GLint location = glGetUniformLocation(m_RendererID, name.c_str());
-		glUniform2i(location, values.x, values.y);
+		glUniform2i(location, static_cast<GLint>(values.x), static_cast<GLint>(values.y));
 	}
 
 	void OpenGLShader::UploadUniformInt3(const std::string& name, const glm::vec3& values)
 	{
 		GLint location = glGetUniformLocation(m_RendererID, name.c_str());
-		glUniform3i(location, values.x, values.y, values.z);
+		glUniform3i(location,
+			static_cast<GLint>(values.x),
+			static_cast<GLint>(values.y),
+			static_cast<GLint>(values.z)
+		);
 	}
 
 	void OpenGLShader::UploadUniformInt4(const std::string& name, const glm::vec4& values)
 	{
 		GLint location = glGetUniformLocation(m_RendererID, name.c_str());
-		glUniform4i(location, values.x, values.y, values.z, values.w);
+		glUniform4i(location,
+			static_cast<GLint>(values.x),
+			static_cast<GLint>(values.y),
+			static_cast<GLint>(values.z),
+			static_cast<GLint>(values.w)
+		);
 	}
 
 	void OpenGLShader::UploadUniformFloat(const std::string& name, float value)

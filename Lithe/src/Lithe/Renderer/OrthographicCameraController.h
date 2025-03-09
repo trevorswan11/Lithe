@@ -33,6 +33,7 @@ namespace Lithe {
 		bool m_Rotation;
 		
 		glm::vec3 m_CameraPosition = { 0.0f, 0.0f, 0.0f };
+		// Counter-clockwise degrees
 		float m_CameraRotation = 0.0f;
 
 		float m_CameraTranslationSpeed = 5.0f, m_CameraRotaionSpeed = 180.0f;

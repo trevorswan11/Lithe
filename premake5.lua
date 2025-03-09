@@ -9,6 +9,11 @@ workspace "Lithe"
 		"Dist"
 	}
 
+	flags
+	{
+		"MultiProcessorCompile"
+	}
+
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 IncludeDir = {}
@@ -82,7 +87,6 @@ project "Lithe"
 
 		defines
 		{
-			"LI_PLATFORM_WINDOWS",
 			"LI_BUILD_DLL",
 			"GLFW_INCLUDE_NONE"
 		}
@@ -147,11 +151,6 @@ project "Sandbox"
 	filter "system:windows"
 		staticruntime "On"
 		systemversion "latest"
-
-		defines
-		{
-			"LI_PLATFORM_WINDOWS"
-		}
 
 	filter "configurations:Debug"
 		defines "LI_DEBUG"
