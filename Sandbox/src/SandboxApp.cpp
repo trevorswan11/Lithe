@@ -1,4 +1,5 @@
 #include <Lithe.h>
+#include <Lithe/Core/EntryPoint.h>
 
 #include "Platform/OpenGL/OpenGLShader.h"
 
@@ -6,6 +7,8 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+
+#include "Sandbox2D.h"
 
 // using namespace Lithe; // Makes implementation much easier, not done here for clarity
 
@@ -15,7 +18,7 @@ public:
 	ExampleLayer()
 		: Layer("Example"), m_CameraController(1280.0f / 720.0f, true)
 	{
-		m_VertexArray.reset(Lithe::VertexArray::Create());
+		m_VertexArray = Lithe::VertexArray::Create();
 
 		// Vertex Buffer
 		float vertices[3 * 7] = {
@@ -42,7 +45,7 @@ public:
 		indexBuffer.reset(Lithe::IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint32_t)));
 		m_VertexArray->SetIndexBuffer(indexBuffer);
 
-		m_SquareVA.reset(Lithe::VertexArray::Create());
+		m_SquareVA = Lithe::VertexArray::Create();
 
 		float squareVertices[5 * 4] = {
 			-0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
@@ -215,13 +218,14 @@ class Sandbox : public Lithe::Application
 public:
 	Sandbox()
 	{
-		PushLayer(new ExampleLayer());
 		Lithe::Application::GetWindow().SetVSync(true);
+
+		//PushLayer(new ExampleLayer());
+		PushLayer(new Sandbox2D());
 	}
 
 	~Sandbox()
 	{
-
 	}
 };
 

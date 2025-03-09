@@ -27,7 +27,3 @@
 #include "Lithe/Renderer/OrthographicCamera.h"
 #include "Lithe/Renderer/OrthographicCameraController.h"
 // -----------------
-
-// ---Entry Point---
-#include "Lithe/Core/EntryPoint.h"
-// -----------------
