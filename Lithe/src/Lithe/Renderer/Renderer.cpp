@@ -1,6 +1,8 @@
 #include "lipch.h"
 #include "Renderer.h"
 
+#include "Lithe/Renderer/Renderer2D.h"
+
 #include "Platform/OpenGL/OpenGLShader.h"
 
 namespace Lithe {
@@ -10,6 +12,7 @@ namespace Lithe {
 	void Renderer::Init()
 	{
 		RenderCommand::Init();
+		Renderer2D::Init();
 	}
 
 	void Renderer::OnWindowResize(uint32_t width, uint32_t height)

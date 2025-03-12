@@ -13,28 +13,6 @@ Sandbox2D::Sandbox2D()
 
 void Sandbox2D::OnAttach()
 {
-	m_SquareVA = Lithe::VertexArray::Create();
-
-	float squareVertices[3 * 4] = {
-		-0.5f, -0.5f, 0.0f,
-		 0.5f, -0.5f, 0.0f,
-		 0.5f,  0.5f, 0.0f,
-		-0.5f,  0.5f, 0.0f
-	};
-
-	Lithe::Ref<Lithe::VertexBuffer> squareVB;
-	squareVB.reset(Lithe::VertexBuffer::Create(squareVertices, sizeof(squareVertices)));
-	squareVB->SetLayout({
-		{ Lithe::ShaderDataType::Float3, "a_Position" }
-	});
-	m_SquareVA->AddVertexBuffer(squareVB);
-
-	uint32_t squareIndices[6] = { 0, 1, 2, 2, 3, 0 };
-	Lithe::Ref<Lithe::IndexBuffer> squareIB;
-	squareIB.reset(Lithe::IndexBuffer::Create(squareIndices, sizeof(squareIndices) / sizeof(uint32_t)));
-	m_SquareVA->SetIndexBuffer(squareIB);
-
-	m_FlatColorShader = Lithe::Shader::Create("assets/shaders/FlatColor.glsl");
 }
 
 void Sandbox2D::OnDetach()
@@ -50,14 +28,13 @@ void Sandbox2D::OnUpdate(Lithe::Timestep ts)
 	Lithe::RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1 });
 	Lithe::RenderCommand::Clear();
 
-	Lithe::Renderer::BeginScene(m_CameraController.GetCamera());
+	Lithe::Renderer2D::BeginScene(m_CameraController.GetCamera());
+	Lithe::Renderer2D::DrawQuad({ 0.0f, 0.0f }, { 1.0f, 1.0f }, { 0.8f, 0.2f, 0.3f, 1.0f });
+	Lithe::Renderer2D::EndScene();
 
-	std::dynamic_pointer_cast<Lithe::OpenGLShader>(m_FlatColorShader)->Bind();
-	std::dynamic_pointer_cast<Lithe::OpenGLShader>(m_FlatColorShader)->UploadUniformFloat4("u_Color", m_SquareColor);
-
-	Lithe::Renderer::Submit(m_FlatColorShader, m_SquareVA, glm::scale(glm::mat4(1.0f), glm::vec3(1.5f)));
-
-	Lithe::Renderer::EndScene();
+	//// TODO: Add - Shader::SetMat4 and Sahder::SetFloat4
+	//std::dynamic_pointer_cast<Lithe::OpenGLShader>(m_FlatColorShader)->Bind();
+	//std::dynamic_pointer_cast<Lithe::OpenGLShader>(m_FlatColorShader)->UploadUniformFloat4("u_Color", m_SquareColor);
 }
 
 void Sandbox2D::OnImGuiRender()

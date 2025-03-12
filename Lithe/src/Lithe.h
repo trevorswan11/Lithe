@@ -17,6 +17,7 @@
 
 // ---Rendering---
 #include "Lithe/Renderer/Renderer.h"
+#include "Lithe/Renderer/Renderer2D.h"
 #include "Lithe/Renderer/RenderCommand.h"
 
 #include "Lithe/Renderer/Shader.h"
