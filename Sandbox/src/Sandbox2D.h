@@ -21,5 +21,7 @@ private:
 	Lithe::Ref<Lithe::VertexArray> m_SquareVA;
 	Lithe::Ref<Lithe::Shader> m_FlatColorShader;
 
+	Lithe::Ref<Lithe::Texture2D> m_CheckerboardTexture;
+
 	glm::vec4 m_SquareColor = { 0.2f, 0.3f, 0.8f, 1.0f };
 };
