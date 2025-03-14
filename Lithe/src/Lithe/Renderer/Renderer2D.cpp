@@ -67,22 +67,34 @@ namespace Lithe {
 	{
 	}
 
-	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color)
+	// ---- Base Quad Drawing ----
+
+	// Draws a quad with a given color and optional scale factor for the texture at the base (0) z-level
+	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color, float textureScale)
 	{
-		DrawQuad({ position.x, position.y, 0.0f }, size, color);
+		DrawQuad({ position.x, position.y, 0.0f }, size, color, textureScale);
 	}
 
-	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const Ref<Texture>& texture)
+	// Draws a quad with a given texture and optional scale factor for the texture at the base (0) z-level
+	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const Ref<Texture>& texture, float textureScale)
 	{
-		DrawQuad({ position.x, position.y, 0.0f }, size, texture);
+		DrawQuad({ position.x, position.y, 0.0f }, size, texture, textureScale);
 	}
 
-	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color)
+	// Draws a quad with a given colored texture and optional scale factor for the texture at the base (0) z-level
+	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const Ref<Texture>& texture, const glm::vec4& color, float textureScale)
+	{
+		DrawQuad({ position.x, position.y, 0.0f }, size, texture, color, textureScale);
+	}
+
+	// Draws a quad with a given color and optional scale factor for the texture at the given z-level
+	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color, float textureScale)
 	{
 		s_Data->TextureShader->SetFloat4("u_Color", color);
+		s_Data->TextureShader->SetFloat("u_TextureScale", textureScale);
 		s_Data->WhiteTexture->Bind();
 
-		glm::mat4 transform = glm::translate(glm::mat4(1.0f), { position.x, position.y, -1 * position.z })
+		glm::mat4 transform = glm::translate(glm::mat4(1.0f), { position.x, position.y, position.z })
 			* glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
 		s_Data->TextureShader->SetMat4("u_Transform", transform);
 
@@ -90,12 +102,14 @@ namespace Lithe {
 		RenderCommand::DrawIndexed(s_Data->QuadVertexArray);
 	}
 
-	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const Ref<Texture>& texture)
+	// Draws a quad with a given texture and optional scale factor for the texture at the given z-level
+	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const Ref<Texture>& texture, float textureScale)
 	{
 		s_Data->TextureShader->SetFloat4("u_Color", glm::vec4(1.0f));
+		s_Data->TextureShader->SetFloat("u_TextureScale", textureScale);
 		texture->Bind();
 
-		glm::mat4 transform = glm::translate(glm::mat4(1.0f), { position.x, position.y, -1 * position.z })
+		glm::mat4 transform = glm::translate(glm::mat4(1.0f), { position.x, position.y, position.z })
 			* glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
 		s_Data->TextureShader->SetMat4("u_Transform", transform);
 
@@ -103,22 +117,49 @@ namespace Lithe {
 		RenderCommand::DrawIndexed(s_Data->QuadVertexArray);
 	}
 
-	void Renderer2D::DrawRotatedQuad(const glm::vec2& position, float rotation, const glm::vec2& size, const glm::vec4& color)
-	{
-		DrawRotatedQuad({ position.x, position.y, 0.0f }, rotation, size, color);
-	}
-
-	void Renderer2D::DrawRotatedQuad(const glm::vec2& position, float rotation, const glm::vec2& size, const Ref<Texture>& texture)
-	{
-		DrawRotatedQuad({ position.x, position.y, 0.0f }, rotation, size, texture);
-	}
-
-	void Renderer2D::DrawRotatedQuad(const glm::vec3& position, float rotation, const glm::vec2& size, const glm::vec4& color)
+	// Draws a quad with a given colored texture and optional scale factor for the texture at the given z-level
+	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const Ref<Texture>& texture, const glm::vec4& color, float textureScale)
 	{
 		s_Data->TextureShader->SetFloat4("u_Color", color);
+		s_Data->TextureShader->SetFloat("u_TextureScale", textureScale);
+		texture->Bind();
+
+		glm::mat4 transform = glm::translate(glm::mat4(1.0f), { position.x, position.y, position.z })
+			* glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
+		s_Data->TextureShader->SetMat4("u_Transform", transform);
+
+		s_Data->QuadVertexArray->Bind();
+		RenderCommand::DrawIndexed(s_Data->QuadVertexArray);
+	}
+
+	// ---- Rotated Quad Drawing ----
+
+	// Draws a rotated quad with a given color and optional scale factor for the texture at the base (0) z-level
+	void Renderer2D::DrawRotatedQuad(const glm::vec2& position, float rotation, const glm::vec2& size, const glm::vec4& color, float textureScale)
+	{
+		DrawRotatedQuad({ position.x, position.y, 0.0f }, rotation, size, color, textureScale);
+	}
+
+	// Draws a rotated quad with a given texture and optional scale factor for the texture at the base (0) z-level
+	void Renderer2D::DrawRotatedQuad(const glm::vec2& position, float rotation, const glm::vec2& size, const Ref<Texture>& texture, float textureScale)
+	{
+		DrawRotatedQuad({ position.x, position.y, 0.0f }, rotation, size, texture, textureScale);
+	}
+
+	// Draws a rotated quad with a given colored texture and optional scale factor for the texture at the base (0) z-level
+	void Renderer2D::DrawRotatedQuad(const glm::vec2& position, float rotation, const glm::vec2& size, const Ref<Texture>& texture, const glm::vec4& color, float textureScale)
+	{
+		DrawRotatedQuad({ position.x, position.y, 0.0f }, rotation, size, texture, color, textureScale);
+	}
+
+	// Draws a rotated quad with a given color and optional scale factor for the texture at the given z-level
+	void Renderer2D::DrawRotatedQuad(const glm::vec3& position, float rotation, const glm::vec2& size, const glm::vec4& color, float textureScale)
+	{
+		s_Data->TextureShader->SetFloat4("u_Color", color);
+		s_Data->TextureShader->SetFloat("u_TextureScale", textureScale);
 		s_Data->WhiteTexture->Bind();
 
-		glm::mat4 transform = glm::translate(glm::mat4(1.0f), { position.x, position.y, -1 * position.z })
+		glm::mat4 transform = glm::translate(glm::mat4(1.0f), { position.x, position.y, position.z })
 			* glm::rotate(glm::mat4(1.0f), glm::radians(rotation), { 0.0f, 0.0f, 1.0f }) 
 			* glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
 		s_Data->TextureShader->SetMat4("u_Transform", transform);
@@ -127,12 +168,30 @@ namespace Lithe {
 		RenderCommand::DrawIndexed(s_Data->QuadVertexArray);
 	}
 
-	void Renderer2D::DrawRotatedQuad(const glm::vec3& position, float rotation, const glm::vec2& size, const Ref<Texture>& texture)
+	// Draws a rotated quad with a given texture and optional scale factor for the texture at the given z-level
+	void Renderer2D::DrawRotatedQuad(const glm::vec3& position, float rotation, const glm::vec2& size, const Ref<Texture>& texture, float textureScale)
 	{
 		s_Data->TextureShader->SetFloat4("u_Color", glm::vec4(1.0f));
+		s_Data->TextureShader->SetFloat("u_TextureScale", textureScale);
 		texture->Bind();
 
-		glm::mat4 transform = glm::translate(glm::mat4(1.0f), { position.x, position.y, -1 * position.z })
+		glm::mat4 transform = glm::translate(glm::mat4(1.0f), { position.x, position.y, position.z })
+			* glm::rotate(glm::mat4(1.0f), glm::radians(rotation), { 0.0f, 0.0f, 1.0f })
+			* glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
+		s_Data->TextureShader->SetMat4("u_Transform", transform);
+
+		s_Data->QuadVertexArray->Bind();
+		RenderCommand::DrawIndexed(s_Data->QuadVertexArray);
+	}
+
+	// Draws a rotated quad with a given colored texture and optional scale factor for the texture at the given z-level
+	void Renderer2D::DrawRotatedQuad(const glm::vec3& position, float rotation, const glm::vec2& size, const Ref<Texture>& texture, const glm::vec4& color, float textureScale)
+	{
+		s_Data->TextureShader->SetFloat4("u_Color", color);
+		s_Data->TextureShader->SetFloat("u_TextureScale", textureScale);
+		texture->Bind();
+
+		glm::mat4 transform = glm::translate(glm::mat4(1.0f), { position.x, position.y, position.z })
 			* glm::rotate(glm::mat4(1.0f), glm::radians(rotation), { 0.0f, 0.0f, 1.0f })
 			* glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
 		s_Data->TextureShader->SetMat4("u_Transform", transform);
