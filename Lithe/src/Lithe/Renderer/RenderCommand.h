@@ -5,7 +5,7 @@
 
 namespace Lithe {
 
-	class LITHE_API RenderCommand
+	class RenderCommand
 	{
 	public:
 		inline static void Init()

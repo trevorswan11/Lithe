@@ -6,7 +6,7 @@
 
 namespace Lithe {
 
-	class LITHE_API OrthographicCamera
+	class OrthographicCamera
 	{
 	public:
 		OrthographicCamera(float left, float right, float bottom, float top);

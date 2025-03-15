@@ -9,7 +9,7 @@
 
 namespace Lithe {
 
-	class LITHE_API OrthographicCameraController
+	class OrthographicCameraController
 	{
 	public:
 		OrthographicCameraController(float aspectratio, bool rotation = false);

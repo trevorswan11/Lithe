@@ -9,7 +9,7 @@ namespace Lithe {
 
 	// LayerStack is 2owned by the applcaiton, layers should live for a long long time
 
-	class LITHE_API LayerStack
+	class LayerStack
 	{
 	using layer_stack = std::vector<Layer*>;
 	public:

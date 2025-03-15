@@ -8,7 +8,7 @@
 namespace Lithe {
 
 	// Handles applciation wide logging
-	class LITHE_API Log
+	class Log
 	{
 	public:
 		static void Init();

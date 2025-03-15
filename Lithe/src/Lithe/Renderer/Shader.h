@@ -9,7 +9,7 @@
 
 namespace Lithe {
 
-	class LITHE_API Shader
+	class Shader
 	{
 	public:
 		virtual ~Shader() = default;

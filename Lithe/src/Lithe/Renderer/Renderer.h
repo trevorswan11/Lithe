@@ -8,7 +8,7 @@
 
 namespace Lithe {
 
-	class LITHE_API Renderer
+	class Renderer
 	{
 	public:
 		static void Init();

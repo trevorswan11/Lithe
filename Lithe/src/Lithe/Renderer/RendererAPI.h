@@ -7,7 +7,7 @@
 
 namespace Lithe {
 
-	class LITHE_API RendererAPI
+	class RendererAPI
 	{
 	public:
 		enum class API

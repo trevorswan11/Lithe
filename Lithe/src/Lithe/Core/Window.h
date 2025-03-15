@@ -24,7 +24,7 @@ namespace Lithe {
 	};
 
 	// Interface represeting desktop system based Window
-	class LITHE_API Window
+	class Window
 	{
 	public:
 		using EventCallbackFn = std::function<void(Event&)>;

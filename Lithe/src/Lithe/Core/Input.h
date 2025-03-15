@@ -4,7 +4,7 @@
 
 namespace Lithe {
 
-	class LITHE_API Input
+	class Input
 	{
 	protected:
 		Input() = default;

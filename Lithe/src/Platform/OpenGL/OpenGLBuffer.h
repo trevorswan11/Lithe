@@ -24,7 +24,7 @@ namespace Lithe {
 
 	// --------------------------- INDEX BUFFER ---------------------------
 
-	class LITHE_API OpenGLIndexBuffer : public IndexBuffer
+	class OpenGLIndexBuffer : public IndexBuffer
 	{
 	public:
 		OpenGLIndexBuffer(uint32_t* indices, uint32_t count);

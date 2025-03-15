@@ -7,7 +7,7 @@
 
 namespace Lithe {
 
-	class LITHE_API VertexArray
+	class VertexArray
 	{
 	public:
 		virtual ~VertexArray() {}

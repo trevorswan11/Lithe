@@ -78,7 +78,7 @@ namespace Lithe {
 
 	// --------------------------- BUFFER LAYOUT ---------------------------
 
-	class LITHE_API BufferLayout
+	class BufferLayout
 	{
 	public:
 		BufferLayout() {}
@@ -115,7 +115,7 @@ namespace Lithe {
 
 	// --------------------------- VERTEX BUFFER ---------------------------
 
-	class LITHE_API VertexBuffer
+	class VertexBuffer
 	{
 	public:
 		virtual ~VertexBuffer() {}
@@ -131,7 +131,7 @@ namespace Lithe {
 
 	// --------------------------- INDEX BUFFER ---------------------------
 
-	class LITHE_API IndexBuffer
+	class IndexBuffer
 	{
 	public:
 		virtual ~IndexBuffer() {}

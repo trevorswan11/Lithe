@@ -6,7 +6,7 @@ namespace Lithe {
 
 	// ---- TEXTURE BASE CLASS ----
 
-	class LITHE_API Texture
+	class Texture
 	{
 	public:
 		virtual ~Texture() = default;
@@ -22,7 +22,7 @@ namespace Lithe {
 
 	// ---- TEXTURE 2D CLASS ----
 
-	class LITHE_API Texture2D : public Texture
+	class Texture2D : public Texture
 	{
 	public:
 		static Ref<Texture2D> Create(uint32_t width, uint32_t height);

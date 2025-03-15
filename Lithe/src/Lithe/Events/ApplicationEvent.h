@@ -7,7 +7,7 @@
 namespace Lithe {
 
 	// Handles window Resizing, including minimizing the Application
-	class LITHE_API WindowResizeEvent : public Event
+	class WindowResizeEvent : public Event
 	{
 	public:
 		WindowResizeEvent(unsigned int width, unsigned int height)
@@ -31,7 +31,7 @@ namespace Lithe {
 	};
 
 	// Handles the Close Button on Applications
-	class LITHE_API WindowCloseEvent : public Event
+	class WindowCloseEvent : public Event
 	{
 	public:
 		WindowCloseEvent() {}
@@ -44,7 +44,7 @@ namespace Lithe {
 
 	// ---May remove implementation in the future---
 
-	class LITHE_API AppTickEvent : public Event
+	class AppTickEvent : public Event
 	{
 	public:
 		AppTickEvent() {}
@@ -53,7 +53,7 @@ namespace Lithe {
 		EVENT_CLASS_CATEGORY(EventCategoryApplication)
 	};
 
-	class LITHE_API AppUpdateEvent : public Event
+	class AppUpdateEvent : public Event
 	{
 	public:
 		AppUpdateEvent() {}
@@ -62,7 +62,7 @@ namespace Lithe {
 		EVENT_CLASS_CATEGORY(EventCategoryApplication)
 	};
 
-	class LITHE_API AppRenderEvent : public Event
+	class AppRenderEvent : public Event
 	{
 	public:
 		AppRenderEvent() {}

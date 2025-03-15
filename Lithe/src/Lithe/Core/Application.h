@@ -15,7 +15,7 @@
 
 namespace Lithe {
 
-	class LITHE_API Application
+	class Application
 	{
 	public:
 		Application();

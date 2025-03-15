@@ -47,7 +47,7 @@ namespace Lithe {
 #define EVENT_CLASS_CATEGORY(category) virtual int GetCategoryFlags() const override { return category; }
 
 	// Base class for any event, defining shared behavior and implementation
-	class LITHE_API Event
+	class Event
 	{
 		friend class EventDispatcher;
 	public:

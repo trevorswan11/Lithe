@@ -35,21 +35,6 @@
 	#error "Unknown platform!"
 #endif // End of platform detection
 
-// DLL support
-#ifdef LI_PLATFORM_WINDOWS
-	#if LI_DYNAMIC_LINK
-		#ifdef LI_BUILD_DLL
-			#define LITHE_API __declspec(dllexport)
-		#else
-			#define LITHE_API __declspec(dllimport)
-		#endif
-	#else
-		#define LITHE_API
-	#endif
-#else
-	#error Lithe only supports Windows!
-#endif // End of DLL support
-
 // Assertions if enabled, specified in premake for debug only
 #ifdef LI_DEBUG
 	#define LI_ENABLE_ASSERTS
