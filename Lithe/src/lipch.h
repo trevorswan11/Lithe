@@ -18,6 +18,8 @@
 
 #include "Lithe/Core/Log.h"
 
+#include "Lithe/Debug/Instrumentor.h"
+
 #ifdef LI_PLATFORM_WINDOWS
 	#include <Windows.h>
 #endif

@@ -57,6 +57,8 @@
 
 #define LI_BIND_EVENT_FN(fn) std::bind(&fn, this, std::placeholders::_1)
 
+#define CONCAT(x, y) x ## y
+
 namespace Lithe {
 
 	template<typename T>
