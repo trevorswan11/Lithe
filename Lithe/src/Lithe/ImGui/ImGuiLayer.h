@@ -16,9 +16,6 @@ namespace Lithe {
 
 		virtual void OnAttach() override;
 		virtual void OnDetach() override;
-		virtual void OnImGuiRender() override;
-
-		// Begin and end imgui window rendering
 
 		void Begin();
 		void End();
