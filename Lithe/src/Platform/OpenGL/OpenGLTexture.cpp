@@ -1,7 +1,7 @@
 #include "lipch.h"
 #include "OpenGLTexture.h"
 
-#include "stb_image.h"
+#include <stb_image.h>
 
 namespace Lithe {
 	OpenGLTexture2D::OpenGLTexture2D(uint32_t width, uint32_t height)

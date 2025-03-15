@@ -1,8 +1,9 @@
 #include "lipch.h"
 #include "WindowsInput.h"
 
-#include <GLFW/glfw3.h>
 #include "Lithe/Core/Application.h"
+
+#include <GLFW/glfw3.h>
 
 namespace Lithe {
 

@@ -13,7 +13,7 @@ namespace Lithe {
 	{
 	using layer_stack = std::vector<Layer*>;
 	public:
-		LayerStack();
+		LayerStack() = default;
 		~LayerStack();
 
 		void PushLayer(Layer* layer);

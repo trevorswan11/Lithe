@@ -1,8 +1,6 @@
 #include <Lithe.h>
 #include <Lithe/Core/EntryPoint.h>
 
-#include "Platform/OpenGL/OpenGLShader.h"
-
 #include "imgui/imgui.h"
 
 #include <glm/gtc/matrix_transform.hpp>
@@ -27,10 +25,7 @@ public:
 			0.0f, 0.5f, 0.0f, 0.8f, 0.8f, 0.2f, 1.0f
 		};
 
-		Lithe::Ref<Lithe::VertexBuffer> vertexBuffer;
-		vertexBuffer.reset(Lithe::VertexBuffer::Create(vertices, sizeof(vertices)));
-		vertexBuffer.reset(Lithe::VertexBuffer::Create(vertices, sizeof(vertices)));
-
+		Lithe::Ref<Lithe::VertexBuffer> vertexBuffer = Lithe::VertexBuffer::Create(vertices, sizeof(vertices));
 		Lithe::BufferLayout layout = {
 			{ Lithe::ShaderDataType::Float3, "a_Position" },
 			{ Lithe::ShaderDataType::Float4, "a_Color" }
@@ -41,12 +36,12 @@ public:
 
 		// Index Buffer
 		uint32_t indices[3] = { 0, 1, 2 };
-		Lithe::Ref<Lithe::IndexBuffer> indexBuffer;
-		indexBuffer.reset(Lithe::IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint32_t)));
+		Lithe::Ref<Lithe::IndexBuffer> indexBuffer = Lithe::IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint32_t));
 		m_VertexArray->SetIndexBuffer(indexBuffer);
 
 		m_SquareVA = Lithe::VertexArray::Create();
 
+		// Vertex Buffer
 		float squareVertices[5 * 4] = {
 			-0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
 			0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
@@ -54,17 +49,16 @@ public:
 			- 0.5f, 0.5f, 0.0f, 0.0f, 1.0f
 		};
 
-		Lithe::Ref<Lithe::VertexBuffer> squareVB;
-		squareVB.reset(Lithe::VertexBuffer::Create(squareVertices, sizeof(squareVertices)));
+		Lithe::Ref<Lithe::VertexBuffer> squareVB = Lithe::VertexBuffer::Create(squareVertices, sizeof(squareVertices));
 		squareVB->SetLayout({
 			{ Lithe::ShaderDataType::Float3, "a_Position" },
 			{ Lithe::ShaderDataType::Float2, "a_TexCoord" }
 		});
 		m_SquareVA->AddVertexBuffer(squareVB);
 
+		// Index Buffer
 		uint32_t squareIndices[6] = { 0, 1, 2, 2, 3, 0 };
-		Lithe::Ref<Lithe::IndexBuffer> squareIB;
-		squareIB.reset(Lithe::IndexBuffer::Create(squareIndices, sizeof(squareIndices) / sizeof(uint32_t)));
+		Lithe::Ref<Lithe::IndexBuffer> squareIB = Lithe::IndexBuffer::Create(squareIndices, sizeof(squareIndices) / sizeof(uint32_t));
 		m_SquareVA->SetIndexBuffer(squareIB);
 
 		// Shader source code to use -- Use R"()" for easy multi-line strings
@@ -144,8 +138,8 @@ public:
 		m_Texture = Lithe::Texture2D::Create("assets/textures/CheckerboardExample.png");
 		m_YellowBalloonTexture = Lithe::Texture2D::Create("assets/textures/BTD6_YellowBalloon.png");
 		
-		std::dynamic_pointer_cast<Lithe::OpenGLShader>(textureShader)->Bind();
-		std::dynamic_pointer_cast<Lithe::OpenGLShader>(textureShader)->UploadUniformInt("u_Texture", 0);
+		textureShader->Bind();
+		textureShader->SetInt("u_Texture", 0);
 	}
 
 	void OnUpdate(Lithe::Timestep ts) override
@@ -161,8 +155,8 @@ public:
 
 		glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(0.1f));
 
-		std::dynamic_pointer_cast<Lithe::OpenGLShader>(m_FlatColorShader)->Bind();
-		std::dynamic_pointer_cast<Lithe::OpenGLShader>(m_FlatColorShader)->UploadUniformFloat3("u_Color", m_SquareColor);
+		m_FlatColorShader->Bind();
+		m_FlatColorShader->SetFloat3("u_Color", m_SquareColor);
 		
 		for (int y = 0; y < 20; y++)
 		{

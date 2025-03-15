@@ -3,8 +3,6 @@
 
 namespace Lithe {
 
-	LayerStack::LayerStack() {}
-
 	LayerStack::~LayerStack()
 	{
 		for (Layer* l : m_Layers)
