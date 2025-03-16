@@ -11,6 +11,8 @@ namespace Lithe {
 
 	Application::Application()
 	{
+		LI_PROFILE_FUNCTION();
+
 		LI_CORE_ASSERT(!s_Instance, "Application already exists!");
 		s_Instance = this;
 
@@ -25,28 +27,38 @@ namespace Lithe {
 
 	Application::~Application()
 	{
+		LI_PROFILE_FUNCTION();
+
 		Renderer::Shutdown();
 	}
 
 	void Application::PushLayer(Layer* layer)
 	{
+		LI_PROFILE_FUNCTION();
+
 		m_LayerStack.PushLayer(layer);
+		layer->OnAttach();
 	}
 
 	void Application::PushOverlay(Layer* layer)
 	{
+		LI_PROFILE_FUNCTION();
+
 		m_LayerStack.PushOverlay(layer);
+		layer->OnAttach();
 	}
 
 	void Application::OnEvent(Event& e)
 	{
+		LI_PROFILE_FUNCTION();
+
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<WindowCloseEvent>(LI_BIND_EVENT_FN(Application::OnWindowClose));
 		dispatcher.Dispatch<WindowResizeEvent>(LI_BIND_EVENT_FN(Application::OnWindowResize));
 
-		for (auto it = m_LayerStack.end(); it != m_LayerStack.begin(); )
+		for (auto it = m_LayerStack.rbegin(); it != m_LayerStack.rend(); ++it)
 		{
-			(*--it)->OnEvent(e);
+			(*it)->OnEvent(e);
 			if (e.Handled)
 				break;
 		}
@@ -54,22 +66,34 @@ namespace Lithe {
 
 	void Application::Run()
 	{
+		LI_PROFILE_FUNCTION();
+
 		while (m_Running)
 		{
+			LI_PROFILE_SCOPE("RunLoop");
+
 			float time = (float)glfwGetTime(); // Will change to platform independent
 			Timestep timestep = time - m_LastFrameTime;
 			m_LastFrameTime = time;
 
 			if (!m_Minimized)
 			{
-				for (Layer* l : m_LayerStack)
-					l->OnUpdate(timestep);
-			}
+				{
+					LI_PROFILE_SCOPE("LayerStack OnUpdate");
 
-			m_ImGuiLayer->Begin();
-			for (Layer* l : m_LayerStack)
-				l->OnImGuiRender();
-			m_ImGuiLayer->End();
+					for (Layer* l : m_LayerStack)
+						l->OnUpdate(timestep);
+				}
+
+				m_ImGuiLayer->Begin();
+				{
+					LI_PROFILE_SCOPE("LayerStack OnImGuiRender");
+
+					for (Layer* l : m_LayerStack)
+						l->OnImGuiRender();
+				}
+				m_ImGuiLayer->End();
+			}
 
 			m_Window->OnUpdate();
 		}
@@ -83,6 +107,8 @@ namespace Lithe {
 
 	bool Application::OnWindowResize(WindowResizeEvent& e)
 	{
+		LI_PROFILE_FUNCTION();
+
 		if (e.GetWidth() == 0 || e.GetHeight() == 0)
 		{
 			m_Minimized = true;

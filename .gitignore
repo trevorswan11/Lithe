@@ -17,6 +17,12 @@ bin
 bin-int/
 Reference/
 
+# Lithe Files
+LitheProfile-Startup.json
+LitheProfile-Runtime.json
+LitheProfile-Shutdown.json
+*.log
+
 # Visual Studio Files
 .vs
 .vscode

@@ -13,6 +13,8 @@
 
 #include "Lithe/ImGui/ImGuiLayer.h"
 
+int main(int argc, char** argv);
+
 namespace Lithe {
 
 	class Application
@@ -20,8 +22,6 @@ namespace Lithe {
 	public:
 		Application();
 		virtual ~Application();
-
-		void Run();
 
 		void OnEvent(Event& e);
 
@@ -31,6 +31,8 @@ namespace Lithe {
 		inline static Application& Get() { return *s_Instance; }
 		inline Window& GetWindow() { return *m_Window; }
 	private:
+		void Run();
+
 		bool OnWindowClose(WindowCloseEvent& e);
 		bool OnWindowResize(WindowResizeEvent& e);
 	private:
@@ -42,6 +44,7 @@ namespace Lithe {
 		float m_LastFrameTime = 0.0f;
 	private:
 		static Application* s_Instance;
+		friend int ::main(int argc, char** argv);
 	};
 
 	// To be defined in CLIENT

@@ -20,6 +20,8 @@ namespace Lithe {
 
 	void Renderer2D::Init()
 	{
+		LI_PROFILE_FUNCTION();
+
 		s_Data = new Renderer2DData();
 		s_Data->QuadVertexArray = VertexArray::Create();
 
@@ -52,17 +54,40 @@ namespace Lithe {
 
 	void Renderer2D::Shutdown()
 	{
+		LI_PROFILE_FUNCTION();
+
 		delete s_Data;
 	}
 
 	void Renderer2D::BeginScene(const OrthographicCamera& camera)
 	{
+		LI_PROFILE_FUNCTION();
+
 		s_Data->TextureShader->Bind();
 		s_Data->TextureShader->SetMat4("u_ViewProjection", camera.GetViewProjectionMatrix());
 	}
 
 	void Renderer2D::EndScene()
 	{
+		LI_PROFILE_FUNCTION();
+
+	}
+
+	void Renderer2D::DrawQuad(const QuadProperties& properties)
+	{
+		LI_PROFILE_FUNCTION();
+
+		s_Data->TextureShader->SetFloat4("u_Color", properties.GetColor());
+		s_Data->TextureShader->SetFloat("u_TextureScale", properties.GetTextureScale());
+		properties.GetTexture()->Bind();
+
+		glm::mat4 transform = glm::translate(glm::mat4(1.0f), properties.GetPosition())
+			* glm::rotate(glm::mat4(1.0f), properties.GetRotation(), {0.0f, 0.0f, 1.0f})
+			* glm::scale(glm::mat4(1.0f), glm::vec3(properties.GetSize(), 1.0f));
+		s_Data->TextureShader->SetMat4("u_Transform", transform);
+
+		s_Data->QuadVertexArray->Bind();
+		RenderCommand::DrawIndexed(s_Data->QuadVertexArray);
 	}
 
 	// ---- Base Quad Drawing ----
@@ -88,6 +113,8 @@ namespace Lithe {
 	// Draws a quad with a given color and optional scale factor for the texture at the given z-level
 	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color, float textureScale)
 	{
+		LI_PROFILE_FUNCTION();
+
 		s_Data->TextureShader->SetFloat4("u_Color", color);
 		s_Data->TextureShader->SetFloat("u_TextureScale", textureScale);
 		s_Data->WhiteTexture->Bind();
@@ -103,6 +130,8 @@ namespace Lithe {
 	// Draws a quad with a given texture and optional scale factor for the texture at the given z-level
 	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const Ref<Texture>& texture, float textureScale)
 	{
+		LI_PROFILE_FUNCTION();
+
 		s_Data->TextureShader->SetFloat4("u_Color", glm::vec4(1.0f));
 		s_Data->TextureShader->SetFloat("u_TextureScale", textureScale);
 		texture->Bind();
@@ -118,6 +147,8 @@ namespace Lithe {
 	// Draws a quad with a given colored texture and optional scale factor for the texture at the given z-level
 	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const Ref<Texture>& texture, const glm::vec4& color, float textureScale)
 	{
+		LI_PROFILE_FUNCTION();
+
 		s_Data->TextureShader->SetFloat4("u_Color", color);
 		s_Data->TextureShader->SetFloat("u_TextureScale", textureScale);
 		texture->Bind();
@@ -153,6 +184,8 @@ namespace Lithe {
 	// Draws a rotated quad with a given color and optional scale factor for the texture at the given z-level
 	void Renderer2D::DrawRotatedQuad(const glm::vec3& position, float rotation, const glm::vec2& size, const glm::vec4& color, float textureScale)
 	{
+		LI_PROFILE_FUNCTION();
+
 		s_Data->TextureShader->SetFloat4("u_Color", color);
 		s_Data->TextureShader->SetFloat("u_TextureScale", textureScale);
 		s_Data->WhiteTexture->Bind();
@@ -169,6 +202,8 @@ namespace Lithe {
 	// Draws a rotated quad with a given texture and optional scale factor for the texture at the given z-level
 	void Renderer2D::DrawRotatedQuad(const glm::vec3& position, float rotation, const glm::vec2& size, const Ref<Texture>& texture, float textureScale)
 	{
+		LI_PROFILE_FUNCTION();
+
 		s_Data->TextureShader->SetFloat4("u_Color", glm::vec4(1.0f));
 		s_Data->TextureShader->SetFloat("u_TextureScale", textureScale);
 		texture->Bind();
@@ -185,6 +220,8 @@ namespace Lithe {
 	// Draws a rotated quad with a given colored texture and optional scale factor for the texture at the given z-level
 	void Renderer2D::DrawRotatedQuad(const glm::vec3& position, float rotation, const glm::vec2& size, const Ref<Texture>& texture, const glm::vec4& color, float textureScale)
 	{
+		LI_PROFILE_FUNCTION();
+
 		s_Data->TextureShader->SetFloat4("u_Color", color);
 		s_Data->TextureShader->SetFloat("u_TextureScale", textureScale);
 		texture->Bind();

@@ -20,6 +20,8 @@ namespace Lithe {
 
 	OpenGLShader::OpenGLShader(const std::string& filepath)
 	{
+		LI_PROFILE_FUNCTION();
+
 		std::string source = ReadFile(filepath);
 		auto shaderSources = PreProcess(source);
 		Compile(shaderSources);
@@ -36,6 +38,8 @@ namespace Lithe {
 	OpenGLShader::OpenGLShader(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc)
 		: m_Name(name)
 	{
+		LI_PROFILE_FUNCTION();
+
 		std::unordered_map<GLenum, std::string> sources;
 		sources[GL_VERTEX_SHADER] = vertexSrc;
 		sources[GL_FRAGMENT_SHADER] = fragmentSrc;
@@ -44,11 +48,15 @@ namespace Lithe {
 
 	OpenGLShader::~OpenGLShader()
 	{
+		LI_PROFILE_FUNCTION();
+
 		glDeleteProgram(m_RendererID);
 	}
 
 	std::string OpenGLShader::ReadFile(const std::string& filepath)
 	{
+		LI_PROFILE_FUNCTION();
+
 		std::string result;
 		std::ifstream in(filepath, std::ios::in | std::ios::binary);
 		if (in)
@@ -72,6 +80,8 @@ namespace Lithe {
 
 	std::unordered_map<GLenum, std::string> OpenGLShader::PreProcess(const std::string& source)
 	{
+		LI_PROFILE_FUNCTION();
+
 		std::unordered_map<GLenum, std::string> shaderSources;
 
 		const char* typeToken = "#type";
@@ -97,6 +107,8 @@ namespace Lithe {
 	// Contains source code from https://www.khronos.org/opengl/wiki/Shader_Compilation
 	void OpenGLShader::Compile(const std::unordered_map<GLenum, std::string>& shaderSources)
 	{
+		LI_PROFILE_FUNCTION();
+
 		GLuint program = glCreateProgram();
 		LI_CORE_ASSERT(shaderSources.size() <= MAX_ALLOWED_SHADERS, "Only 2 shaders are supported!");
 		std::array<GLenum, MAX_ALLOWED_SHADERS> glShaderIDs;
@@ -166,36 +178,50 @@ namespace Lithe {
 
 	void OpenGLShader::Bind() const
 	{
+		LI_PROFILE_FUNCTION();
+
 		glUseProgram(m_RendererID);
 	}
 
 	void OpenGLShader::Unbind() const
 	{
+		LI_PROFILE_FUNCTION();
+
 		glUseProgram(0);
 	}
 
 	void OpenGLShader::SetInt(const std::string& name, int value)
 	{
+		LI_PROFILE_FUNCTION();
+
 		UploadUniformInt(name, value);
 	}
 
 	void OpenGLShader::SetFloat(const std::string& name, float value)
 	{
+		LI_PROFILE_FUNCTION();
+
 		UploadUniformFloat(name, value);
 	}
 
 	void OpenGLShader::SetFloat3(const std::string& name, const glm::vec3& values)
 	{
+		LI_PROFILE_FUNCTION();
+
 		UploadUniformFloat3(name, values);
 	}
 
 	void OpenGLShader::SetFloat4(const std::string& name, const glm::vec4& values)
 	{
+		LI_PROFILE_FUNCTION();
+
 		UploadUniformFloat4(name, values);
 	}
 
 	void OpenGLShader::SetMat4(const std::string& name, const glm::mat4& values)
 	{
+		LI_PROFILE_FUNCTION();
+
 		UploadUniformMat4(name, values);
 	}
 

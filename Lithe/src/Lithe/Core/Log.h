@@ -28,7 +28,7 @@ namespace Lithe {
 #define LI_CORE_INFO(...)		::Lithe::Log::GetCoreLogger()->info(__VA_ARGS__)
 #define LI_CORE_WARN(...)		::Lithe::Log::GetCoreLogger()->warn(__VA_ARGS__)
 #define LI_CORE_ERROR(...)		::Lithe::Log::GetCoreLogger()->error(__VA_ARGS__)
-#define LI_CORE_CRTITICAL(...)	::Lithe::Log::GetCoreLogger()->critical(__VA_ARGS__)
+#define LI_CORE_CRITICAL(...)	::Lithe::Log::GetCoreLogger()->critical(__VA_ARGS__)
 
 // Client log macros
 
@@ -44,4 +44,4 @@ namespace Lithe {
 //#define LI_CORE_INFO(...)
 //#define LI_CORE_WARN(...)
 //#define LI_CORE_ERROR(...)
-//#define LI_CORE_CRTITICAL(...)
+//#define LI_CORE_CRITICAL(...)
