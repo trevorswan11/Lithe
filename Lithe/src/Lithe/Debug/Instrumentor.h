@@ -161,8 +161,7 @@ namespace Lithe {
 
 }
 
-#define LI_PROFILE 1 // TODO: CoreConfig for project
-#if LI_PROFILE
+#ifdef LI_PROFILE
     #define LI_PROFILE_BEGIN_SESSION(name, filepath)    ::Lithe::Instrumentor::Get().BeginSession(name, filepath)
     #define LI_PROFILE_END_SESSION()                    ::Lithe::Instrumentor::Get().EndSession()
     #define LI_PROFILE_SCOPE(name)                      ::Lithe::InstrumentationTimer CONCAT(timer, __LINE__)(name)

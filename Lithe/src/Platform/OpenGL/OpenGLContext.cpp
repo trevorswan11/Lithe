@@ -21,7 +21,7 @@ namespace Lithe {
 		LI_CORE_ASSERT(status, "Failed to initialize Glad!");
 
 		// Show the graphics driver that is being used
-		LI_CORE_INFO("OpenGl Info:");
+		LI_CORE_INFO("OpenGL Info:");
 		LI_CORE_INFO("  Vendor: {0}", (const char*)glGetString(GL_VENDOR));
 		LI_CORE_INFO("  Renderer: {0}", (const char*)glGetString(GL_RENDERER));
 		LI_CORE_INFO("  Version: {0}", (const char*)glGetString(GL_VERSION));

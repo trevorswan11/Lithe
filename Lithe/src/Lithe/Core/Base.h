@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Lithe/Debug/Config.h"
+
 #include <memory>
 
 // Platform detection using predefined macros
@@ -38,6 +40,9 @@
 // Assertions if enabled, specified in premake for debug only
 #ifdef LI_DEBUG
 	#define LI_ENABLE_ASSERTS
+	#ifndef CLIENT_DISABLE_PROFILE
+ 		#define LI_PROFILE
+ 	#endif
 #endif
 
 #ifdef LI_ENABLE_ASSERTS

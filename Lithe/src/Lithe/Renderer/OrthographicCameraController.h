@@ -12,6 +12,16 @@ namespace Lithe {
 	class OrthographicCameraController
 	{
 	public:
+		struct CameraBounds
+		{
+			float Top, Bottom;
+			float Left, Right;
+
+			CameraBounds(float left, float right, float bottom, float top)
+				: Top(top), Bottom(bottom), Left(left), Right(right) {
+			}
+		};
+	public:
 		OrthographicCameraController(float aspectratio, bool rotation = false);
 
 		void OnUpdate(Timestep ts);
@@ -22,6 +32,16 @@ namespace Lithe {
 
 		float GetZoomLevel() { return m_ZoomLevel; }
 		void SetZoomLevel(float level) { m_ZoomLevel = level; }
+
+		CameraBounds& GetBounds() { return m_CameraBounds; }
+		void SetBounds(CameraBounds bounds) { m_CameraBounds = bounds; }
+		void SetBounds(float left, float right, float bottom, float top)
+		{
+			m_CameraBounds.Top = top;
+			m_CameraBounds.Bottom = bottom;
+			m_CameraBounds.Left = left;
+			m_CameraBounds.Right = right;
+		}
 	private:
 		bool OnMouseScrolled(MouseScrolledEvent& e);
 		bool OnWindowResized(WindowResizeEvent& e);
@@ -29,6 +49,7 @@ namespace Lithe {
 		float m_AspectRatio;
 		float m_ZoomLevel = 1.0f;
 		OrthographicCamera m_Camera;
+		CameraBounds m_CameraBounds;
 
 		bool m_Rotation;
 		

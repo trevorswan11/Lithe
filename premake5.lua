@@ -164,5 +164,7 @@ project "Sandbox"
 
 	filter "configurations:Dist"
 		defines "LI_DIST"
+		kind "WindowedApp"
 		runtime "Release"
 		optimize "on"
+		linkoptions { "/ENTRY:mainCRTStartup" }
