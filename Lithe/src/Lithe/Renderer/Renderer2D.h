@@ -48,7 +48,9 @@ namespace Lithe {
 		static void BeginScene(const OrthographicCamera& camera);
 		static void EndScene();
 		static void Flush();
-
+	private:
+		static void FlushAndReset();
+	public:
 		// ---- Base Quad Drawing ----
 
 		// === OVERLOADS ===
@@ -145,6 +147,19 @@ namespace Lithe {
 		// === IMPL ===
 
 		static void DrawRotatedQuad(const glm::vec3& position, float degrees, const glm::vec2& size, const Ref<Texture2D>& texture, const glm::vec4& color, float textureScale = 1.0f);
+
+		// --- Stats ---
+
+		struct Stats
+		{
+			uint32_t DrawCalls = 0;
+			uint32_t QuadCount = 0;
+
+			uint32_t GetTotalVertexCount() const { return QuadCount * 4; };
+			uint32_t GetTotalIndexCount() const { return QuadCount * 6; };
+		};
+		static void ResetStats();
+		static Stats GetStats();
 	};
 
 }

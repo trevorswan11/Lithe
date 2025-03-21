@@ -13,16 +13,16 @@ namespace Lithe {
 	{
 		glm::vec3 Position;
 		glm::vec4 Color;
-		glm::vec2 TexCoord;
+		glm::vec2 TextureCoord;
 		float TexIndex;
 		float TextureScale;
 	};
 
 	struct Renderer2DData
 	{
-		const uint32_t MAX_QUADS = 10000;
-		const uint32_t MAX_VERTICES = MAX_QUADS * 4;
-		const uint32_t MAX_INDICES = MAX_QUADS * 6;
+		static const uint32_t MAX_QUADS = 10000;
+		static const uint32_t MAX_VERTICES = MAX_QUADS * 4;
+		static const uint32_t MAX_INDICES = MAX_QUADS * 6;
 		static const uint32_t MAX_TEXTURE_SLOTS = 32; // TODO: RenderCaps
 
 		Ref<VertexArray> QuadVertexArray;
@@ -38,7 +38,9 @@ namespace Lithe {
 		uint32_t TextureSlotIndex = 1; // 0 = white texture
 
 		glm::vec4 QuadVertexPositions[4];
-		glm::vec2 QuadTexCoordPositions[4];
+		glm::vec2 QuadTextureCoordinatePositions[4];
+
+		Renderer2D::Stats Stats;
 	};
 
 	static Renderer2DData s_Data;
@@ -100,10 +102,10 @@ namespace Lithe {
 		s_Data.QuadVertexPositions[2] = { 0.5, 0.5f, 0.0f, 1.0f };
 		s_Data.QuadVertexPositions[3] = { -0.5, 0.5f, 0.0f, 1.0f };
 
-		s_Data.QuadTexCoordPositions[0] = { 0.0f, 0.0f };
-		s_Data.QuadTexCoordPositions[1] = { 1.0f, 0.0f };
-		s_Data.QuadTexCoordPositions[2] = { 1.0f, 1.0f };
-		s_Data.QuadTexCoordPositions[3] = { 0.0f, 1.0f };
+		s_Data.QuadTextureCoordinatePositions[0] = { 0.0f, 0.0f };
+		s_Data.QuadTextureCoordinatePositions[1] = { 1.0f, 0.0f };
+		s_Data.QuadTextureCoordinatePositions[2] = { 1.0f, 1.0f };
+		s_Data.QuadTextureCoordinatePositions[3] = { 0.0f, 1.0f };
 	}
 
 	void Renderer2D::Shutdown()
@@ -142,6 +144,20 @@ namespace Lithe {
 			s_Data.TextureSlots[i]->Bind(i);
 		}
 		RenderCommand::DrawIndexed(s_Data.QuadVertexArray, s_Data.QuadIndexCount);
+		
+		#ifndef CLIENT_DISABLE_RENDERER_STATS
+			s_Data.Stats.DrawCalls++;
+		#endif
+	}
+
+	void Renderer2D::FlushAndReset()
+	{
+		EndScene();
+
+		s_Data.QuadIndexCount = 0;
+		s_Data.QuadVertexBufferPtr = s_Data.QuadVertexBufferBase;
+
+		s_Data.TextureSlotIndex = 1;
 	}
 
 	// ---- Regular Quad Drawing ----
@@ -149,6 +165,9 @@ namespace Lithe {
 	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const Ref<Texture2D>& texture, const glm::vec4& color, float textureScale)
 	{
 		LI_PROFILE_FUNCTION();
+
+		if (s_Data.QuadIndexCount >= Renderer2DData::MAX_INDICES)
+			FlushAndReset();
 
 		float textureIndex = 0.0f;
 		for (uint32_t i = 1; i < s_Data.TextureSlotIndex; i++)
@@ -174,13 +193,17 @@ namespace Lithe {
 		{
 			s_Data.QuadVertexBufferPtr->Position = transform * s_Data.QuadVertexPositions[i];
 			s_Data.QuadVertexBufferPtr->Color = color;
-			s_Data.QuadVertexBufferPtr->TexCoord = s_Data.QuadTexCoordPositions[i];
+			s_Data.QuadVertexBufferPtr->TextureCoord = s_Data.QuadTextureCoordinatePositions[i];
 			s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
 			s_Data.QuadVertexBufferPtr->TextureScale = textureScale;
 			s_Data.QuadVertexBufferPtr++;
 		}
 
 		s_Data.QuadIndexCount += 6;
+
+		#ifndef CLIENT_DISABLE_RENDERER_STATS
+			s_Data.Stats.QuadCount++;
+		#endif
 	}
 
 	// ---- Rotated Quad Drawing ----
@@ -188,6 +211,9 @@ namespace Lithe {
 	void Renderer2D::DrawRotatedQuad(const glm::vec3& position, float degrees, const glm::vec2& size, const Ref<Texture2D>& texture, const glm::vec4& color, float textureScale)
 	{
 		LI_PROFILE_FUNCTION();
+
+		if (s_Data.QuadIndexCount >= Renderer2DData::MAX_INDICES)
+			FlushAndReset();
 
 		float textureIndex = 0.0f;
 		for (uint32_t i = 1; i < s_Data.TextureSlotIndex; i++)
@@ -214,13 +240,27 @@ namespace Lithe {
 		{
 			s_Data.QuadVertexBufferPtr->Position = transform * s_Data.QuadVertexPositions[i];
 			s_Data.QuadVertexBufferPtr->Color = color;
-			s_Data.QuadVertexBufferPtr->TexCoord = s_Data.QuadTexCoordPositions[i];
+			s_Data.QuadVertexBufferPtr->TextureCoord = s_Data.QuadTextureCoordinatePositions[i];
 			s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
 			s_Data.QuadVertexBufferPtr->TextureScale = textureScale;
 			s_Data.QuadVertexBufferPtr++;
 		}
 
 		s_Data.QuadIndexCount += 6;
+
+		#ifndef CLIENT_DISABLE_RENDERER_STATS
+			s_Data.Stats.QuadCount++;
+		#endif
+	}
+
+	void Renderer2D::ResetStats()
+	{
+		memset(&s_Data.Stats, 0, sizeof(Stats));
+	}
+
+	Renderer2D::Stats Renderer2D::GetStats()
+	{
+		return s_Data.Stats;
 	}
 
 }

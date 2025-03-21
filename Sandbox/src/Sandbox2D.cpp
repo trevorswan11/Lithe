@@ -31,6 +31,7 @@ void Sandbox2D::OnUpdate(Lithe::Timestep ts)
 	m_CameraController.OnUpdate(ts);
 
 	// Render
+	Lithe::Renderer2D::ResetStats();
 	{
 		LI_PROFILE_SCOPE("Renderer Prep");
 		Lithe::RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1 });
@@ -61,6 +62,14 @@ void Sandbox2D::OnImGuiRender()
 	LI_PROFILE_FUNCTION();
 
 	ImGui::Begin("Settings");
+
+	auto stats = Lithe::Renderer2D::GetStats();
+	ImGui::Text("Renderer2D Stats:");
+	ImGui::Text("Draw Calls: %d", stats.DrawCalls);
+	ImGui::Text("Quads: %d", stats.QuadCount);
+	ImGui::Text("Vertices: %d", stats.GetTotalVertexCount());
+	ImGui::Text("Indices: %d", stats.GetTotalIndexCount());
+
 	ImGui::ColorEdit4("Square Color", glm::value_ptr(m_SquareColor));
 	ImGui::End();
 }
