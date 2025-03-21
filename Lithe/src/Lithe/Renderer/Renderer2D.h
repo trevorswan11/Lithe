@@ -12,8 +12,7 @@ namespace Lithe {
 	{
 	public:
 		QuadProperties(bool useRadians = false)
-			: m_UseRadians(useRadians) {
-		}
+			: m_UseRadians(useRadians) {}
 	public:
 		inline void SetPosition(const glm::vec2& position) { m_Position = glm::vec3(position, 0.0f); }
 		inline void SetPosition(const glm::vec3& position) { m_Position = position; }
@@ -21,21 +20,21 @@ namespace Lithe {
 		inline void SetTexture(const Ref<Texture2D>& texture) { m_Texture = texture; }
 		inline void SetColor(const glm::vec4& color) { m_Color = color; }
 		inline void SetTextureScale(float textureScale) { m_TextureScale = textureScale; }
-		inline void SetRoation(float rotation) { m_Rotation = m_UseRadians ? rotation : glm::radians(rotation); }
+		inline void SetRoation(float rotation) { m_RotationDegrees = m_UseRadians ? glm::degrees(rotation) : rotation; }
 	public:
 		glm::vec3 GetPosition() const { return m_Position; }
 		glm::vec2 GetSize() const { return m_Size; }
 		const Ref<Texture2D>& GetTexture() const { return m_Texture; }
 		glm::vec4 GetColor() const { return m_Color; }
 		float GetTextureScale() const { return m_TextureScale; }
-		float GetRotation() const { return m_Rotation; }
+		float GetRotationDegrees() const { return m_RotationDegrees; }
 	private:
 		glm::vec3		m_Position;
 		glm::vec2		m_Size;
 		Ref<Texture2D>	m_Texture;
 		glm::vec4		m_Color;
 		float			m_TextureScale = 1.0f;
-		float			m_Rotation = 0.0f;
+		float			m_RotationDegrees = 0.0f;
 	private:
 		bool			m_UseRadians;
 	};
@@ -51,24 +50,101 @@ namespace Lithe {
 		static void Flush();
 
 		// ---- Base Quad Drawing ----
-		static void DrawQuad(const QuadProperties& properties);
 
-		static void DrawQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color);
-		static void DrawQuad(const glm::vec2& position, const glm::vec2& size, const Ref<Texture2D>& texture, float textureScale = 1.0f);
-		static void DrawQuad(const glm::vec2& position, const glm::vec2& size, const Ref<Texture2D>& texture, const glm::vec4& color, float textureScale = 1.0f);
-		static void DrawQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& colorf);
-		static void DrawQuad(const glm::vec3& position, const glm::vec2& size, const Ref<Texture2D>& texture, float textureScale = 1.0f);
+		// === OVERLOADS ===
+
+		inline static void DrawQuad(const QuadProperties& properties)
+		{
+			DrawQuad(
+				properties.GetPosition(),
+				properties.GetSize(),
+				properties.GetTexture(),
+				properties.GetColor(),
+				properties.GetTextureScale()
+			);
+		}
+
+		inline static void DrawQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color)
+		{
+			DrawQuad({ position.x, position.y, 0.0f }, size, color);
+		}
+
+		inline static void DrawQuad(const glm::vec2& position, const glm::vec2& size, const Ref<Texture2D>& texture, float textureScale = 1.0f)
+		{
+			DrawQuad({ position.x, position.y, 0.0f }, size, texture, textureScale);
+		}
+		
+		inline static void DrawQuad(const glm::vec2& position, const glm::vec2& size, const Ref<Texture2D>& texture, const glm::vec4& color, float textureScale = 1.0f)
+		{
+			DrawQuad({ position.x, position.y, 0.0f }, size, texture, color, textureScale);
+		}
+		
+		inline static void DrawQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color)
+		{
+			auto whiteTexture = Texture2D::Create(1, 1);
+			uint32_t whiteTextureData = 0xffffffff;
+			whiteTexture->SetData(&whiteTextureData, sizeof(uint32_t));
+
+			DrawQuad(position, size, whiteTexture, color, 1.0f);
+		}
+		
+		inline static void DrawQuad(const glm::vec3& position, const glm::vec2& size, const Ref<Texture2D>& texture, float textureScale = 1.0f)
+		{
+			DrawQuad(position, size, texture, glm::vec4(1.0f), textureScale);
+		}
+		
+		// === IMPL ===
+
 		static void DrawQuad(const glm::vec3& position, const glm::vec2& size, const Ref<Texture2D>& texture, const glm::vec4& color, float textureScale = 1.0f);
 
 		// ---- Rotated Quad Drawing ----
-		static void DrawRotatedQuad(const QuadProperties& properties);
 
-		static void DrawRotatedQuad(const glm::vec2& position, float rotation, const glm::vec2& size, const glm::vec4& color);
-		static void DrawRotatedQuad(const glm::vec2& position, float rotation, const glm::vec2& size, const Ref<Texture2D>& texture, float textureScale = 1.0f);
-		static void DrawRotatedQuad(const glm::vec2& position, float rotation, const glm::vec2& size, const Ref<Texture2D>& texture, const glm::vec4& color, float textureScale = 1.0f);
-		static void DrawRotatedQuad(const glm::vec3& position, float rotation, const glm::vec2& size, const glm::vec4& color);
-		static void DrawRotatedQuad(const glm::vec3& position, float rotation, const glm::vec2& size, const Ref<Texture2D>& texture, float textureScale = 1.0f);
-		static void DrawRotatedQuad(const glm::vec3& position, float rotation, const glm::vec2& size, const Ref<Texture2D>& texture, const glm::vec4& color, float textureScale = 1.0f);
+		// === OVERLOADS ===
+
+		static void Renderer2D::DrawRotatedQuad(const QuadProperties& properties)
+		{
+			DrawRotatedQuad(
+				properties.GetPosition(),
+				properties.GetRotationDegrees(),
+				properties.GetSize(),
+				properties.GetTexture(),
+				properties.GetColor(),
+				properties.GetTextureScale()
+			);
+		}
+
+		inline static void DrawRotatedQuad(const glm::vec2& position, float degrees, const glm::vec2& size, const glm::vec4& color)
+		{
+			DrawRotatedQuad({ position.x, position.y, 0.0f }, degrees, size, color);
+		}
+
+		inline static void DrawRotatedQuad(const glm::vec2& position, float degrees, const glm::vec2& size, const Ref<Texture2D>& texture, float textureScale = 1.0f)
+		{
+			DrawRotatedQuad({ position.x, position.y, 0.0f }, degrees, size, texture, textureScale);
+		}
+		
+		inline static void DrawRotatedQuad(const glm::vec2& position, float degrees, const glm::vec2& size, const Ref<Texture2D>& texture, const glm::vec4& color, float textureScale = 1.0f)
+		{
+			DrawRotatedQuad({ position.x, position.y, 0.0f }, degrees, size, texture, color, textureScale);
+		}
+		
+		inline static void DrawRotatedQuad(const glm::vec3& position, float degrees, const glm::vec2& size, const glm::vec4& color)
+		{
+			auto whiteTexture = Texture2D::Create(1, 1);
+			uint32_t whiteTextureData = 0xffffffff;
+			whiteTexture->SetData(&whiteTextureData, sizeof(uint32_t));
+
+			DrawRotatedQuad(position, degrees, size, whiteTexture, color, 1.0f);
+		}
+		
+		inline static void DrawRotatedQuad(const glm::vec3& position, float degrees, const glm::vec2& size, const Ref<Texture2D>& texture, float textureScale = 1.0f)
+		{
+			DrawRotatedQuad(position, degrees, size, texture, glm::vec4(1.0f), textureScale);
+		}
+		
+		// === IMPL ===
+
+		static void DrawRotatedQuad(const glm::vec3& position, float degrees, const glm::vec2& size, const Ref<Texture2D>& texture, const glm::vec4& color, float textureScale = 1.0f);
 	};
 
 }

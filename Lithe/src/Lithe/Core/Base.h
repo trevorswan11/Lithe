@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Lithe/Debug/Config.h"
+#include "ClientConfig.h"
 
 #include <memory>
 
