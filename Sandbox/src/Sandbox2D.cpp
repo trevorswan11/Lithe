@@ -45,14 +45,26 @@ void Sandbox2D::OnUpdate(Lithe::Timestep ts)
 		LI_PROFILE_SCOPE("Renderer Draw");
 		Lithe::Renderer2D::BeginScene(m_CameraController.GetCamera());
 
-		Lithe::Renderer2D::DrawRotatedQuad({ -1.0f, -3.0f }, 20.0f, { 0.8f, 0.8f }, { 0.8f, 0.2f, 0.3f, 1.0f });
+		Lithe::Renderer2D::DrawQuad({ 0.0f, 0.0f }, { 20.0f, 20.0f }, m_CheckerboardTexture, 10.0f);
 		
-		Lithe::Renderer2D::DrawQuad({ 0.5f, -0.5f }, { 0.5f, 0.75f }, { 0.2f, 0.3f, 0.8f, 1.0f });
-		Lithe::Renderer2D::DrawQuad({ -1.0f, 0.0f }, { 0.8f, 0.8f }, { 0.8f, 0.2f, 0.3f, 1.0f });
+		Lithe::Renderer2D::DrawRotatedQuad({ -1.0f, -3.0f, 0.2f }, 20.0f, { 0.8f, 0.8f }, { 0.8f, 0.2f, 0.3f, 1.0f });
+		Lithe::Renderer2D::DrawQuad({ 0.5f, -0.5f, 0.2f }, { 0.5f, 0.75f }, { 0.2f, 0.3f, 0.8f, 1.0f });
+		Lithe::Renderer2D::DrawQuad({ -1.0f, 0.0f, 0.2f }, { 0.8f, 0.8f }, { 0.8f, 0.2f, 0.3f, 1.0f });
 
-		Lithe::Renderer2D::DrawQuad({ 0.0f, 0.0f }, { 10.0f, 10.0f }, m_CheckerboardTexture, 10.0f);
-		Lithe::Renderer2D::DrawRotatedQuad({ 0.0f, 0.0f, 0.1f }, rotation, { 1.0f, 1.0f }, m_CheckerboardTexture, { 0.2f, 0.8f, 0.3f, 1.0f }, 1.0f);
+		Lithe::Renderer2D::DrawRotatedQuad({ 0.0f, 0.0f, 0.3f }, rotation, { 1.0f, 1.0f }, m_CheckerboardTexture, { 0.2f, 0.8f, 0.3f, 1.0f }, 1.0f);
 		
+		Lithe::Renderer2D::EndScene();
+
+		Lithe::Renderer2D::BeginScene(m_CameraController.GetCamera());
+
+		for (float y = -5.0f; y < 5.0f; y += 0.5f)
+		{
+			for (float x = -5.0f; x < 5.0f; x += 0.5f)
+			{
+				glm::vec4 color = { (x + 5.0f) / 10.0f, 0.4f, (y + 5.0f) / 10.0f, 0.7f };
+				Lithe::Renderer2D::DrawQuad({ x, y, 0.1f }, { 0.45f, 0.45f }, color);
+			}
+		}
 		Lithe::Renderer2D::EndScene();
 	}
 }
@@ -69,6 +81,23 @@ void Sandbox2D::OnImGuiRender()
 	ImGui::Text("Quads: %d", stats.QuadCount);
 	ImGui::Text("Vertices: %d", stats.GetTotalVertexCount());
 	ImGui::Text("Indices: %d", stats.GetTotalIndexCount());
+
+	{
+		LI_PROFILE_SCOPE("ImGui Average FPS");
+		
+		static float fpsHistory[100] = {};
+		static int fpsIndex = 0;
+		static float fpsSum = 0.0f;
+
+		float currentFps = 1.0f / ImGui::GetIO().DeltaTime;
+		fpsSum -= fpsHistory[fpsIndex];
+		fpsSum += currentFps;
+		fpsHistory[fpsIndex] = currentFps;
+
+		fpsIndex = (fpsIndex + 1) % 100;
+		float avgFps = fpsSum / 100.0f;
+		ImGui::Text("Avg FPS: %.1f", avgFps);
+	}
 
 	ImGui::ColorEdit4("Square Color", glm::value_ptr(m_SquareColor));
 	ImGui::End();

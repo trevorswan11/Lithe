@@ -9,7 +9,8 @@ namespace Lithe {
 	{
 		LI_PROFILE_FUNCTION();
 
-		m_InternalForamt = GL_RGBA8, m_DataFormat = GL_RGBA;
+		m_InternalForamt = GL_RGBA8;
+		m_DataFormat = GL_RGBA;
 
 		glCreateTextures(GL_TEXTURE_2D, 1, &m_RendererID);
 		glTextureStorage2D(m_RendererID, 1, m_InternalForamt, m_Width, m_Height);

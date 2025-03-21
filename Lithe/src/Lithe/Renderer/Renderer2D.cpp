@@ -87,7 +87,7 @@ namespace Lithe {
 		uint32_t whiteTextureData = 0xffffffff;
 		s_Data.WhiteTexture->SetData(&whiteTextureData, sizeof(uint32_t));
 
-		int32_t samplers[s_Data.MAX_TEXTURE_SLOTS];
+		int32_t samplers[s_Data.MAX_TEXTURE_SLOTS] {};
 		for (uint32_t i = 0; i < s_Data.MAX_TEXTURE_SLOTS; i++)
 			samplers[i] = i;
 
@@ -140,9 +140,8 @@ namespace Lithe {
 	void Renderer2D::Flush()
 	{
 		for (uint32_t i = 0; i < s_Data.TextureSlotIndex; i++)
-		{
 			s_Data.TextureSlots[i]->Bind(i);
-		}
+		
 		RenderCommand::DrawIndexed(s_Data.QuadVertexArray, s_Data.QuadIndexCount);
 		
 		#ifndef CLIENT_DISABLE_RENDERER_STATS
@@ -168,22 +167,26 @@ namespace Lithe {
 
 		if (s_Data.QuadIndexCount >= Renderer2DData::MAX_INDICES)
 			FlushAndReset();
-
+		
 		float textureIndex = 0.0f;
-		for (uint32_t i = 1; i < s_Data.TextureSlotIndex; i++)
+		if (texture != nullptr)
 		{
-			if (s_Data.TextureSlots[i] == texture)
+			textureIndex = 0.0f;
+			for (uint32_t i = 1; i < s_Data.TextureSlotIndex; i++)
 			{
-				textureIndex = (float)i;
-				break;
+				if (*s_Data.TextureSlots[i].get() == *texture.get())
+				{
+					textureIndex = (float)i;
+					break;
+				}
 			}
-		}
 
-		if (textureIndex == 0.0f)
-		{
-			textureIndex = (float)s_Data.TextureSlotIndex;
-			s_Data.TextureSlots[s_Data.TextureSlotIndex] = texture;
-			s_Data.TextureSlotIndex++;
+			if (textureIndex == 0.0f)
+			{
+				textureIndex = (float)s_Data.TextureSlotIndex;
+				s_Data.TextureSlots[s_Data.TextureSlotIndex] = texture;
+				s_Data.TextureSlotIndex++;
+			}
 		}
 		
 		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
@@ -214,22 +217,25 @@ namespace Lithe {
 
 		if (s_Data.QuadIndexCount >= Renderer2DData::MAX_INDICES)
 			FlushAndReset();
-
+		
 		float textureIndex = 0.0f;
-		for (uint32_t i = 1; i < s_Data.TextureSlotIndex; i++)
+		if (texture != nullptr)
 		{
-			if (s_Data.TextureSlots[i] == texture)
+			for (uint32_t i = 1; i < s_Data.TextureSlotIndex; i++)
 			{
-				textureIndex = (float)i;
-				break;
+				if (*s_Data.TextureSlots[i].get() == *texture.get())
+				{
+					textureIndex = (float)i;
+					break;
+				}
 			}
-		}
 
-		if (textureIndex == 0.0f)
-		{
-			textureIndex = (float)s_Data.TextureSlotIndex;
-			s_Data.TextureSlots[s_Data.TextureSlotIndex] = texture;
-			s_Data.TextureSlotIndex++;
+			if (textureIndex == 0.0f)
+			{
+				textureIndex = (float)s_Data.TextureSlotIndex;
+				s_Data.TextureSlots[s_Data.TextureSlotIndex] = texture;
+				s_Data.TextureSlotIndex++;
+			}
 		}
 
 		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
