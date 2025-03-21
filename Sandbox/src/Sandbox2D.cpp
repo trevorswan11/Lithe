@@ -15,7 +15,6 @@ void Sandbox2D::OnAttach()
 	LI_PROFILE_FUNCTION();
 
 	m_CheckerboardTexture = Lithe::Texture2D::Create("assets/textures/CheckerboardExample.png");
-	m_MountainTexture = Lithe::Texture2D::Create("assets/textures/SmokeyMountains.jpg");
 }
 
 void Sandbox2D::OnDetach()
@@ -42,12 +41,14 @@ void Sandbox2D::OnUpdate(Lithe::Timestep ts)
 		LI_PROFILE_SCOPE("Renderer Draw");
 		Lithe::Renderer2D::BeginScene(m_CameraController.GetCamera());
 
+		//Lithe::Renderer2D::DrawRotatedQuad({ -1.0f, 0.0f }, 20.0f, { 0.8f, 0.8f }, { 0.8f, 0.2f, 0.3f, 1.0f });
+		
 		Lithe::Renderer2D::DrawQuad({ 0.5f, -0.5f }, { 0.5f, 0.75f }, { 0.2f, 0.3f, 0.8f, 1.0f });
-		Lithe::Renderer2D::DrawRotatedQuad({ -1.0f, 0.0f }, 20.0f, { 0.8f, 0.8f }, { 0.8f, 0.2f, 0.3f, 1.0f });
+		Lithe::Renderer2D::DrawQuad({ -1.0f, 0.0f }, { 0.8f, 0.8f }, { 0.8f, 0.2f, 0.3f, 1.0f });
 
-		Lithe::Renderer2D::DrawQuad({ 0.0f, 0.0f }, { 10.0f, 10.0f }, m_CheckerboardTexture);
-		Lithe::Renderer2D::DrawQuad({ 1.0f, 1.0f, -0.1f }, { 100.0f, 100.0f }, m_MountainTexture, 10.0f);
-
+		Lithe::Renderer2D::DrawQuad({ -5.0f, -5.0f }, { 10.0f, 10.0f }, m_CheckerboardTexture, 10.0f);
+		Lithe::Renderer2D::DrawQuad({ -5.0f, -5.0f }, { 0.3f, 0.3f }, m_CheckerboardTexture, { 0.2f, 0.3f, 0.8f, 1.0f }, 120.0f);
+		
 		Lithe::Renderer2D::EndScene();
 	}
 }
