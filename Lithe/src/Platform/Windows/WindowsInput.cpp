@@ -1,27 +1,27 @@
 #include "lipch.h"
-#include "WindowsInput.h"
 
+#include "Lithe/Core/Input.h"
 #include "Lithe/Core/Application.h"
 
 #include <GLFW/glfw3.h>
 
 namespace Lithe {
 
-	bool WindowsInput::IsKeyPressedImpl(int keycode)
+	bool Input::IsKeyPressed(KeyCode key)
 	{
 		auto window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
-		auto state = glfwGetKey(window, keycode);
+		auto state = glfwGetKey(window, static_cast<int32_t>(key));
 		return state == GLFW_PRESS || state == GLFW_REPEAT;
 	}
 
-	bool WindowsInput::IsMouseButtonPressedImpl(int button)
+	bool Input::IsMouseButtonPressed(MouseCode button)
 	{
 		auto window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
-		auto state = glfwGetMouseButton(window, button);
+		auto state = glfwGetMouseButton(window, static_cast<int32_t>(button));
 		return state == GLFW_PRESS;
 	}
 
-	std::pair<float, float> WindowsInput::GetMousePosImpl()
+	std::pair<float, float> Input::GetMousePos()
 	{
 		auto window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
 		double xpos, ypos;
@@ -30,15 +30,15 @@ namespace Lithe {
 		return { static_cast<float>(xpos), static_cast<float>(ypos) };
 	}
 
-	float WindowsInput::GetMouseXImpl()
+	float Input::GetMouseX()
 	{
-		auto [x, _] = GetMousePosImpl();
+		auto [x, _] = GetMousePos();
 		return x;
 	}
 
-	float WindowsInput::GetMouseYImpl()
+	float Input::GetMouseY()
 	{
-		auto [_, y] = GetMousePosImpl();
+		auto [_, y] = GetMousePos();
 		return y;
 	}
 

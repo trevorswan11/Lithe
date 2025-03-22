@@ -28,10 +28,13 @@ namespace Lithe {
 		void PushLayer(Layer* layer);
 		void PushOverlay(Layer* layer);
 
-		inline static Application& Get() { return *s_Instance; }
 		inline Window& GetWindow() { return *m_Window; }
 
 		void Close();
+
+		ImGuiLayer* GetImGuiLayer() { return m_ImGuiLayer; }
+
+		inline static Application& Get() { return *s_Instance; }
 	private:
 		void Run();
 

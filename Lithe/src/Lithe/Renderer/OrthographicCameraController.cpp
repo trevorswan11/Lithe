@@ -16,25 +16,25 @@ namespace Lithe {
 	{
 		LI_PROFILE_FUNCTION();
 
-		if (Input::IsKeyPressed(LI_KEY_W))
+		if (Input::IsKeyPressed(Lithe::KeyCode::W))
 		{
 			m_CameraPosition.x += -sin(glm::radians(m_CameraRotation)) * m_CameraTranslationSpeed * ts;
 			m_CameraPosition.y += cos(glm::radians(m_CameraRotation)) * m_CameraTranslationSpeed * ts;
 
 		}
-		else if (Input::IsKeyPressed(LI_KEY_S))
+		else if (Input::IsKeyPressed(Lithe::KeyCode::S))
 		{
 			m_CameraPosition.x -= -sin(glm::radians(m_CameraRotation)) * m_CameraTranslationSpeed * ts;
 			m_CameraPosition.y -= cos(glm::radians(m_CameraRotation)) * m_CameraTranslationSpeed * ts;
 
 		}
 
-		if (Input::IsKeyPressed(LI_KEY_A))
+		if (Input::IsKeyPressed(Lithe::KeyCode::A))
 		{
 			m_CameraPosition.x -= cos(glm::radians(m_CameraRotation)) * m_CameraTranslationSpeed * ts;
 			m_CameraPosition.y -= sin(glm::radians(m_CameraRotation)) * m_CameraTranslationSpeed * ts;
 		}
-		else if (Input::IsKeyPressed(LI_KEY_D))
+		else if (Input::IsKeyPressed(Lithe::KeyCode::D))
 		{
 			m_CameraPosition.x += cos(glm::radians(m_CameraRotation)) * m_CameraTranslationSpeed * ts;
 			m_CameraPosition.y += sin(glm::radians(m_CameraRotation)) * m_CameraTranslationSpeed * ts;
@@ -42,11 +42,11 @@ namespace Lithe {
 
 		if (m_Rotation)
 		{
-			if (Input::IsKeyPressed(LI_KEY_Q))
+			if (Input::IsKeyPressed(Lithe::KeyCode::Q))
 			{
 				m_CameraRotation -= m_CameraRotaionSpeed * ts;
 			}
-			else if (Input::IsKeyPressed(LI_KEY_E))
+			else if (Input::IsKeyPressed(Lithe::KeyCode::E))
 			{
 				m_CameraRotation += m_CameraRotaionSpeed * ts;
 			}
@@ -58,7 +58,7 @@ namespace Lithe {
 				m_CameraRotation += 360.0f;
 		}
 
-		if (Input::IsKeyPressed(LI_KEY_R))
+		if (Input::IsKeyPressed(Lithe::KeyCode::R))
 		{
 			m_CameraPosition.x = 0.0f;
 			m_CameraPosition.y = 0.0f;
@@ -80,6 +80,12 @@ namespace Lithe {
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<MouseScrolledEvent>(LI_BIND_EVENT_FN(OrthographicCameraController::OnMouseScrolled));
 		dispatcher.Dispatch<WindowResizeEvent>(LI_BIND_EVENT_FN(OrthographicCameraController::OnWindowResized));
+	}
+
+	void OrthographicCameraController::OnResize(float width, float height)
+	{
+		m_AspectRatio = width / height;
+		m_Camera.SetProjection(-m_AspectRatio * m_ZoomLevel, m_AspectRatio * m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel);
 	}
 
 	void OrthographicCameraController::CalculateView()

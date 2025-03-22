@@ -10,7 +10,7 @@
 
 // You need to change keycodes if NOT using glfw
 #include "Lithe/Core/Input.h"
-#include "Lithe/Core/MouseButtonCodes.h"
+#include "Lithe/Core/MouseCodes.h"
 #include "Lithe/Core/KeyCodes.h"
 
 #include "Lithe/ImGui/ImGuiLayer.h"

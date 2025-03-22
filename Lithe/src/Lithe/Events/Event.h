@@ -51,6 +51,7 @@ namespace Lithe {
 	{
 		friend class EventDispatcher;
 	public:
+		virtual ~Event() = default;
 		bool Handled = false;
 		// Pure virtual functions, like GetEventType, GetName, and GetCategoryFlags MUST be implemented
 

@@ -16,10 +16,30 @@ namespace Lithe {
 		LI_PROFILE_FUNCTION();
 
 		glDeleteFramebuffers(1, &m_RendererID);
+		glDeleteTextures(1, &m_ColorAttachment);
+		glDeleteTextures(1, &m_DepthAttachment);
+	}
+
+	void OpenGLFramebuffer::Bind()
+	{
+		glBindFramebuffer(GL_FRAMEBUFFER, m_RendererID);
+		glViewport(0, 0, m_Spec.Width, m_Spec.Height);
+	}
+
+	void OpenGLFramebuffer::Unbind()
+	{
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 
 	void OpenGLFramebuffer::Invalidate()
 	{
+		if (m_RendererID)
+		{
+			glDeleteFramebuffers(1, &m_RendererID);
+			glDeleteTextures(1, &m_ColorAttachment);
+			glDeleteTextures(1, &m_DepthAttachment);
+		}
+
 		glCreateFramebuffers(1, &m_RendererID);
 		glBindFramebuffer(GL_FRAMEBUFFER, m_RendererID);
 
@@ -42,14 +62,11 @@ namespace Lithe {
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 
-	void OpenGLFramebuffer::Bind()
+	void OpenGLFramebuffer::Resize(uint32_t width, uint32_t height)
 	{
-		glBindFramebuffer(GL_FRAMEBUFFER, m_RendererID);
-	}
-
-	void OpenGLFramebuffer::Unbind()
-	{
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		m_Spec.Width = width;
+		m_Spec.Height = height;
+		Invalidate();
 	}
 
 }
