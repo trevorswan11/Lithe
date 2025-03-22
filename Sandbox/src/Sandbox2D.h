@@ -6,6 +6,7 @@ class Sandbox2D : public Lithe::Layer
 {
 public:
 	Sandbox2D();
+	Sandbox2D(Lithe::OrthographicCameraController& camera);
 	virtual ~Sandbox2D() = default;
 
 	virtual void OnAttach() override;
@@ -22,7 +23,6 @@ private:
 	Lithe::Ref<Lithe::Shader> m_FlatColorShader;
 
 	Lithe::Ref<Lithe::Texture2D> m_CheckerboardTexture;
-	Lithe::Ref<Lithe::Texture2D> m_MountainTexture;
 
 	glm::vec4 m_SquareColor = { 0.2f, 0.3f, 0.8f, 1.0f };
 };

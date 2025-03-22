@@ -140,6 +140,7 @@ project "Sandbox"
 		"Lithe/vendor/spdlog/include",
 		"Lithe/src",
 		"Lithe/vendor",
+		"%{prj.name}/src",
 		"%{IncludeDir.glm}"
 	}
 

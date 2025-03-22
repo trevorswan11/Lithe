@@ -10,6 +10,11 @@ Sandbox2D::Sandbox2D()
 {
 }
 
+Sandbox2D::Sandbox2D(Lithe::OrthographicCameraController& camera)
+	: Layer("Sandbox2D"), m_CameraController(camera)
+{
+}
+
 void Sandbox2D::OnAttach()
 {
 	LI_PROFILE_FUNCTION();
@@ -33,21 +38,21 @@ void Sandbox2D::OnUpdate(Lithe::Timestep ts)
 	// Render
 	Lithe::Renderer2D::ResetStats();
 	{
-		LI_PROFILE_SCOPE("Renderer Prep");
-		Lithe::RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1 });
+		LI_PROFILE_SCOPE("Sandbox2D Renderer Prep");
+		Lithe::RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1.0f });
 		Lithe::RenderCommand::Clear();
 	}
 
 	{
 		static float rotation = 0.0f;
-		rotation += ts * 20.0f;
+		rotation += ts * 1.0f;
 
-		LI_PROFILE_SCOPE("Renderer Draw");
+		LI_PROFILE_SCOPE("Sandbox2D Renderer Draw");
 		Lithe::Renderer2D::BeginScene(m_CameraController.GetCamera());
 
 		Lithe::Renderer2D::DrawQuad({ 0.0f, 0.0f }, { 20.0f, 20.0f }, m_CheckerboardTexture, 10.0f);
 		
-		Lithe::Renderer2D::DrawRotatedQuad({ -1.0f, -3.0f, 0.2f }, 20.0f, { 0.8f, 0.8f }, { 0.8f, 0.2f, 0.3f, 1.0f });
+		Lithe::Renderer2D::DrawRotatedQuad({ -1.0f, -3.0f, 0.2f }, glm::radians(20.0f), { 0.8f, 0.8f }, { 0.8f, 0.2f, 0.3f, 1.0f });
 		Lithe::Renderer2D::DrawQuad({ 0.5f, -0.5f, 0.2f }, { 0.5f, 0.75f }, { 0.2f, 0.3f, 0.8f, 1.0f });
 		Lithe::Renderer2D::DrawQuad({ -1.0f, 0.0f, 0.2f }, { 0.8f, 0.8f }, { 0.8f, 0.2f, 0.3f, 1.0f });
 

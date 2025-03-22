@@ -211,7 +211,7 @@ namespace Lithe {
 
 	// ---- Rotated Quad Drawing ----
 
-	void Renderer2D::DrawRotatedQuad(const glm::vec3& position, float degrees, const glm::vec2& size, const Ref<Texture2D>& texture, const glm::vec4& color, float textureScale)
+	void Renderer2D::DrawRotatedQuad(const glm::vec3& position, float rotationRadians, const glm::vec2& size, const Ref<Texture2D>& texture, const glm::vec4& color, float textureScale)
 	{
 		LI_PROFILE_FUNCTION();
 
@@ -239,7 +239,7 @@ namespace Lithe {
 		}
 
 		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
-			* glm::rotate(glm::mat4(1.0f), glm::radians(degrees), { 0.0f, 0.0f, 1.0f })
+			* glm::rotate(glm::mat4(1.0f), rotationRadians, { 0.0f, 0.0f, 1.0f })
 			* glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
 
 		for (uint8_t i = 0; i < 4; i++)

@@ -3,6 +3,7 @@
 
 #include "Sandbox2D.h"
 #include "ExampleLayer.h"
+#include "Particles/ParticleSystemLayer.h"
 
 class Sandbox : public Lithe::Application
 {
@@ -10,9 +11,11 @@ public:
 	Sandbox()
 	{
 		Lithe::Application::GetWindow().SetVSync(true);
+		Lithe::OrthographicCameraController camera(1280.0f / 720.0f, true);
 
 		//PushLayer(new ExampleLayer());
-		PushLayer(new Sandbox2D());
+		PushLayer(new Sandbox2D(camera));
+		PushOverlay(new ParticleSystemLayer(camera));
 	}
 
 	~Sandbox()
