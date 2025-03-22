@@ -23,11 +23,6 @@ private:
 	Lithe::Ref<Lithe::Shader> m_FlatColorShader;
 
 	Lithe::Ref<Lithe::Texture2D> m_CheckerboardTexture;
-	Lithe::Ref<Lithe::Texture2D> m_SpriteSheet;
-	Lithe::Ref<Lithe::SubTexture2D> m_TextureStairs, m_TextureBarrel, m_TextureTree;
 
 	glm::vec4 m_SquareColor = { 0.2f, 0.3f, 0.8f, 1.0f };
-
-	uint32_t m_MapWidth, m_MapHeight;
-	std::unordered_map<char, Lithe::Ref<Lithe::SubTexture2D>> s_TextureMap;
 };

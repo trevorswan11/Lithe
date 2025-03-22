@@ -1,9 +1,11 @@
 #include <Lithe.h>
 #include <Lithe/Core/EntryPoint.h>
 
-#include "Sandbox2D.h"
 #include "ExampleLayer.h"
+
+#include "Sandbox2D.h"
 #include "Particles/ParticleSystemLayer.h"
+#include "Game/GameLayer.h"
 
 class Sandbox : public Lithe::Application
 {
@@ -16,6 +18,7 @@ public:
 		//PushLayer(new ExampleLayer());
 		PushLayer(new Sandbox2D(camera));
 		//PushLayer(new ParticleSystemLayer(camera));
+		//PushLayer(new GameLayer(camera));
 	}
 
 	~Sandbox()
