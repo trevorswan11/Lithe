@@ -20,7 +20,7 @@ namespace Lithe {
 	class Application
 	{
 	public:
-		Application();
+		Application(const std::string& name = "Lithe Engine");
 		virtual ~Application();
 
 		void OnEvent(Event& e);

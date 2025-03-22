@@ -17,8 +17,6 @@ public:
 	void OnEvent(Lithe::Event& e) override;
 private:
 	Lithe::OrthographicCameraController m_CameraController;
-	Lithe::Ref<Lithe::Framebuffer> m_Framebuffer;
-
 	Lithe::Ref<Lithe::Texture2D> m_CheckerboardTexture;
 
 	glm::vec4 m_SquareColor = { 0.2f, 0.3f, 0.8f, 1.0f };

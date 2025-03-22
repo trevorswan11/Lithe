@@ -112,6 +112,64 @@ project "Lithe"
 		runtime "Release"
 		optimize "on"
 
+project "Lithium"
+	location "Lithium"
+	kind "ConsoleApp"
+	language "C++"
+	cppdialect "C++17"
+	staticruntime "on"
+
+	dependson { "Lithe" }
+
+	filter "action:vs*"
+		buildoptions { "/utf-8" }
+
+	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
+	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
+
+	files
+	{
+		"%{prj.name}/src/**.h",
+		"%{prj.name}/src/**.hpp",
+		"%{prj.name}/src/**.c",
+		"%{prj.name}/src/**.cpp"
+	}
+
+	includedirs
+	{
+		"Lithe/vendor/spdlog/include",
+		"Lithe/src",
+		"Lithe/vendor",
+		"%{prj.name}/src",
+		"%{IncludeDir.glm}"
+	}
+
+	links
+	{
+		"Lithe"
+	}
+
+	filter "system:windows"
+		staticruntime "On"
+		systemversion "latest"
+
+	filter "configurations:Debug"
+		defines "LI_DEBUG"
+		runtime "Debug"
+		symbols "on"
+
+	filter "configurations:Release"
+		defines "LI_RELEASE"
+		runtime "Release"
+		optimize "on"
+
+	filter "configurations:Dist"
+		defines "LI_DIST"
+		kind "WindowedApp"
+		runtime "Release"
+		optimize "on"
+		linkoptions { "/ENTRY:mainCRTStartup" }
+
 project "Sandbox"
 	location "Sandbox"
 	kind "ConsoleApp"
