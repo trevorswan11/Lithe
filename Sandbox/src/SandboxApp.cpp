@@ -15,8 +15,7 @@ public:
 
 		//PushLayer(new ExampleLayer());
 		PushLayer(new Sandbox2D(camera));
-		PushLayer(new ParticleSystemLayer(camera));
-		
+		//PushLayer(new ParticleSystemLayer(camera));
 	}
 
 	~Sandbox()

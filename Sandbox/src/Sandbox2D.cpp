@@ -20,6 +20,11 @@ void Sandbox2D::OnAttach()
 	LI_PROFILE_FUNCTION();
 
 	m_CheckerboardTexture = Lithe::Texture2D::Create("assets/textures/CheckerboardExample.png");
+	m_SpriteSheet = Lithe::Texture2D::Create("assets/game/textures/RPGpack_sheet_2X.png");
+
+	m_TextureStairs = Lithe::SubTexture2D::CreateFromCoords(m_SpriteSheet, { 7, 6 }, { 128, 128 });
+	m_TextureBarrel = Lithe::SubTexture2D::CreateFromCoords(m_SpriteSheet, { 8, 2 }, { 128, 128 });
+	m_TextureTree = Lithe::SubTexture2D::CreateFromCoords(m_SpriteSheet, { 2, 1 }, { 128, 128 }, { 1, 2 });
 }
 
 void Sandbox2D::OnDetach()
@@ -43,11 +48,13 @@ void Sandbox2D::OnUpdate(Lithe::Timestep ts)
 		Lithe::RenderCommand::Clear();
 	}
 
+#if 0
 	{
+		LI_PROFILE_SCOPE("Sandbox2D Renderer Draw");
+
 		static float rotation = 0.0f;
 		rotation += ts * 1.0f;
 
-		LI_PROFILE_SCOPE("Sandbox2D Renderer Draw");
 		Lithe::Renderer2D::BeginScene(m_CameraController.GetCamera());
 
 		Lithe::Renderer2D::DrawQuad({ 0.0f, 0.0f }, { 20.0f, 20.0f }, m_CheckerboardTexture, 10.0f);
@@ -70,6 +77,19 @@ void Sandbox2D::OnUpdate(Lithe::Timestep ts)
 				Lithe::Renderer2D::DrawQuad({ x, y, 0.1f }, { 0.45f, 0.45f }, color);
 			}
 		}
+		Lithe::Renderer2D::EndScene();
+	}
+#endif
+
+	{
+		LI_PROFILE_SCOPE("SpriteSheet Draw");
+		Lithe::Renderer2D::BeginScene(m_CameraController.GetCamera());
+
+		//Lithe::Renderer2D::DrawQuad({ 0.0f, 0.0f, 0.6f }, { 20.0f, 20.0f }, m_SpriteSheet);
+		Lithe::Renderer2D::DrawQuad({ 0.0f, 0.0f, 0.7f }, { 1.0f, 1.0f }, m_TextureStairs);
+		Lithe::Renderer2D::DrawQuad({ 1.0f, 0.0f, 0.8f }, { 1.0f, 1.0f }, m_TextureBarrel);
+		Lithe::Renderer2D::DrawQuad({ -1.0f, 0.0f, 0.8f }, { 1.0f, 2.0f }, m_TextureTree);
+
 		Lithe::Renderer2D::EndScene();
 	}
 }

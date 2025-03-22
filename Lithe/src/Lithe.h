@@ -22,6 +22,7 @@
 
 #include "Lithe/Renderer/Shader.h"
 #include "Lithe/Renderer/Texture.h"
+#include "Lithe/Renderer/SubTexture2D.h"
 #include "Lithe/Renderer/Buffer.h"
 #include "Lithe/Renderer/VertexArray.h"
 
