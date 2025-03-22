@@ -2,8 +2,8 @@
 #include <Lithe/Core/EntryPoint.h>
 
 #include "ExampleLayer.h"
-
 #include "Sandbox2D.h"
+
 #include "Particles/ParticleSystemLayer.h"
 #include "Game/GameLayer.h"
 

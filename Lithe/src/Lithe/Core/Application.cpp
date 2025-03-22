@@ -64,6 +64,11 @@ namespace Lithe {
 		}
 	}
 
+	void Application::Close()
+	{
+		m_Running = false;
+	}
+
 	void Application::Run()
 	{
 		LI_PROFILE_FUNCTION();
