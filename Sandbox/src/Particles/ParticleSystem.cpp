@@ -21,6 +21,8 @@ ParticleSystem::ParticleSystem(uint32_t maxParticles)
 
 void ParticleSystem::OnUpdate(Lithe::Timestep ts)
 {
+	LI_PROFILE_FUNCTION();
+
 	for (auto& particle : m_ParticlePool)
 	{
 		if (!particle.Active)
@@ -44,6 +46,8 @@ void ParticleSystem::OnUpdate(Lithe::Timestep ts)
 
 void ParticleSystem::OnRender(Lithe::OrthographicCamera& camera)
 {
+	LI_PROFILE_FUNCTION();
+
 	Lithe::Renderer2D::BeginScene(camera);
 	for (auto& particle : m_ParticlePool)
 	{
@@ -64,6 +68,8 @@ void ParticleSystem::OnRender(Lithe::OrthographicCamera& camera)
 
 void ParticleSystem::Emit(const ParticleProps& particleProps)
 {
+	LI_PROFILE_FUNCTION();
+
 	Particle& particle = m_ParticlePool[m_PoolIndex];
 	particle.Active = true;
 	particle.Position = particleProps.Position;
