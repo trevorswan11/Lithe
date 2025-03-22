@@ -17,6 +17,7 @@ public:
 	void OnEvent(Lithe::Event& e) override;
 private:
 	Lithe::OrthographicCameraController m_CameraController;
+	Lithe::Ref<Lithe::Framebuffer> m_Framebuffer;
 
 	Lithe::Ref<Lithe::Texture2D> m_CheckerboardTexture;
 

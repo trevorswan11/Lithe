@@ -20,6 +20,12 @@ void Sandbox2D::OnAttach()
 	LI_PROFILE_FUNCTION();
 
 	m_CheckerboardTexture = Lithe::Texture2D::Create("assets/textures/CheckerboardExample.png");
+
+	Lithe::FramebufferSpec fbSpec;
+	fbSpec.Width = Lithe::Application::Get().GetWindow().GetWidth();
+	fbSpec.Height = Lithe::Application::Get().GetWindow().GetHeight();
+	m_Framebuffer = Lithe::Framebuffer::Create(fbSpec);
+
 	m_CameraController.SetZoomLevel(5.0f);
 }
 
@@ -40,6 +46,7 @@ void Sandbox2D::OnUpdate(Lithe::Timestep ts)
 	Lithe::Renderer2D::ResetStats();
 	{
 		LI_PROFILE_SCOPE("Sandbox2D Renderer Prep");
+		m_Framebuffer->Bind();
 		Lithe::RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1.0f });
 		Lithe::RenderCommand::Clear();
 	}
@@ -73,6 +80,7 @@ void Sandbox2D::OnUpdate(Lithe::Timestep ts)
 			}
 		}
 		Lithe::Renderer2D::EndScene();
+		m_Framebuffer->Unbind();
 	}
 }
 
@@ -81,7 +89,7 @@ void Sandbox2D::OnImGuiRender()
 	LI_PROFILE_FUNCTION();
 
 	// Note: Switch this to true to enable dockspace
-	static bool dockingEnabled = false;
+	static bool dockingEnabled = true;
 	if (dockingEnabled)
 	{
 		static bool dockspaceOpen = true;
@@ -154,8 +162,8 @@ void Sandbox2D::OnImGuiRender()
 
 		ImGui::ColorEdit4("Square Color", glm::value_ptr(m_SquareColor));
 
-		uintptr_t textureID = m_CheckerboardTexture->GetRendererID();
-		ImGui::Image(reinterpret_cast<void*>(textureID), ImVec2{ 256.0f, 256.0f });
+		uintptr_t textureID = m_Framebuffer->GetColorAttachmentRendererID();
+		ImGui::Image(reinterpret_cast<void*>(textureID), ImVec2{ 1280.0f, 720.0f });
 		ImGui::End();
 
 		ImGui::End();
@@ -173,8 +181,8 @@ void Sandbox2D::OnImGuiRender()
 
 		ImGui::ColorEdit4("Square Color", glm::value_ptr(m_SquareColor));
 
-		uintptr_t textureID = m_CheckerboardTexture->GetRendererID();
-		ImGui::Image(reinterpret_cast<void*>(textureID), ImVec2{ 256.0f, 256.0f });
+		uintptr_t textureID = m_Framebuffer->GetColorAttachmentRendererID();
+		ImGui::Image(reinterpret_cast<void*>(textureID), ImVec2{ 1280.0f, 720.0f });
 		ImGui::End();
 	}
 }
