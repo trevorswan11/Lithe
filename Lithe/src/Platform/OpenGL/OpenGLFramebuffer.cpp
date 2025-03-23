@@ -5,6 +5,8 @@
 
 namespace Lithe {
 
+	static const uint32_t s_MaxFramebufferSize = 8192;
+
 	OpenGLFramebuffer::OpenGLFramebuffer(const FramebufferSpec& spec)
 		: m_Spec(spec)
 	{
@@ -62,11 +64,16 @@ namespace Lithe {
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 
-	void OpenGLFramebuffer::Resize(uint32_t width, uint32_t height)
+	void OpenGLFramebuffer::Resize(uint32_t width, uint32_t height, bool invalidate)
 	{
+		if (width == 0 || height == 0 || width > s_MaxFramebufferSize || height > s_MaxFramebufferSize)
+		{
+			LI_CORE_WARN("Attempted to rezize framebuffer to {0}, {1}", width, height);
+			return;
+		}
 		m_Spec.Width = width;
 		m_Spec.Height = height;
-		Invalidate();
+		if (invalidate) Invalidate();
 	}
 
 }

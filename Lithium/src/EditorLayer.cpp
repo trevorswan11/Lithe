@@ -7,12 +7,12 @@
 
 namespace Lithe {
 	EditorLayer::EditorLayer()
-		: Layer("Sandbox2D"), m_CameraController(1280.0f / 720.0f, true)
+		: Layer("EditorLayer"), m_CameraController(1280.0f / 720.0f, true)
 	{
 	}
 
 	EditorLayer::EditorLayer(OrthographicCameraController& camera)
-		: Layer("Sandbox2D"), m_CameraController(camera)
+		: Layer("EditorLayer"), m_CameraController(camera)
 	{
 	}
 
@@ -50,7 +50,10 @@ namespace Lithe {
 
 		// Update
 		if (m_ViewportFocused)
+		{
 			m_CameraController.OnUpdate(ts);
+			m_CameraController.OnResize(m_ViewportSize.x, m_ViewportSize.y);
+		}
 
 		// Render
 		Renderer2D::ResetStats();
