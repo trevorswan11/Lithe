@@ -48,6 +48,14 @@ namespace Lithe {
 			m_CameraController.OnResize(m_ViewportSize.x, m_ViewportSize.y);
 		}
 
+		// Camera fix on Reopen
+		if (Application::Get().GetWasMinimized())
+		{
+			m_Framebuffer->Resize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+			m_CameraController.OnResize(m_ViewportSize.x, m_ViewportSize.y);
+			Application::Get().SetWasMinimized(false);
+		}
+
 		// Update
 		if (m_ViewportFocused)
 		{

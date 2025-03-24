@@ -31,6 +31,8 @@ namespace Lithe {
 		inline Window& GetWindow() { return *m_Window; }
 
 		void Close();
+		inline void SetWasMinimized(bool wasMinimized) { m_WasMinimized = wasMinimized; }
+		inline bool GetWasMinimized() const { return m_WasMinimized; }
 
 		ImGuiLayer* GetImGuiLayer() { return m_ImGuiLayer; }
 
@@ -44,6 +46,7 @@ namespace Lithe {
 		Scope<Window> m_Window;
 		ImGuiLayer* m_ImGuiLayer;
 		bool m_Running = true;
+		bool m_WasMinimized = false;
 		bool m_Minimized = false;
 		LayerStack m_LayerStack;
 		float m_LastFrameTime = 0.0f;

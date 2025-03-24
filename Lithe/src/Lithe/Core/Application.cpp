@@ -116,6 +116,7 @@ namespace Lithe {
 
 		if (e.GetWidth() == 0 || e.GetHeight() == 0)
 		{
+			SetWasMinimized(true);
 			m_Minimized = true;
 			return false;
 		}
