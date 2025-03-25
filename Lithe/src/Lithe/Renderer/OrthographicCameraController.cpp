@@ -16,6 +16,10 @@ namespace Lithe {
 	{
 		LI_PROFILE_FUNCTION();
 
+		#ifdef CLIENT_USE_DEFAULT_CAMERA_CONTROLS
+			return;
+		#endif
+
 		if (Input::IsKeyPressed(Lithe::KeyCode::W))
 		{
 			m_CameraPosition.x += -sin(glm::radians(m_CameraRotation)) * m_CameraTranslationSpeed * ts;
@@ -97,6 +101,10 @@ namespace Lithe {
 	bool OrthographicCameraController::OnMouseScrolled(MouseScrolledEvent& e)
 	{
 		LI_PROFILE_FUNCTION();
+
+		#ifdef CLIENT_USE_DEFAULT_CAMERA_CONTROLS
+			return false;
+		#endif
 
 		m_ZoomLevel -= e.GetYOffset() * 0.5f;
 		m_ZoomLevel = std::max(m_ZoomLevel, 0.25f);

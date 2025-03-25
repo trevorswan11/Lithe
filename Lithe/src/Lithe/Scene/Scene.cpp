@@ -2,16 +2,12 @@
 #include "Scene.h"
 
 #include "Lithe/Scene/Components.h"
+#include "Lithe/Scene/Entity.h"
 #include "Lithe/Renderer/Renderer2D.h"
 
 #include <glm/glm.hpp>
 
 namespace Lithe {
-
-	static void DoMath(const glm::mat4& transform)
-	{
-
-	}
 
 	Scene::Scene()
 	{
@@ -22,19 +18,49 @@ namespace Lithe {
 	{
 	}
 
-	entt::entity Scene::CreateEntity()
+	Entity Scene::CreateEntity(const std::string& name)
 	{
-		return m_Registry.create();
+		Entity entity = { m_Registry.create(), this };
+		entity.AddComponent<TransformComponent>();
+		auto& tag = entity.AddComponent<TagComponent>();
+		tag.Tag = name.empty() ? "Entity" : name;
+		return entity;
 	}
 
 	void Scene::OnUpdate(Timestep ts)
 	{
-		auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
-		for (auto entity : group)
+		// Render sprites
+		Camera* primaryCamera = nullptr;
+		glm::mat4* primaryCameraTransform = nullptr;
 		{
-			auto& [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
+			auto group = m_Registry.group<CameraComponent>(entt::get<TransformComponent>);
+			for (auto entity : group)
+			{
+				auto& [transform, camera] = group.get<TransformComponent, CameraComponent>(entity);
 
-			Renderer2D::DrawQuad(transform, sprite.Color);
+				if (camera.Primary)
+				{
+					primaryCamera = &camera.Camera;
+					primaryCameraTransform = &transform.Transform;
+					break;
+				}
+			}
+		}
+
+		// Render from main camera
+		if (primaryCamera)
+		{
+			Renderer2D::BeginScene(primaryCamera->GetProjection(), *primaryCameraTransform);
+
+			auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
+			for (auto entity : group)
+			{
+				auto& [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
+
+				Renderer2D::DrawQuad(transform, sprite.Color);
+			}
+
+			Renderer2D::EndScene();
 		}
 	}
 

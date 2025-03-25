@@ -22,7 +22,10 @@ namespace Lithe {
 		Ref<Framebuffer> m_Framebuffer;
 
 		Ref<Scene> m_ActiveScene;
-		entt::entity m_SquareEntity;
+		Entity m_SquareEntity;
+		Entity m_FirstCameraEntity, m_SecondCameraEntity;
+
+		bool m_PrimaryCamera = true;
 
 		Ref<Texture2D> m_CheckerboardTexture;
 

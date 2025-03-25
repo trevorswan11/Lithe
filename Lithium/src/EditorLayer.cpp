@@ -31,11 +31,16 @@ namespace Lithe {
 
 		m_ActiveScene = CreateRef<Scene>();
 
-		auto square = m_ActiveScene->CreateEntity();
-		m_ActiveScene->Reg().emplace<TransformComponent>(square);
-		m_ActiveScene->Reg().emplace<SpriteRendererComponent>(square, glm::vec4{ 0.0f, 1.0f, 0.0f, 1.0f });
+		// Square
+		m_SquareEntity = m_ActiveScene->CreateEntity("Modifiable Square");
+		m_SquareEntity.AddComponent<SpriteRendererComponent>(glm::vec4{ 0.0f, 1.0f, 0.0f, 1.0f });
 
-		m_SquareEntity = square;
+		// Cameras
+		m_FirstCameraEntity = m_ActiveScene->CreateEntity("Camera Entity");
+		m_FirstCameraEntity.AddComponent<CameraComponent>(glm::ortho(-16.0f, 16.0f, -9.0f, 9.0f, -1.0f, 1.0f)).Primary = true;
+
+		m_SecondCameraEntity = m_ActiveScene->CreateEntity("Clip-Space Camera Entity");
+		m_SecondCameraEntity.AddComponent<CameraComponent>(glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, -1.0f, 1.0f));
 	}
 
 	void EditorLayer::OnDetach()
@@ -77,12 +82,8 @@ namespace Lithe {
 		RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1.0f });
 		RenderCommand::Clear();
 
-		Renderer2D::BeginScene(m_CameraController.GetCamera());
-
 		// Update Scene
 		m_ActiveScene->OnUpdate(ts);
-
-		Renderer2D::EndScene();
 
 		m_Framebuffer->Unbind();
 	}
@@ -159,10 +160,28 @@ namespace Lithe {
 		ImGui::Text("Vertices: %d", stats.GetTotalVertexCount());
 		ImGui::Text("Indices: %d", stats.GetTotalIndexCount());
 
-		auto& squareColor =  m_ActiveScene->Reg().get<SpriteRendererComponent>(m_SquareEntity).Color;
-		ImGui::ColorEdit4("Square Color", glm::value_ptr(squareColor));
+		if(m_SquareEntity)
+		{
+			ImGui::Separator();
+			auto& tag = m_SquareEntity.GetComponent<TagComponent>().Tag;
+			ImGui::Text("%s", tag.c_str());
+
+			auto& squareColor = m_SquareEntity.GetComponent<SpriteRendererComponent>().Color;
+			ImGui::ColorEdit4("Square Color", glm::value_ptr(squareColor));
+			ImGui::Separator();
+		}
+
+		ImGui::DragFloat3("Camera Transform",
+			glm::value_ptr(m_FirstCameraEntity.GetComponent<TransformComponent>().Transform[3]));
+
+		if (ImGui::Checkbox("Camera A", &m_PrimaryCamera))
+		{
+			m_FirstCameraEntity.GetComponent<CameraComponent>().Primary = m_PrimaryCamera;
+			m_SecondCameraEntity.GetComponent<CameraComponent>().Primary = !m_PrimaryCamera;
+		}
 
 		{
+			ImGui::Separator();
 			LI_PROFILE_SCOPE("ImGui Average FPS");
 
 			static float fpsHistory[100] = {};
@@ -177,6 +196,7 @@ namespace Lithe {
 			fpsIndex = (fpsIndex + 1) % 100;
 			float avgFps = fpsSum / 100.0f;
 			ImGui::Text("Avg FPS: %.1f", avgFps);
+			ImGui::Separator();
 		}
 
 		ImGui::End();

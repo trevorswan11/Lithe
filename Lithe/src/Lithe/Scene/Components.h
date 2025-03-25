@@ -1,10 +1,21 @@
 #pragma once
 
 #include "Lithe/Core/Base.h"
+#include "Lithe/Renderer/Camera.h"
 
 #include <glm/glm.hpp>
 
 namespace Lithe {
+
+	struct TagComponent
+	{
+		std::string Tag;
+
+		TagComponent() = default;
+		TagComponent(const TagComponent&) = default;
+		TagComponent(const std::string& tag)
+			: Tag(tag) {}
+	};
 
 	struct TransformComponent
 	{
@@ -27,6 +38,17 @@ namespace Lithe {
 		SpriteRendererComponent(const SpriteRendererComponent&) = default;
 		SpriteRendererComponent(const glm::vec4& color)
 			: Color(color) {}
+	};
+
+	struct CameraComponent
+	{
+		Camera Camera;
+		bool Primary = false; // Scene should handle eventually
+
+		CameraComponent() = default;
+		CameraComponent(const CameraComponent&) = default;
+		CameraComponent(const glm::mat4& projection)
+			: Camera(projection) {}
 	};
 
 }

@@ -7,7 +7,7 @@
 namespace Lithe {
 
 	OpenGLContext::OpenGLContext(GLFWwindow* windowHandle)
-		: m_windowHandle(windowHandle)	
+		: m_WindowHandle(windowHandle)
 	{
 		LI_CORE_ASSERT(windowHandle, "widnowHandle is null!");
 	}
@@ -16,7 +16,7 @@ namespace Lithe {
 	{
 		LI_PROFILE_FUNCTION();
 
-		glfwMakeContextCurrent(m_windowHandle);
+		glfwMakeContextCurrent(m_WindowHandle);
 		int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 		LI_CORE_ASSERT(status, "Failed to initialize Glad!");
 
@@ -40,7 +40,7 @@ namespace Lithe {
 	{
 		LI_PROFILE_FUNCTION();
 
-		glfwSwapBuffers(m_windowHandle);
+		glfwSwapBuffers(m_WindowHandle);
 	}
 
 }

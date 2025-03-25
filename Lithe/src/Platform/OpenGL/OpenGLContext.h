@@ -15,7 +15,7 @@ namespace Lithe {
 		virtual void Init() override;
 		virtual void SwapBuffers() override;
 	private:
-		GLFWwindow* m_windowHandle;
+		GLFWwindow* m_WindowHandle;
 	};
 
 }
