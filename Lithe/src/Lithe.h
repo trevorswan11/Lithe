@@ -15,6 +15,9 @@
 
 #include "Lithe/ImGui/ImGuiLayer.h"
 
+#include "Lithe/Scene/Scene.h"
+#include "Lithe/Scene/Components.h"
+
 // ---Rendering---
 #include "Lithe/Renderer/Renderer.h"
 #include "Lithe/Renderer/Renderer2D.h"

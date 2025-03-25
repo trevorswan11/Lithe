@@ -32,7 +32,12 @@ namespace Lithe {
 
 		inline static void DrawQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color)
 		{
-			DrawQuad(position, size, (Ref<Texture2D>)nullptr, color, 1.0f);
+			DrawQuad(position, size, (Ref<Texture2D>)nullptr, color);
+		}
+
+		inline static void DrawQuad(const glm::mat4& transform, const glm::vec4& color)
+		{
+			DrawQuad(transform, (Ref<Texture2D>)nullptr, color);
 		}
 
 		inline static void DrawQuad(const glm::vec2& position, const glm::vec2& size, const Ref<Texture2D>& texture, float textureScale = 1.0f)
@@ -53,6 +58,16 @@ namespace Lithe {
 		inline static void DrawQuad(const glm::vec3& position, const glm::vec2& size, const Ref<SubTexture2D>& subTexture, float textureScale = 1.0f)
 		{
 			DrawQuad(position, size, subTexture, glm::vec4(1.0f), textureScale);
+		}
+
+		inline static void DrawQuad(const glm::mat4& transform, const Ref<Texture2D>& texture, float textureScale = 1.0f)
+		{
+			DrawQuad(transform, texture, glm::vec4(1.0f), textureScale);
+		}
+
+		inline static void DrawQuad(const glm::mat4& transform, const Ref<SubTexture2D>& subTexture, float textureScale = 1.0f)
+		{
+			DrawQuad(transform, subTexture, glm::vec4(1.0f), textureScale);
 		}
 		
 		inline static void DrawQuad(const glm::vec2& position, const glm::vec2& size, const Ref<Texture2D>& texture, const glm::vec4& color, float textureScale = 1.0f)
@@ -118,6 +133,11 @@ namespace Lithe {
 
 		static void DrawRotatedQuad(const glm::vec3& position, float rotationRadians, const glm::vec2& size, const Ref<Texture2D>& texture, const glm::vec4& color, float textureScale = 1.0f);
 		static void DrawRotatedQuad(const glm::vec3& position, float rotationRadians, const glm::vec2& size, const Ref<SubTexture2D>& subTexture, const glm::vec4& color, float textureScale = 1.0f);
+
+		// --- MASTER IMPLEMENTATION ---
+
+		static void DrawQuad(const glm::mat4& transform, const Ref<Texture2D>& texture, const glm::vec4& color, float textureScale = 1.0f);
+		static void DrawQuad(const glm::mat4& transform, const Ref<SubTexture2D>& subTexture, const glm::vec4& color, float textureScale = 1.0f);
 
 		// --- Stats ---
 

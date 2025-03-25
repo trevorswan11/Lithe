@@ -22,6 +22,7 @@ IncludeDir["Glad"] = "Lithe/vendor/Glad/include"
 IncludeDir["ImGui"] = "Lithe/vendor/imgui"
 IncludeDir["glm"] = "Lithe/vendor/glm"
 IncludeDir["stb_image"] = "Lithe/vendor/stb_image"
+IncludeDir["entt"] = "Lithe/vendor/entt/include"
 
 group "Dependencies"
     include "Lithe/vendor/GLFW"
@@ -70,7 +71,8 @@ project "Lithe"
 		"%{IncludeDir.Glad}",
 		"%{IncludeDir.ImGui}",
 		"%{IncludeDir.glm}",
-		"%{IncludeDir.stb_image}"
+		"%{IncludeDir.stb_image}",
+		"%{IncludeDir.entt}"
 	}
 
 	links
@@ -141,7 +143,8 @@ project "Lithium"
 		"Lithe/src",
 		"Lithe/vendor",
 		"%{prj.name}/src",
-		"%{IncludeDir.glm}"
+		"%{IncludeDir.glm}",
+		"%{IncludeDir.entt}"
 	}
 
 	links
@@ -199,7 +202,8 @@ project "Sandbox"
 		"Lithe/src",
 		"Lithe/vendor",
 		"%{prj.name}/src",
-		"%{IncludeDir.glm}"
+		"%{IncludeDir.glm}",
+		"%{IncludeDir.entt}"
 	}
 
 	links
