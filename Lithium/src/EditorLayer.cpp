@@ -37,10 +37,10 @@ namespace Lithe {
 
 		// Cameras
 		m_FirstCameraEntity = m_ActiveScene->CreateEntity("Camera Entity");
-		m_FirstCameraEntity.AddComponent<CameraComponent>(glm::ortho(-16.0f, 16.0f, -9.0f, 9.0f, -1.0f, 1.0f)).Primary = true;
+		m_FirstCameraEntity.AddComponent<CameraComponent>().Primary = true;
 
 		m_SecondCameraEntity = m_ActiveScene->CreateEntity("Clip-Space Camera Entity");
-		m_SecondCameraEntity.AddComponent<CameraComponent>(glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, -1.0f, 1.0f));
+		m_SecondCameraEntity.AddComponent<CameraComponent>().Camera.SetOrthographicSize(0.25f);
 	}
 
 	void EditorLayer::OnDetach()
@@ -59,6 +59,8 @@ namespace Lithe {
 		{
 			m_Framebuffer->Resize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
 			m_CameraController.OnResize(m_ViewportSize.x, m_ViewportSize.y);
+
+			m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
 		}
 
 		// Camera fix on Reopen
@@ -66,6 +68,7 @@ namespace Lithe {
 		{
 			m_Framebuffer->Resize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
 			m_CameraController.OnResize(m_ViewportSize.x, m_ViewportSize.y);
+			m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
 			Application::Get().SetWasMinimized(false);
 		}
 
@@ -178,6 +181,18 @@ namespace Lithe {
 		{
 			m_FirstCameraEntity.GetComponent<CameraComponent>().Primary = m_PrimaryCamera;
 			m_SecondCameraEntity.GetComponent<CameraComponent>().Primary = !m_PrimaryCamera;
+		}
+
+		{
+			ImGui::Separator();
+			auto& camera = m_SecondCameraEntity.GetComponent<CameraComponent>().Camera;
+			float orthoSize = camera.GetOrthographicSize();
+			if (ImGui::DragFloat("Second Camera Ortho Size", &orthoSize))
+			{
+				orthoSize = orthoSize <= 0.25f ? 0.25f : orthoSize;
+				camera.SetOrthographicSize(orthoSize);
+			}
+			ImGui::Separator();
 		}
 
 		{

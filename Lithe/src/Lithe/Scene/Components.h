@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Lithe/Core/Base.h"
-#include "Lithe/Renderer/Camera.h"
+#include "Lithe/Scene/SceneCamera.h"
 
 #include <glm/glm.hpp>
 
@@ -42,13 +42,12 @@ namespace Lithe {
 
 	struct CameraComponent
 	{
-		Camera Camera;
+		SceneCamera Camera;
 		bool Primary = false; // Scene should handle eventually
+		bool FixedAspectRatio = false;
 
 		CameraComponent() = default;
 		CameraComponent(const CameraComponent&) = default;
-		CameraComponent(const glm::mat4& projection)
-			: Camera(projection) {}
 	};
 
 }
