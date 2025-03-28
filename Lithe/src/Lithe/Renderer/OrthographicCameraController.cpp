@@ -16,7 +16,7 @@ namespace Lithe {
 	{
 		LI_PROFILE_FUNCTION();
 
-		#ifdef CLIENT_USE_DEFAULT_CAMERA_CONTROLS
+		#ifdef CLIENT_DISABLE_DEFAULT_CAMERA_CONTROLS
 			return;
 		#endif
 
@@ -102,7 +102,7 @@ namespace Lithe {
 	{
 		LI_PROFILE_FUNCTION();
 
-		#ifdef CLIENT_USE_DEFAULT_CAMERA_CONTROLS
+		#ifdef CLIENT_DISABLE_DEFAULT_CAMERA_CONTROLS
 			return false;
 		#endif
 
