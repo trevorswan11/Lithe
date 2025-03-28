@@ -3,6 +3,7 @@
 
 #include "Lithe/Scene/Components.h"
 #include "Lithe/Scene/Entity.h"
+#include "Lithe/Scene/ScriptableEntity.h"
 #include "Lithe/Renderer/Renderer2D.h"
 
 #include <glm/glm.hpp>
@@ -29,6 +30,22 @@ namespace Lithe {
 
 	void Scene::OnUpdate(Timestep ts)
 	{
+		// Update Scripts
+		{
+			// Should be moved to a ScenePlay Func
+			m_Registry.view<NativeScriptComponent>().each([=](auto entity, auto& nsc)
+				{
+					if (!nsc.Instance)
+					{
+						nsc.Instance = nsc.InstantiateScript();
+						nsc.Instance->m_Entity = Entity{ entity, this };
+						nsc.Instance->OnCreate();
+					}
+					nsc.Instance->OnUpdate(ts);
+				}
+			);
+		}
+
 		// Render sprites
 		Camera* primaryCamera = nullptr;
 		glm::mat4* primaryCameraTransform = nullptr;
@@ -36,7 +53,7 @@ namespace Lithe {
 			auto group = m_Registry.group<CameraComponent>(entt::get<TransformComponent>);
 			for (auto entity : group)
 			{
-				auto& [transform, camera] = group.get<TransformComponent, CameraComponent>(entity);
+				auto [transform, camera] = group.get<TransformComponent, CameraComponent>(entity);
 
 				if (camera.Primary)
 				{
@@ -55,7 +72,7 @@ namespace Lithe {
 			auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
 			for (auto entity : group)
 			{
-				auto& [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
+				auto [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
 
 				Renderer2D::DrawQuad(transform, sprite.Color);
 			}

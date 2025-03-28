@@ -18,6 +18,7 @@
 #include "Lithe/Scene/Scene.h"
 #include "Lithe/Scene/Components.h"
 #include "Lithe/Scene/Entity.h"
+#include "Lithe/Scene/ScriptableEntity.h"
 
 // ---Rendering---
 #include "Lithe/Renderer/Renderer.h"
