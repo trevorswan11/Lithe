@@ -1,5 +1,8 @@
 #pragma once
 
+#include "Lithe/Core/Base.h"
+#include "Lithe/Core/MouseCodes.h"
+
 #include "Lithe/Events/Event.h"
 
 namespace Lithe {
@@ -57,21 +60,21 @@ namespace Lithe {
 	class MouseButtonEvent : public Event
 	{
 	public:
-		inline int GetMouseButton() const { return m_Button; }
+		inline MouseCode GetMouseButton() const { return m_Button; }
 
 		EVENT_CLASS_CATEGORY(EventCategoryMouse | EventCategoryInput)
 	protected:
-		MouseButtonEvent(int button)
+		MouseButtonEvent(MouseCode button)
 			: m_Button(button) {}
 
-		int m_Button;
+		MouseCode m_Button;
 	};
 
 	// Handles mouse button presses
 	class MouseButtonPressedEvent : public MouseButtonEvent
 	{
 	public:
-		MouseButtonPressedEvent(int button)
+		MouseButtonPressedEvent(MouseCode button)
 			: MouseButtonEvent(button) {}
 
 		// Formats the event with the buttons qualifier
@@ -89,7 +92,7 @@ namespace Lithe {
 	class MouseButtonReleasedEvent : public MouseButtonEvent
 	{
 	public:
-		MouseButtonReleasedEvent(int button)
+		MouseButtonReleasedEvent(MouseCode button)
 			: MouseButtonEvent(button) {
 		}
 
