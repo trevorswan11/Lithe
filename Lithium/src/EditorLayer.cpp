@@ -35,6 +35,9 @@ namespace Lithe {
 		m_SquareEntity = m_ActiveScene->CreateEntity("Modifiable Square");
 		m_SquareEntity.AddComponent<SpriteRendererComponent>(glm::vec4{ 0.0f, 1.0f, 0.0f, 1.0f });
 
+		auto redSquare = m_ActiveScene->CreateEntity("Red Square");
+		redSquare.AddComponent<SpriteRendererComponent>(glm::vec4{ 1.0f, 0.0f, 0.0f, 1.0f });
+
 		// Cameras
 		m_FirstCameraEntity = m_ActiveScene->CreateEntity("Camera Entity");
 		m_FirstCameraEntity.AddComponent<CameraComponent>().Primary = true;
