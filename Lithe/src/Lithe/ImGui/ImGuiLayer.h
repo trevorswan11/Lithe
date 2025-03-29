@@ -8,6 +8,14 @@
 
 namespace Lithe {
 
+	enum class ImGuiFonts
+	{
+		Bold = 0,
+		Italic = 1,
+		BoldItalic = 2,
+		Default = 3,
+	};
+
 	class ImGuiLayer : public Layer
 	{
 	public:
@@ -22,6 +30,9 @@ namespace Lithe {
 		void End();
 
 		void BlockEvents(bool block = true) { m_BlockEvents = block; }
+
+		static float GetLineHeight();
+		void SetDarkThemeColors();
 	private:
 		bool m_BlockEvents = true;
 		float m_Time = 0.0f;

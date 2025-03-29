@@ -5,8 +5,7 @@
  	#include "Platform/Windows/WindowsWindow.h"
  #endif
  
- namespace Lithe
- {
+namespace Lithe {
  
  	Scope<Window> Window::Create(const WindowProps& props)
  	{
@@ -18,4 +17,4 @@
  	    #endif
  	}
  
- }
+}
