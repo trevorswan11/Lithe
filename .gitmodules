@@ -13,3 +13,6 @@
 [submodule "Lithe/vendor/Glad"]
 	path = Lithe/vendor/Glad
 	url = https://github.com/trevorswan11/glad
+[submodule "Lithe/vendor/yaml-cpp"]
+	path = Lithe/vendor/yaml-cpp
+	url = https://github.com/trevorswan11/yaml-cpp
