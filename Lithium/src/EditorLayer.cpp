@@ -32,17 +32,18 @@ namespace Lithe {
 		m_ActiveScene = CreateRef<Scene>();
 
 		// Square
-		m_SquareEntity = m_ActiveScene->CreateEntity("Modifiable Square");
-		m_SquareEntity.AddComponent<SpriteRendererComponent>(glm::vec4{ 0.0f, 1.0f, 0.0f, 1.0f });
+		auto squareA = m_ActiveScene->CreateEntity("Square A");
+		squareA.AddComponent<SpriteRendererComponent>(glm::vec4{ 0.0f, 1.0f, 0.0f, 1.0f });
 
-		auto redSquare = m_ActiveScene->CreateEntity("Red Square");
-		redSquare.AddComponent<SpriteRendererComponent>(glm::vec4{ 1.0f, 0.0f, 0.0f, 1.0f });
+		auto squareB = m_ActiveScene->CreateEntity("Square B");
+		squareB.AddComponent<SpriteRendererComponent>(glm::vec4{ 1.0f, 0.0f, 0.0f, 1.0f });
+		squareB.GetComponent<TransformComponent>().Translation.x = -2.0f;
 
 		// Cameras
-		m_FirstCameraEntity = m_ActiveScene->CreateEntity("Camera Entity");
+		m_FirstCameraEntity = m_ActiveScene->CreateEntity("First Camera (A)");
 		m_FirstCameraEntity.AddComponent<CameraComponent>().Primary = true;
 
-		m_SecondCameraEntity = m_ActiveScene->CreateEntity("Clip-Space Camera Entity");
+		m_SecondCameraEntity = m_ActiveScene->CreateEntity("Second Camera (B)");
 		m_SecondCameraEntity.AddComponent<CameraComponent>();
 
 		class CameraController : public ScriptableEntity
@@ -59,17 +60,17 @@ namespace Lithe {
 
 			void OnUpdate(Timestep ts)
 			{
-				auto& transform = GetComponent<TransformComponent>().Transform;
+				auto& translation = GetComponent<TransformComponent>().Translation;
 				float speed = 5.0f;
 
 				if (Input::IsKeyPressed(KeyCode::A))
-					transform[3][0] -= speed * ts;
+					translation.x -= speed * ts;
 				else if (Input::IsKeyPressed(KeyCode::D))
-					transform[3][0] += speed * ts;
+					translation.x += speed * ts;
 				if (Input::IsKeyPressed(KeyCode::W))
-					transform[3][1] += speed * ts;
+					translation.y += speed * ts;
 				else if (Input::IsKeyPressed(KeyCode::S))
-					transform[3][1] -= speed * ts;
+					translation.y -= speed * ts;
 			}
 		};
 
@@ -191,7 +192,7 @@ namespace Lithe {
 
 		m_SceneHierarchyPanel.OnImGuiRender();
 
-		ImGui::Begin("Settings");
+		ImGui::Begin("Stats");
 
 		auto stats = Renderer2D::GetStats();
 		ImGui::Text("Renderer2D Stats:");
@@ -199,38 +200,6 @@ namespace Lithe {
 		ImGui::Text("Quads: %d", stats.QuadCount);
 		ImGui::Text("Vertices: %d", stats.GetTotalVertexCount());
 		ImGui::Text("Indices: %d", stats.GetTotalIndexCount());
-
-		if(m_SquareEntity)
-		{
-			ImGui::Separator();
-			auto& tag = m_SquareEntity.GetComponent<TagComponent>().Tag;
-			ImGui::Text("%s", tag.c_str());
-
-			auto& squareColor = m_SquareEntity.GetComponent<SpriteRendererComponent>().Color;
-			ImGui::ColorEdit4("Square Color", glm::value_ptr(squareColor));
-			ImGui::Separator();
-		}
-
-		ImGui::DragFloat3("Camera Transform",
-			glm::value_ptr(m_FirstCameraEntity.GetComponent<TransformComponent>().Transform[3]));
-
-		if (ImGui::Checkbox("Camera A", &m_PrimaryCamera))
-		{
-			m_FirstCameraEntity.GetComponent<CameraComponent>().Primary = m_PrimaryCamera;
-			m_SecondCameraEntity.GetComponent<CameraComponent>().Primary = !m_PrimaryCamera;
-		}
-
-		{
-			ImGui::Separator();
-			auto& camera = m_SecondCameraEntity.GetComponent<CameraComponent>().Camera;
-			float orthoSize = camera.GetOrthographicSize();
-			if (ImGui::DragFloat("Second Camera Ortho Size", &orthoSize))
-			{
-				orthoSize = orthoSize <= 0.25f ? 0.25f : orthoSize;
-				camera.SetOrthographicSize(orthoSize);
-			}
-			ImGui::Separator();
-		}
 
 		{
 			ImGui::Separator();

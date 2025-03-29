@@ -23,7 +23,6 @@ namespace Lithe {
 		Ref<Framebuffer> m_Framebuffer;
 
 		Ref<Scene> m_ActiveScene;
-		Entity m_SquareEntity;
 		Entity m_FirstCameraEntity, m_SecondCameraEntity;
 
 		bool m_PrimaryCamera = true;
@@ -32,8 +31,6 @@ namespace Lithe {
 
 		bool m_ViewportFocused = false, m_ViewportHovered = false;
 		glm::vec2 m_ViewportSize = glm::vec2(0.0f);
-
-		glm::vec4 m_SquareColor = { 0.2f, 0.3f, 0.8f, 1.0f };
 
 		// Panels
 		SceneHierarchyPanel m_SceneHierarchyPanel;
