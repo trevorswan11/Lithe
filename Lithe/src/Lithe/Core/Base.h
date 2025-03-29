@@ -1,63 +1,32 @@
 #pragma once
 
 #include "ClientConfig.h"
+#include "Lithe/Core/PlatformDetection.h"
 
 #include <memory>
 
-// Platform detection using predefined macros
-#ifdef _WIN32
-	/* Windows x64/x86 */
-	#ifdef _WIN64
-		/* Windows x64  */
-		#define LI_PLATFORM_WINDOWS
-	#else
-		/* Windows x86 */
-		#error "x86 Builds are not supported!"
-	#endif
-#elif defined(__APPLE__) || defined(__MACH__)
-	#include <TargetConditionals.h>
-	#if TARGET_IPHONE_SIMULATOR == 1
-		#error "IOS simulator is not supported!"
-	#elif TARGET_OS_IPHONE == 1
-		#define LI_PLATFORM_IOS
-		#error "IOS is not supported!"
-	#elif TARGET_OS_MAC == 1
-		#define LI_PLATFORM_MACOS
-		#error "MacOS is not supported!"
-	#else
-		#error "Unknown Apple platform!"
-	#endif
-#elif defined(__ANDROID__)
-	#define LI_PLATFORM_ANDROID
-	#error "Android is not supported!"
-#elif defined(__linux__)
-	#define LI_PLATFORM_LINUX
-	#error "Linux is not supported!"
-#else
-	#error "Unknown platform!"
-#endif // End of platform detection
-
 // Assertions if enabled, specified in premake for debug only
 #ifdef LI_DEBUG
+	#if defined(LI_PLATFORM_WINDOWS)
+		#define LI_DEBUGBREAK() __debugbreak()
+	#elif defined(LI_PLATFORM_LINUX)
+		#include <signal.h>
+		#define LI_DEBUGBREAK() raise(SIGTRAP)
+	#else
+		#error "Platform doesn't support debugbreak yet!"
+	#endif
 	#define LI_ENABLE_ASSERTS
-	#ifndef CLIENT_DISABLE_PROFILE
- 		#define LI_PROFILE
- 	#endif
-#endif
-
-#ifdef LI_ENABLE_ASSERTS
-	// CLIENT: Breaks debugging (fatal error) if condition is not met, prints qualifying information
-	#define LI_ASSERT(x, ...) { if(!(x)) { LI_ERROR("Assertion Failed: {0}", __VA_ARGS__); __debugbreak(); } }
-	// CORE: Breaks debugging (fatal error) if condition is not met, prints qualifying information
-	#define LI_CORE_ASSERT(x, ...) { if(!(x)) { LI_CORE_ERROR("Assertion Failed: {0}", __VA_ARGS__); __debugbreak(); } }
 #else
-	// CLIENT: Does nothing without LI_ENABLE_ASSERTS
-	#define LI_ASSERT(x, ...)
-	// CORE: Does nothing without LI_ENABLE_ASSERTS
-	#define LI_CORE_ASSERT(x, ...)
+	#define LI_DEBUGBREAK()
 #endif
 
-// Creates a bitmask with only the x-th bit set
+#ifndef CLIENT_DISABLE_PROFILE
+	#define LI_PROFILE
+#endif
+
+#define LI_EXPAND_MACRO(x) x
+#define LI_STRINGIFY_MACRO(x) #x
+
 #define BIT(x) (1 << x)
 
 #define LI_BIND_EVENT_FN(fn) [this](auto&&... args) -> decltype(auto) { return this->fn(std::forward<decltype(args)>(args)...); }
@@ -83,3 +52,6 @@ namespace Lithe {
 	}
 
 }
+
+#include "Lithe/Core/Log.h"
+#include "Lithe/Core/Assert.h"

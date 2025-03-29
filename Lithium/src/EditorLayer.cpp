@@ -1,4 +1,5 @@
 #include "EditorLayer.h"
+#include "Lithe/Scene/SceneSerializer.h"
 
 #include <imgui/imgui.h>
 
@@ -77,6 +78,9 @@ namespace Lithe {
 		m_FirstCameraEntity.AddComponent<NativeScriptComponent>().Bind<CameraController>();
 
 		m_SceneHierarchyPanel.SetContext(m_ActiveScene);
+
+		SceneSerializer serializer(m_ActiveScene);
+		serializer.Serialize("assets/scenes/Example.lithe");
 	}
 
 	void EditorLayer::OnDetach()
