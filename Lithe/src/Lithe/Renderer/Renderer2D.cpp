@@ -109,6 +109,16 @@ namespace Lithe {
 		delete[] s_Data.QuadVertexBufferBase;
 	}
 
+	void Renderer2D::BeginScene(const OrthographicCamera& camera)
+	{
+		LI_PROFILE_FUNCTION();
+
+		s_Data.TextureShader->Bind();
+		s_Data.TextureShader->SetMat4("u_ViewProjection", camera.GetViewProjectionMatrix());
+
+		StartBatch();
+	}
+
 	void Renderer2D::BeginScene(const Camera& camera, const glm::mat4& transform)
 	{
 		LI_PROFILE_FUNCTION();
@@ -118,56 +128,44 @@ namespace Lithe {
 		s_Data.TextureShader->Bind();
 		s_Data.TextureShader->SetMat4("u_ViewProjection", viewProj);
 
-		s_Data.QuadIndexCount = 0;
-		s_Data.QuadVertexBufferPtr = s_Data.QuadVertexBufferBase;
-
-		s_Data.TextureSlotIndex = 1;
-	}
-
-	void Renderer2D::BeginScene(const OrthographicCamera& camera)
-	{
-		LI_PROFILE_FUNCTION();
-
-		s_Data.TextureShader->Bind();
-		s_Data.TextureShader->SetMat4("u_ViewProjection", camera.GetViewProjectionMatrix());
-
-		s_Data.QuadIndexCount = 0;
-		s_Data.QuadVertexBufferPtr = s_Data.QuadVertexBufferBase;
-
-		s_Data.TextureSlotIndex = 1;
+		StartBatch();
 	}
 
 	void Renderer2D::EndScene()
 	{
 		LI_PROFILE_FUNCTION();
 
-		uint32_t dataSize = static_cast<uint32_t>((uint8_t*)s_Data.QuadVertexBufferPtr - (uint8_t*)s_Data.QuadVertexBufferBase);
-		s_Data.QuadVertexBuffer->SetData(s_Data.QuadVertexBufferBase, dataSize);
-
 		Flush();
 	}
 
-	void Renderer2D::Flush()
+	void Renderer2D::StartBatch()
 	{
-		if (s_Data.QuadIndexCount == 0) return;
-		for (uint32_t i = 0; i < s_Data.TextureSlotIndex; i++)
-			s_Data.TextureSlots[i]->Bind(i);
-		
-		RenderCommand::DrawIndexed(s_Data.QuadVertexArray, s_Data.QuadIndexCount);
-		
-		#ifndef CLIENT_DISABLE_RENDERER_STATS
-			s_Data.Stats.DrawCalls++;
-		#endif
-	}
-
-	void Renderer2D::FlushAndReset()
-	{
-		EndScene();
-
 		s_Data.QuadIndexCount = 0;
 		s_Data.QuadVertexBufferPtr = s_Data.QuadVertexBufferBase;
 
 		s_Data.TextureSlotIndex = 1;
+	}
+
+	void Renderer2D::Flush()
+	{
+		if (s_Data.QuadIndexCount == 0)
+			return; // Nothing to draw
+
+		uint32_t dataSize = (uint32_t)((uint8_t*)s_Data.QuadVertexBufferPtr - (uint8_t*)s_Data.QuadVertexBufferBase);
+		s_Data.QuadVertexBuffer->SetData(s_Data.QuadVertexBufferBase, dataSize);
+
+		// Bind textures
+		for (uint32_t i = 0; i < s_Data.TextureSlotIndex; i++)
+			s_Data.TextureSlots[i]->Bind(i);
+
+		RenderCommand::DrawIndexed(s_Data.QuadVertexArray, s_Data.QuadIndexCount);
+		s_Data.Stats.DrawCalls++;
+	}
+
+	void Renderer2D::NextBatch()
+	{
+		Flush();
+		StartBatch();
 	}
 
 	// ---- Regular Quad Drawing ----
@@ -215,7 +213,7 @@ namespace Lithe {
 		};
 
 		if (s_Data.QuadIndexCount >= Renderer2DData::MAX_INDICES)
-			FlushAndReset();
+			NextBatch();
 
 		float textureIndex = 0.0f;
 		if (texture != nullptr)
@@ -263,7 +261,7 @@ namespace Lithe {
 		const Ref<Texture2D> texture = subTexture->GetTexture();
 
 		if (s_Data.QuadIndexCount >= Renderer2DData::MAX_INDICES)
-			FlushAndReset();
+			NextBatch();
 
 		float textureIndex = 0.0f;
 		if (subTexture != nullptr)

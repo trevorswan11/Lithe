@@ -15,7 +15,8 @@ namespace Lithe {
 		TagComponent() = default;
 		TagComponent(const TagComponent&) = default;
 		TagComponent(const std::string& tag)
-			: Tag(tag) {}
+			: Tag(tag) {
+		}
 	};
 
 	struct TransformComponent
@@ -27,13 +28,15 @@ namespace Lithe {
 		TransformComponent() = default;
 		TransformComponent(const TransformComponent&) = default;
 		TransformComponent(const glm::vec3& translation)
-			: Translation(translation) {}
+			: Translation(translation) {
+		}
 
 		glm::mat4 GetTransform() const
 		{
 			glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), Rotation.x, { 1, 0, 0 })
 				* glm::rotate(glm::mat4(1.0f), Rotation.y, { 0, 1, 0 })
 				* glm::rotate(glm::mat4(1.0f), Rotation.z, { 0, 0, 1 });
+
 			return glm::translate(glm::mat4(1.0f), Translation)
 				* rotation
 				* glm::scale(glm::mat4(1.0f), Scale);
@@ -42,18 +45,19 @@ namespace Lithe {
 
 	struct SpriteRendererComponent
 	{
-		glm::vec4 Color{ 1.0f };
+		glm::vec4 Color{ 1.0f, 1.0f, 1.0f, 1.0f };
 
 		SpriteRendererComponent() = default;
 		SpriteRendererComponent(const SpriteRendererComponent&) = default;
 		SpriteRendererComponent(const glm::vec4& color)
-			: Color(color) {}
+			: Color(color) {
+		}
 	};
 
 	struct CameraComponent
 	{
 		SceneCamera Camera;
-		bool Primary = false; // Scene should handle eventually
+		bool Primary = true; // TODO: think about moving to Scene
 		bool FixedAspectRatio = false;
 
 		CameraComponent() = default;
@@ -78,12 +82,4 @@ namespace Lithe {
 		}
 	};
 
-	template<typename... Component>
-	struct ComponentGroup
-	{
-	};
-
-	using AllComponents =
-		ComponentGroup<TransformComponent, SpriteRendererComponent,
-		CameraComponent, NativeScriptComponent>;
 }

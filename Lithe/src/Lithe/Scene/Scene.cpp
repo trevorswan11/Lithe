@@ -100,11 +100,6 @@ namespace Lithe {
 		}
 	}
 
-	void Scene::Reset()
-	{
-		m_Registry.clear();
-	}
-
 	template<typename T>
 	void Scene::OnComponentAdded(Entity entity, T& component)
 	{

@@ -24,13 +24,11 @@ namespace Lithe {
 		void NewScene();
 		void OpenScene();
 		void SaveSceneAs();
-		void SaveScene();
 	private:
 		OrthographicCameraController m_CameraController;
 		Ref<Framebuffer> m_Framebuffer;
 
 		Ref<Scene> m_ActiveScene;
-		std::string m_SceneSaveCache;
 		Entity m_FirstCameraEntity, m_SecondCameraEntity;
 
 		bool m_PrimaryCamera = true;

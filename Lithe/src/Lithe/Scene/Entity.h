@@ -58,7 +58,7 @@ namespace Lithe {
 
 		bool operator!=(const Entity& other) const { return !(*this == other); }
 	private:
-		entt::entity m_EntityHandle = entt::null;
+		entt::entity m_EntityHandle{ entt::null };
 		Scene* m_Scene = nullptr;
 	};
 

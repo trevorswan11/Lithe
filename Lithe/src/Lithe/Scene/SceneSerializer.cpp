@@ -1,10 +1,9 @@
 #include "lipch.h"
-#include "SceneSerializer.h"
+#include "Lithe/Scene/SceneSerializer.h"
 
 #include "Lithe/Scene/Entity.h"
 #include "Lithe/Scene/Components.h"
 
-#include <filesystem>
 #include <fstream>
 
 #include <yaml-cpp/yaml.h>
@@ -64,7 +63,6 @@ namespace YAML {
 	};
 
 }
-
 namespace Lithe {
 
 	YAML::Emitter& operator<<(YAML::Emitter& out, const glm::vec3& v)
@@ -82,7 +80,9 @@ namespace Lithe {
 	}
 
 	SceneSerializer::SceneSerializer(const Ref<Scene>& scene)
-		: m_Scene(scene) {}
+		: m_Scene(scene)
+	{
+	}
 
 	static void SerializeEntity(YAML::Emitter& out, Entity entity)
 	{
@@ -154,30 +154,23 @@ namespace Lithe {
 
 	void SceneSerializer::Serialize(const std::string& filepath)
 	{
-		std::filesystem::path path(filepath);
-		std::filesystem::create_directories(path.parent_path());
-
 		YAML::Emitter out;
 		out << YAML::BeginMap;
 		out << YAML::Key << "Scene" << YAML::Value << "Untitled";
 		out << YAML::Key << "Entities" << YAML::Value << YAML::BeginSeq;
 		m_Scene->m_Registry.view<entt::entity>().each([&](auto entityID)
-		{
-			Entity entity = { entityID, m_Scene.get() };
-			if (!entity)
-				return;
+			{
+				Entity entity = { entityID, m_Scene.get() };
+				if (!entity)
+					return;
 
-			SerializeEntity(out, entity);
-		});
+				SerializeEntity(out, entity);
+			});
 		out << YAML::EndSeq;
 		out << YAML::EndMap;
 
 		std::ofstream fout(filepath);
-		if (fout.is_open())
-		{
-			fout << out.c_str();
-			fout.close();
-		}
+		fout << out.c_str();
 	}
 
 	void SceneSerializer::SerializeRuntime(const std::string& filepath)

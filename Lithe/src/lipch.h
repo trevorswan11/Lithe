@@ -1,5 +1,14 @@
 #pragma once
 
+#include "Lithe/Core/PlatformDetection.h"
+
+#ifdef LI_PLATFORM_WINDOWS
+	#ifndef NOMINMAX
+		// See github.com/skypjack/entt/wiki/Frequently-Asked-Questions#warning-c4003-the-min-the-max-and-the-macro
+		#define NOMINMAX
+	#endif
+#endif
+
 // Include this header file as the first import in any project cpp files!
 
 #include <iostream>
