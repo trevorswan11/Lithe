@@ -6,6 +6,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include "Lithe/Utils/PlatformUtils.h"
+
 namespace Lithe {
 	EditorLayer::EditorLayer()
 		: Layer("EditorLayer"), m_CameraController(1280.0f / 720.0f, true)
@@ -31,7 +33,7 @@ namespace Lithe {
 		m_CameraController.SetZoomLevel(5.0f);
 
 		m_ActiveScene = CreateRef<Scene>();
-
+#if 0
 		// Square
 		auto squareA = m_ActiveScene->CreateEntity("Square A");
 		squareA.AddComponent<SpriteRendererComponent>(glm::vec4{ 0.0f, 1.0f, 0.0f, 1.0f });
@@ -76,11 +78,8 @@ namespace Lithe {
 		};
 
 		m_FirstCameraEntity.AddComponent<NativeScriptComponent>().Bind<CameraController>();
-
+#endif
 		m_SceneHierarchyPanel.SetContext(m_ActiveScene);
-
-		SceneSerializer serializer(m_ActiveScene);
-		serializer.Serialize("assets/scenes/Example.lithe");
 	}
 
 	void EditorLayer::OnDetach()
@@ -180,6 +179,18 @@ namespace Lithe {
 		{
 			if (ImGui::BeginMenu("File"))
 			{
+				if (ImGui::MenuItem("New", "Ctrl+N"))
+					NewScene();
+
+				if (ImGui::MenuItem("Open...", "Ctrl+O"))
+					OpenScene();
+
+				if (ImGui::MenuItem("Save As...", "Ctrl+Shift+S"))
+					SaveSceneAs();
+
+				if (ImGui::MenuItem("Save", "Ctrl+S"))
+					SaveScene();
+
 				if (ImGui::MenuItem("Exit")) Application::Get().Close();
 				ImGui::EndMenu();
 			}
@@ -242,6 +253,96 @@ namespace Lithe {
 		LI_PROFILE_FUNCTION();
 
 		m_CameraController.OnEvent(e);
+
+		EventDispatcher dispatcher(e);
+		dispatcher.Dispatch<KeyPressedEvent>(LI_BIND_EVENT_FN(EditorLayer::OnKeyPressed));
+	}
+
+	bool EditorLayer::OnKeyPressed(KeyPressedEvent& e)
+	{
+		// Shortcuts
+		if (e.GetRepeatCount() > 0)
+			return false;
+
+		bool control = Input::IsKeyPressed(Key::LeftControl) || Input::IsKeyPressed(Key::RightControl);
+		bool shift = Input::IsKeyPressed(Key::LeftShift) || Input::IsKeyPressed(Key::RightShift);
+		switch (e.GetKeyCode())
+		{
+			case Key::N:
+			{
+				if (control)
+					NewScene();
+				break;
+			}
+			case Key::O:
+			{
+				if (control)
+					OpenScene();
+				break;
+			}
+			case Key::S:
+			{
+				if (control && shift)
+					SaveSceneAs();
+				else if (control)
+					SaveScene();
+
+				break;
+			}
+			default:
+				break;
+		}
+		return false;
+	}
+
+	void EditorLayer::NewScene()
+	{
+		m_ActiveScene = CreateRef<Scene>();
+		m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+		m_SceneHierarchyPanel.SetContext(m_ActiveScene);
+		m_SceneSaveCache = std::string();
+		LI_INFO("Creating Scene");
+	}
+
+	void EditorLayer::OpenScene()
+	{
+		std::string filepath = FileDialogs::OpenFile("Lithe Scene (*.lithe)\0*.lithe\0");
+		if (!filepath.empty())
+		{
+			m_ActiveScene->Reset();
+			m_ActiveScene = CreateRef<Scene>();
+			m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+			m_SceneHierarchyPanel.SetContext(m_ActiveScene);
+
+			SceneSerializer serializer(m_ActiveScene);
+			serializer.Deserialize(filepath);
+			m_SceneSaveCache = filepath;
+			LI_INFO("Opening Scene: {0}", m_SceneSaveCache);
+		}
+	}
+
+	void EditorLayer::SaveSceneAs()
+	{
+		std::string filepath = FileDialogs::SaveFile("Lithe Scene (*.lithe)\0*.lithe\0");
+		if (!filepath.empty())
+		{
+			SceneSerializer serializer(m_ActiveScene);
+			serializer.Serialize(filepath);
+			m_SceneSaveCache = filepath;
+			LI_INFO("Saving Scene: {0}", m_SceneSaveCache);
+		}
+	}
+
+	void EditorLayer::SaveScene()
+	{
+		if (!m_SceneSaveCache.empty())
+		{
+			SceneSerializer serializer(m_ActiveScene);
+			serializer.Serialize(m_SceneSaveCache);
+			LI_INFO("Saving Scene: {0}", m_SceneSaveCache);
+		}
+		else
+			SaveSceneAs();
 	}
 
 }

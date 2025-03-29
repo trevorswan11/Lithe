@@ -4,6 +4,7 @@
 #include "Lithe/Scene/Entity.h"
 #include "Lithe/Scene/Components.h"
 
+#include <filesystem>
 #include <fstream>
 
 #include <yaml-cpp/yaml.h>
@@ -19,6 +20,7 @@ namespace YAML {
 			node.push_back(rhs.x);
 			node.push_back(rhs.y);
 			node.push_back(rhs.z);
+			node.SetStyle(EmitterStyle::Flow);
 			return node;
 		}
 
@@ -44,6 +46,7 @@ namespace YAML {
 			node.push_back(rhs.y);
 			node.push_back(rhs.z);
 			node.push_back(rhs.w);
+			node.SetStyle(EmitterStyle::Flow);
 			return node;
 		}
 
@@ -151,6 +154,9 @@ namespace Lithe {
 
 	void SceneSerializer::Serialize(const std::string& filepath)
 	{
+		std::filesystem::path path(filepath);
+		std::filesystem::create_directories(path.parent_path());
+
 		YAML::Emitter out;
 		out << YAML::BeginMap;
 		out << YAML::Key << "Scene" << YAML::Value << "Untitled";
@@ -167,7 +173,11 @@ namespace Lithe {
 		out << YAML::EndMap;
 
 		std::ofstream fout(filepath);
-		fout << out.c_str();
+		if (fout.is_open())
+		{
+			fout << out.c_str();
+			fout.close();
+		}
 	}
 
 	void SceneSerializer::SerializeRuntime(const std::string& filepath)
@@ -178,11 +188,7 @@ namespace Lithe {
 
 	bool SceneSerializer::Deserialize(const std::string& filepath)
 	{
-		std::ifstream stream(filepath);
-		std::stringstream strStream;
-		strStream << stream.rdbuf();
-
-		YAML::Node data = YAML::Load(strStream.str());
+		YAML::Node data = YAML::LoadFile(filepath);
 		if (!data["Scene"])
 			return false;
 
