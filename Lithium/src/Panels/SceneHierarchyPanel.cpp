@@ -34,7 +34,7 @@ namespace Lithe {
 
 		m_Context->m_Registry.view<entt::entity>().each([&](auto entityID)
 			{
-				Entity entity{ entityID , m_Context.get() };
+				Entity entity{ entityID, m_Context.get() };
 				DrawEntityNode(entity);
 			});
 
@@ -178,8 +178,7 @@ namespace Lithe {
 			float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
 			ImGui::Separator();
 			bool open = ImGui::TreeNodeEx((void*)typeid(T).hash_code(), treeNodeFlags, name.c_str());
-			ImGui::PopStyleVar(
-			);
+			ImGui::PopStyleVar();
 			ImGui::SameLine(contentRegionAvailable.x - lineHeight * 0.5f);
 			if (ImGui::Button("+", ImVec2{ lineHeight, lineHeight }))
 			{
@@ -259,7 +258,8 @@ namespace Lithe {
 				DrawVec3Control("Rotation", rotation);
 				component.Rotation = glm::radians(rotation);
 				DrawVec3Control("Scale", component.Scale, 1.0f);
-			});
+			}
+		);
 
 		DrawComponent<CameraComponent>("Camera", entity, [](auto& component)
 			{

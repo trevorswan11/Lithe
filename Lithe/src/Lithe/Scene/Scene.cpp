@@ -16,6 +16,8 @@ namespace Lithe {
 
 	Scene::~Scene()
 	{
+		LI_CORE_INFO("Scene deconstructor called!");
+		m_Registry.clear();
 	}
 
 	Entity Scene::CreateEntity(const std::string& name)
