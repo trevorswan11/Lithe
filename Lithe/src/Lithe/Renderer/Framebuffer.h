@@ -9,7 +9,8 @@ namespace Lithe {
 		None = 0,
 
 		// Color
-		RGBA8 = 1,
+		RGBA8,
+		RED_INTEGER,
 
 		// Depth/stencil
 		DEPTH24STENCIL8,
@@ -56,6 +57,9 @@ namespace Lithe {
 
 		virtual void Invalidate() = 0;
 		virtual void Resize(uint32_t width, uint32_t height, bool invalidate = true) = 0;
+		virtual int ReadPixel(uint32_t attachmentIndex, int x, int y) = 0;
+
+		virtual void ClearAttachment(uint32_t attachmentIndex, int value) = 0;
 
 		virtual uint32_t GetColorAttachmentRendererID(uint32_t index = 0) const = 0;
 
