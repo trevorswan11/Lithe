@@ -23,6 +23,7 @@ namespace Lithe {
 		void OnEvent(Event& e) override;
 	private:
 		bool OnKeyPressed(KeyPressedEvent& e);
+		bool OnMouseButtonPressed(MouseButtonPressedEvent& e);
 
 		void NewScene();
 		void OpenScene();
@@ -47,6 +48,7 @@ namespace Lithe {
 		glm::vec2 m_ViewportBounds[2];
 
 		int m_GizmoType = -1;
+		Entity m_HoveredEntity;
 
 		// Panels
 		SceneHierarchyPanel m_SceneHierarchyPanel;

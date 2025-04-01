@@ -16,6 +16,9 @@ namespace Lithe {
 		glm::vec2 TextureCoord;
 		float TexIndex;
 		float TextureScale;
+
+		// Editor Only
+		int EntityID;
 	};
 
 	struct Renderer2DData
@@ -56,7 +59,8 @@ namespace Lithe {
 			{ ShaderDataType::Float4, "a_Color" },
 			{ ShaderDataType::Float2, "a_TexCoord" },
 			{ ShaderDataType::Float, "a_TexIndex" },
-			{ ShaderDataType::Float, "a_TextureScale" }
+			{ ShaderDataType::Float, "a_TextureScale" },
+			{ ShaderDataType::Int, "a_EntityID" },
 		});
 		s_Data.QuadVertexArray->AddVertexBuffer(s_Data.QuadVertexBuffer);
 
@@ -217,7 +221,7 @@ namespace Lithe {
 
 	// --- MASTER IMPLEMENTATION ---
 
-	void Renderer2D::DrawQuad(const glm::mat4& transform, const Ref<Texture2D>& texture, const glm::vec4& color, float textureScale)
+	void Renderer2D::DrawQuad(const glm::mat4& transform, const Ref<Texture2D>& texture, const glm::vec4& color, float textureScale, int entityID)
 	{
 		LI_PROFILE_FUNCTION();
 
@@ -256,6 +260,7 @@ namespace Lithe {
 			s_Data.QuadVertexBufferPtr->TextureCoord = textureCoords[i];
 			s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
 			s_Data.QuadVertexBufferPtr->TextureScale = textureScale;
+			s_Data.QuadVertexBufferPtr->EntityID = entityID;
 			s_Data.QuadVertexBufferPtr++;
 		}
 
@@ -266,7 +271,7 @@ namespace Lithe {
 		#endif
 	}
 
-	void Renderer2D::DrawQuad(const glm::mat4& transform, const Ref<SubTexture2D>& subTexture, const glm::vec4& color, float textureScale)
+	void Renderer2D::DrawQuad(const glm::mat4& transform, const Ref<SubTexture2D>& subTexture, const glm::vec4& color, float textureScale, int entityID)
 	{
 		LI_PROFILE_FUNCTION();
 
@@ -304,6 +309,7 @@ namespace Lithe {
 			s_Data.QuadVertexBufferPtr->TextureCoord = textureCoords[i];
 			s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
 			s_Data.QuadVertexBufferPtr->TextureScale = textureScale;
+			s_Data.QuadVertexBufferPtr->EntityID = entityID;
 			s_Data.QuadVertexBufferPtr++;
 		}
 
@@ -312,6 +318,11 @@ namespace Lithe {
 		#ifndef CLIENT_DISABLE_RENDERER_STATS
 			s_Data.Stats.QuadCount++;
 		#endif
+	}
+
+	void Renderer2D::DrawSprite(const glm::mat4& transform, SpriteRendererComponent& src, int entityID)
+	{
+		DrawQuad(transform, src.Color, entityID);
 	}
 
 	void Renderer2D::ResetStats()
