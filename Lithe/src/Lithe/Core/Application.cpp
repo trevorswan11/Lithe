@@ -2,8 +2,7 @@
 #include "Application.h"
 
 #include "Lithe/Core/Input.h"
-
-#include <GLFW/glfw3.h>
+#include "Lithe/Utils/PlatformUtils.h"
 
 namespace Lithe {
 
@@ -77,7 +76,7 @@ namespace Lithe {
 		{
 			LI_PROFILE_SCOPE("RunLoop");
 
-			float time = (float)glfwGetTime(); // Will change to platform independent
+			float time = Time::GetTime();
 			Timestep timestep = time - m_LastFrameTime;
 			m_LastFrameTime = time;
 

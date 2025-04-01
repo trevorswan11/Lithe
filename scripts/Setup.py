@@ -14,8 +14,10 @@ os.chdir('./../') # Change from devtools/scripts directory to root
 premakeInstalled = PremakeRequirements.Validate()
 VulkanRequirements.Validate()
 
-print("\nUpdating submodules...")
-subprocess.call(["git", "submodule", "update", "--init", "--recursive"])
+reply = str(input("\nWould you like to update all git submodules? [Y/N]: ")).lower().strip()[:1]
+if reply == 'y':
+    print("\nUpdating submodules...")
+    subprocess.call(["git", "submodule", "update", "--init", "--recursive"])
 
 if (premakeInstalled):
     if platform.system() == "Windows":

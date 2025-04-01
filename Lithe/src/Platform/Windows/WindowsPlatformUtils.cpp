@@ -49,4 +49,9 @@ namespace Lithe {
 		return std::nullopt;
 	}
 
+	float Time::GetTime()
+	{
+		return (float)glfwGetTime();
+	}
+
 }
