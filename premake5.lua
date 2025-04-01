@@ -1,4 +1,5 @@
 include "./vendor/premake/premake_customization/solution_items.lua"
+include "Dependencies.lua"
 
 workspace "Lithe"
 	architecture "x86_64"
@@ -22,16 +23,6 @@ workspace "Lithe"
 	}
 
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
-
-IncludeDir = {}
-IncludeDir["GLFW"] = "%{wks.location}/Lithe/vendor/GLFW/include"
-IncludeDir["Glad"] = "%{wks.location}/Lithe/vendor/Glad/include"
-IncludeDir["ImGui"] = "%{wks.location}/Lithe/vendor/imgui"
-IncludeDir["glm"] = "%{wks.location}/Lithe/vendor/glm"
-IncludeDir["stb_image"] = "%{wks.location}/Lithe/vendor/stb_image"
-IncludeDir["entt"] = "%{wks.location}/Lithe/vendor/entt/include"
-IncludeDir["yaml_cpp"] = "%{wks.location}/Lithe/vendor/yaml-cpp/include"
-IncludeDir["ImGuizmo"] = "%{wks.location}/Lithe/vendor/ImGuizmo"
 
 group "Dependencies"
 	include "vendor/premake"

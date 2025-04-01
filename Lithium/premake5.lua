@@ -2,7 +2,7 @@ project "Lithium"
 	kind "ConsoleApp"
 	language "C++"
 	cppdialect "C++17"
-	staticruntime "on"
+	staticruntime "off"
 
 	dependson { "Lithe" }
 
@@ -37,7 +37,6 @@ project "Lithium"
 	}
 
 	filter "system:windows"
-		staticruntime "On"
 		systemversion "latest"
 
 	filter "configurations:Debug"
