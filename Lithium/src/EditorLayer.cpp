@@ -176,6 +176,9 @@ namespace Lithe {
 				if (ImGui::MenuItem("Save As...", "Ctrl+Shift+S"))
 					SaveSceneAs();
 
+				if (ImGui::MenuItem("Save", "Ctrl+S"))
+					SaveScene();
+
 				if (ImGui::MenuItem("Exit")) Application::Get().Close();
 				ImGui::EndMenu();
 			}
@@ -248,6 +251,8 @@ namespace Lithe {
 			{
 				if (control && shift)
 					SaveSceneAs();
+				if (control)
+					SaveScene();
 				break;
 			}
 			default:
@@ -261,6 +266,8 @@ namespace Lithe {
 		m_ActiveScene = CreateRef<Scene>();
 		m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
 		m_SceneHierarchyPanel.SetContext(m_ActiveScene);
+		m_SaveSceneCache = std::nullopt;
+		LI_INFO("Creating Scene");
 	}
 
 	void EditorLayer::OpenScene()
@@ -274,6 +281,8 @@ namespace Lithe {
 
 			SceneSerializer serializer(m_ActiveScene);
 			serializer.Deserialize(*filepath);
+			m_SaveSceneCache = filepath;
+			LI_INFO("Opening Scene: {0}", *m_SaveSceneCache);
 		}
 	}
 
@@ -284,7 +293,21 @@ namespace Lithe {
 		{
 			SceneSerializer serializer(m_ActiveScene);
 			serializer.Serialize(*filepath);
+			m_SaveSceneCache = *filepath;
+			LI_INFO("Saving Scene: {0}", *m_SaveSceneCache);
 		}
+	}
+
+	void EditorLayer::SaveScene()
+	{
+		if (m_SaveSceneCache)
+		{
+			SceneSerializer serializer(m_ActiveScene);
+			serializer.Serialize(*m_SaveSceneCache);
+			LI_INFO("Saving Scene: {0}", *m_SaveSceneCache);
+		}
+		else
+			SaveSceneAs();
 	}
 
 }

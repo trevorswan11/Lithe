@@ -159,7 +159,10 @@ namespace Lithe {
 			s_Data.TextureSlots[i]->Bind(i);
 
 		RenderCommand::DrawIndexed(s_Data.QuadVertexArray, s_Data.QuadIndexCount);
-		s_Data.Stats.DrawCalls++;
+
+		#ifndef CLIENT_DISABLE_RENDERER_STATS
+			s_Data.Stats.DrawCalls++;
+		#endif
 	}
 
 	void Renderer2D::NextBatch()

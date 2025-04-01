@@ -170,7 +170,11 @@ namespace Lithe {
 		out << YAML::EndMap;
 
 		std::ofstream fout(filepath);
-		fout << out.c_str();
+		if (fout.is_open())
+		{
+			fout << out.c_str();
+			fout.close();
+		}
 	}
 
 	void SceneSerializer::SerializeRuntime(const std::string& filepath)

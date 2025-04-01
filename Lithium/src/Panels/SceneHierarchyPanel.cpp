@@ -166,7 +166,7 @@ namespace Lithe {
 	}
 
 	template<typename T, typename UIFunction>
-	static void DrawComponent(const std::string& name, Entity entity, UIFunction uiFunction)
+	static void DrawComponent(const std::string& name, Entity entity, UIFunction uiFunction, bool removeable = true)
 	{
 		const ImGuiTreeNodeFlags treeNodeFlags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_FramePadding;
 		if (entity.HasComponent<T>())
@@ -200,7 +200,7 @@ namespace Lithe {
 				ImGui::TreePop();
 			}
 
-			if (removeComponent)
+			if (removeable && removeComponent)
 				entity.RemoveComponent<T>();
 		}
 	}
@@ -258,7 +258,7 @@ namespace Lithe {
 				DrawVec3Control("Rotation", rotation);
 				component.Rotation = glm::radians(rotation);
 				DrawVec3Control("Scale", component.Scale, 1.0f);
-			}
+			}, false
 		);
 
 		DrawComponent<CameraComponent>("Camera", entity, [](auto& component)

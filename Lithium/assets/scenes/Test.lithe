@@ -13,8 +13,8 @@ Entities:
     TagComponent:
       Tag: Red Square
     TransformComponent:
-      Translation: [-1.20000005, 1.10000002, 0]
-      Rotation: [0, 0.598647892, -0.813323379]
+      Translation: [-1.60000002, 1.10000002, 0]
+      Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     SpriteRendererComponent:
       Color: [1, 0, 0, 1]

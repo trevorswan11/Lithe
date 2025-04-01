@@ -3,13 +3,14 @@
 #include <Lithe.h>
 #include "Panels/SceneHierarchyPanel.h"
 
+#include <optional>
+
 namespace Lithe {
 
 	class EditorLayer : public Layer
 	{
 	public:
 		EditorLayer();
-		EditorLayer(OrthographicCameraController& camera);
 		virtual ~EditorLayer() = default;
 
 		virtual void OnAttach() override;
@@ -24,11 +25,13 @@ namespace Lithe {
 		void NewScene();
 		void OpenScene();
 		void SaveSceneAs();
+		void SaveScene();
 	private:
 		OrthographicCameraController m_CameraController;
 		Ref<Framebuffer> m_Framebuffer;
 
 		Ref<Scene> m_ActiveScene;
+		std::optional<std::string> m_SaveSceneCache;
 		Entity m_FirstCameraEntity, m_SecondCameraEntity;
 
 		bool m_PrimaryCamera = true;
