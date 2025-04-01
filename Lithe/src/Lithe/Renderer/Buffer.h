@@ -84,7 +84,7 @@ namespace Lithe {
 		BufferLayout() {}
 
 		BufferLayout(const std::initializer_list<BufferElements>& elements) 
-		: m_Elements(elements) 
+			: m_Elements(elements) 
 		{
 			CalculateOffsetAndStride();
 		}
