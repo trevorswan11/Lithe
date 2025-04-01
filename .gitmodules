@@ -16,3 +16,6 @@
 [submodule "Lithe/vendor/yaml-cpp"]
 	path = Lithe/vendor/yaml-cpp
 	url = https://github.com/trevorswan11/yaml-cpp
+[submodule "Lithe/vendor/ImGuizmo"]
+	path = Lithe/vendor/ImGuizmo
+	url = https://github.com/trevorswan11/ImGuizmo

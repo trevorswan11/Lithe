@@ -4,6 +4,7 @@
 
 #include "Lithe/Renderer/Camera.h"
 #include "Lithe/Renderer/OrthographicCamera.h"
+#include "Lithe/Renderer/EditorCamera.h"
 
 #include "Lithe/Renderer/Texture.h"
 #include "Lithe/Renderer/SubTexture2D.h"
@@ -17,6 +18,7 @@ namespace Lithe {
 		static void Shutdown();
 
 		static void BeginScene(const OrthographicCamera& camera); // TODO: remove
+		static void BeginScene(const EditorCamera& camera);
 		static void BeginScene(const Camera& camera, const glm::mat4& transform);
 		static void EndScene();
 		static void Flush();

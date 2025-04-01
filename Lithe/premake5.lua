@@ -22,7 +22,9 @@ project "Lithe"
 		"vendor/glm/glm/**.hpp",
 		"vendor/glm/glm/**.inl",
 		"vendor/stb_image/**.h",
-		"vendor/stb_image/**.cpp"
+		"vendor/stb_image/**.cpp",
+		"vendor/ImGuizmo/ImGuizmo.h",
+		"vendor/ImGuizmo/ImGuizmo.cpp"
 	}
 
 	defines
@@ -42,7 +44,8 @@ project "Lithe"
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.stb_image}",
 		"%{IncludeDir.entt}",
-		"%{IncludeDir.yaml_cpp}"
+		"%{IncludeDir.yaml_cpp}",
+		"%{IncludeDir.ImGuizmo}"
 	}
 
 	links
@@ -53,6 +56,9 @@ project "Lithe"
 		"Glad",
 		"ImGui"
 	}
+
+	filter "files:vendor/ImGuizmo/**.cpp"
+		flags { "NoPCH" }
 
 	filter "system:windows"
 		systemversion "latest"

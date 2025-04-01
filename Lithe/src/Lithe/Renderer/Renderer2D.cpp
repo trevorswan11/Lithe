@@ -119,6 +119,16 @@ namespace Lithe {
 		StartBatch();
 	}
 
+	void Renderer2D::BeginScene(const EditorCamera& camera)
+	{
+		LI_PROFILE_FUNCTION();
+
+		s_Data.TextureShader->Bind();
+		s_Data.TextureShader->SetMat4("u_ViewProjection", camera.GetViewProjection());
+
+		StartBatch();
+	}
+
 	void Renderer2D::BeginScene(const Camera& camera, const glm::mat4& transform)
 	{
 		LI_PROFILE_FUNCTION();

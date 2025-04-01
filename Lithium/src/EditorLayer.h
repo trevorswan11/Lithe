@@ -1,6 +1,8 @@
 #pragma once
 
 #include <Lithe.h>
+#include "Lithe/Renderer/EditorCamera.h"
+
 #include "Panels/SceneHierarchyPanel.h"
 
 #include <optional>
@@ -30,6 +32,8 @@ namespace Lithe {
 		OrthographicCameraController m_CameraController;
 		Ref<Framebuffer> m_Framebuffer;
 
+		EditorCamera m_EditorCamera;
+
 		Ref<Scene> m_ActiveScene;
 		std::optional<std::string> m_SaveSceneCache;
 		Entity m_FirstCameraEntity, m_SecondCameraEntity;
@@ -40,6 +44,8 @@ namespace Lithe {
 
 		bool m_ViewportFocused = false, m_ViewportHovered = false;
 		glm::vec2 m_ViewportSize = glm::vec2(0.0f);
+
+		int m_GizmoType = -1;
 
 		// Panels
 		SceneHierarchyPanel m_SceneHierarchyPanel;

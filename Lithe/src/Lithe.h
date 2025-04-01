@@ -5,6 +5,7 @@
 #include "Lithe/Core/Application.h"
 #include "Lithe/Core/Layer.h"
 #include "Lithe/Core/Log.h"
+#include "Lithe/Math/Math.h"
 
 #include "Lithe/Core/Timestep.h"
 
