@@ -22,6 +22,7 @@ namespace Lithe {
 	private:
 		Ref<Scene> m_Context;
 		Entity m_SelectionContext;
+		float m_CachedTilingFactor = 1.0f;
 	};
 
 }

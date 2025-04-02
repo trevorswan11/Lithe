@@ -17,7 +17,9 @@ namespace Lithe {
 		~Scene();
 
 		Entity CreateEntity(const std::string& name = std::string());
+		Entity CloneEntity(Entity entity);
 		void DestroyEntity(Entity entity);
+
 
 		void OnUpdateEditor(Timestep ts, EditorCamera& camera);
 		void OnUpdateRuntime(Timestep ts);

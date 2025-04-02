@@ -217,6 +217,8 @@ namespace Lithe {
 					SaveSceneAs();
 				if (ImGui::MenuItem("Save", "Ctrl+S"))
 					SaveScene();
+				if (ImGui::MenuItem("Reset"))
+					if (m_SaveSceneCache) OpenScene(*m_SaveSceneCache);
 				if (ImGui::MenuItem("Exit"))
 					Application::Get().Close();
 				ImGui::EndMenu();

@@ -27,6 +27,21 @@ namespace Lithe {
 		return entity;
 	}
 
+	Entity Scene::CloneEntity(Entity entity)
+	{
+		Entity copiedEntity = { m_Registry.create(), this };
+		copiedEntity.AddComponent<TagComponent>(entity.GetComponent<TagComponent>().Tag + " Copy");
+		if (entity.HasComponent<CameraComponent>())
+			copiedEntity.AddComponent<CameraComponent>(entity.GetComponent<CameraComponent>());
+		if (entity.HasComponent<TransformComponent>())
+			copiedEntity.AddComponent<TransformComponent>(entity.GetComponent<TransformComponent>());
+		if (entity.HasComponent<SpriteRendererComponent>())
+			copiedEntity.AddComponent<SpriteRendererComponent>(entity.GetComponent<SpriteRendererComponent>());
+		if (entity.HasComponent<NativeScriptComponent>())
+			copiedEntity.AddComponent<NativeScriptComponent>(entity.GetComponent<NativeScriptComponent>());
+		return copiedEntity;
+	}
+
 	void Scene::DestroyEntity(Entity entity)
 	{
 		m_Registry.destroy(entity);

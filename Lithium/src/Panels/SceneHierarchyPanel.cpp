@@ -83,8 +83,10 @@ namespace Lithe {
 		bool entityDeleted = false;
 		if (ImGui::BeginPopupContextItem())
 		{
-			if (ImGui::MenuItem("Delete Entity"))
+			if (ImGui::MenuItem("Delete"))
 				entityDeleted = true;
+			if (ImGui::MenuItem("Duplicate"))
+				m_Context->CloneEntity(entity);
 
 			ImGui::EndPopup();
 		}
@@ -325,14 +327,18 @@ namespace Lithe {
 
 					ImGui::Checkbox("Fixed Aspect Ratio", &component.FixedAspectRatio);
 				}
-			});
+			}
+		);
 
-		DrawComponent<SpriteRendererComponent>("Sprite Renderer", entity, [](auto& component)
+		DrawComponent<SpriteRendererComponent>("Sprite Renderer", entity, [=](auto& component)
 			{
 				ImGui::ColorEdit4("Color", glm::value_ptr(component.Color));
 				float buttonWidth = ImGui::GetContentRegionAvail().x / 2;
 				if (ImGui::Button("Reset Texture", ImVec2(buttonWidth / 2, 0.0f)))
+				{
 					component.Texture = std::nullopt;
+					component.SubTextureUsed = false;
+				}
 				ImGui::SameLine();
 				ImGui::Button("Texture", ImVec2(buttonWidth / 1.4f, 0.0f));
 
@@ -365,24 +371,48 @@ namespace Lithe {
 
 				ImGui::SameLine();
 				ImGui::Checkbox("SubTexture", &component.SubTextureUsed);
-				if (component.SubTextureUsed)
+				if (component.Texture && component.SubTextureUsed)
 				{
-					auto& subTexture2D = *std::get_if<Ref<SubTexture2D>>(&*component.Texture);
-					if (ImGui::InputFloat2("Coords", glm::value_ptr(component.Coords), 3))
-						subTexture2D.get()->SetRawTexCoords(component.Coords);
-					if (ImGui::InputFloat2("Cell Size", glm::value_ptr(component.CellSize), 3))
-						subTexture2D.get()->SetCellSize(component.CellSize);
-					if (ImGui::InputFloat2("Sprite Size", glm::value_ptr(component.SpriteSize), 3))
-						subTexture2D.get()->SetSpriteSize(component.SpriteSize);
+					if (auto subTexture2D = std::get_if<Ref<SubTexture2D>>(&*component.Texture))
+					{
+						if (ImGui::InputFloat2("Coords", glm::value_ptr(component.Coords), 3))
+							subTexture2D->get()->SetRawTexCoords(component.Coords);
+						if (ImGui::InputFloat2("Cell Size", glm::value_ptr(component.CellSize), 3))
+							subTexture2D->get()->SetCellSize(component.CellSize);
+						if (ImGui::InputFloat2("Sprite Size", glm::value_ptr(component.SpriteSize), 3))
+							subTexture2D->get()->SetSpriteSize(component.SpriteSize);
+						float width = ImGui::GetContentRegionAvail().x;
+						if (ImGui::Button("Re-Render as Texture", ImVec2{ width, 0.0f }))
+						{
+							component.Texture = subTexture2D->get()->GetTexture();
+							component.SubTextureUsed = false;
+							component.TilingFactor = m_CachedTilingFactor;
+						}
+					}
 				}
 
 				if (component.Texture)
 				{
-					auto texture2D = std::get_if<Ref<Texture2D>>(&*component.Texture);
-					ImGui::SliderFloat("Tiling Factor", &component.TilingFactor, 0.1f, 100.0f);
+					if (auto texture2D = std::get_if<Ref<Texture2D>>(&*component.Texture))
+					{
+						ImGui::SliderFloat("Tiling Factor", &component.TilingFactor, 0.1f, 100.0f);
+						float width = ImGui::GetContentRegionAvail().x;
+						if (ImGui::Button("Re-Render as Sub Texture", ImVec2{ width, 0.0f }))
+						{
+							component.Texture = SubTexture2D::CreateFromCoords(
+								*texture2D,
+								component.Coords,
+								component.CellSize,
+								component.SpriteSize
+							);
+							component.SubTextureUsed = true;
+							m_CachedTilingFactor = component.TilingFactor;
+							component.TilingFactor = 1.0f;
+						}
+					}
 				}
-			});
-
+			}
+		);
 	}
 
 }
