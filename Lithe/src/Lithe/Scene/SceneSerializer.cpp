@@ -84,7 +84,7 @@ namespace Lithe {
 		: m_Scene(scene)
 	{
 	}
-
+	// TODO: Texture serialization
 	static void SerializeEntity(YAML::Emitter& out, Entity entity)
 	{
 		out << YAML::BeginMap; // Entity

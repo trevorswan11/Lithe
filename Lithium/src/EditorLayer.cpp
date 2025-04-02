@@ -13,6 +13,8 @@
 
 namespace Lithe {
 
+	extern const std::filesystem::path g_AssetPath;
+
 	EditorLayer::EditorLayer()
 		: Layer("EditorLayer"), m_CameraController(1280.0f / 720.0f)
 	{
@@ -237,6 +239,7 @@ namespace Lithe {
 		}
 
 		m_SceneHierarchyPanel.OnImGuiRender();
+		m_ContentBrowserPanel.OnImGuiRender();
 
 		ImGui::Begin("Stats");
 
@@ -246,6 +249,25 @@ namespace Lithe {
 		ImGui::Text("Quads: %d", stats.QuadCount);
 		ImGui::Text("Vertices: %d", stats.GetTotalVertexCount());
 		ImGui::Text("Indices: %d", stats.GetTotalIndexCount());
+
+		{
+			ImGui::Separator();
+			LI_PROFILE_SCOPE("ImGui Average FPS");
+
+			static float fpsHistory[100] = {};
+			static int fpsIndex = 0;
+			static float fpsSum = 0.0f;
+
+			float currentFps = 1.0f / ImGui::GetIO().DeltaTime;
+			fpsSum -= fpsHistory[fpsIndex];
+			fpsSum += currentFps;
+			fpsHistory[fpsIndex] = currentFps;
+
+			fpsIndex = (fpsIndex + 1) % 100;
+			float avgFps = fpsSum / 100.0f;
+			ImGui::Text("Avg FPS: %.1f", avgFps);
+			ImGui::Separator();
+		}
 
 		ImGui::End();
 
@@ -269,6 +291,17 @@ namespace Lithe {
 
 		uint64_t textureID = m_Framebuffer->GetColorAttachmentRendererID();
 		ImGui::Image(reinterpret_cast<void*>(textureID), ImVec2{ m_ViewportSize.x, m_ViewportSize.y }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
+
+		if (ImGui::BeginDragDropTarget())
+		{
+			
+			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
+			{
+				const wchar_t* path = (const wchar_t*)payload->Data;
+				OpenScene(std::filesystem::path(g_AssetPath) / path);
+			}
+			ImGui::EndDragDropTarget();
+		}
 
 		// Gizmos
 		Entity selectedEntity = m_SceneHierarchyPanel.GetSelectedEntity();
@@ -408,16 +441,19 @@ namespace Lithe {
 	{
 		std::optional<std::string> filepath = FileDialogs::OpenFile("Lithe Scene (*.lithe)\0*.lithe\0");
 		if (filepath)
-		{
-			m_ActiveScene = CreateRef<Scene>();
-			m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
-			m_SceneHierarchyPanel.SetContext(m_ActiveScene);
+			OpenScene(*filepath);
+	}
 
-			SceneSerializer serializer(m_ActiveScene);
-			serializer.Deserialize(*filepath);
-			m_SaveSceneCache = filepath;
-			LITHIUM_INFO("Opening Scene: {0}", *m_SaveSceneCache);
-		}
+	void EditorLayer::OpenScene(const std::filesystem::path& path)
+	{
+		m_ActiveScene = CreateRef<Scene>();
+		m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+		m_SceneHierarchyPanel.SetContext(m_ActiveScene);
+
+		SceneSerializer serializer(m_ActiveScene);
+		serializer.Deserialize(path.string());
+		m_SaveSceneCache = path.string();
+		LITHIUM_INFO("Opening Scene: {0}", *m_SaveSceneCache);
 	}
 
 	void EditorLayer::SaveSceneAs()

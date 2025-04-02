@@ -3,6 +3,8 @@
 #include "Lithe/Core/Base.h"
 #include "Lithe/Scene/SceneCamera.h"
 
+#include "Lithe/Renderer/Texture.h"
+
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/quaternion.hpp>
 
@@ -47,6 +49,9 @@ namespace Lithe {
 	struct SpriteRendererComponent
 	{
 		glm::vec4 Color{ 1.0f, 1.0f, 1.0f, 1.0f };
+		Ref<Texture2D> Texture; // Todo: Make variant of Sub and normal, with optional wrapper
+		//glm::vec2 TextureCoordinates[4]; // Todo: Initialize to default coordinates
+		float TilingFactor = 1.0f;
 
 		SpriteRendererComponent() = default;
 		SpriteRendererComponent(const SpriteRendererComponent&) = default;

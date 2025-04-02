@@ -4,6 +4,7 @@
 #include "Lithe/Renderer/EditorCamera.h"
 
 #include "Panels/SceneHierarchyPanel.h"
+#include "Panels/ContentBrowserPanel.h"
 
 #include <optional>
 
@@ -27,6 +28,7 @@ namespace Lithe {
 
 		void NewScene();
 		void OpenScene();
+		void OpenScene(const std::filesystem::path& path);
 		void SaveSceneAs();
 		void SaveScene();
 	private:
@@ -52,6 +54,7 @@ namespace Lithe {
 
 		// Panels
 		SceneHierarchyPanel m_SceneHierarchyPanel;
+		ContentBrowserPanel m_ContentBrowserPanel;
 	};
 
 }
