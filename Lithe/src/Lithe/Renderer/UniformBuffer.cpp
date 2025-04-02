@@ -1,23 +1,23 @@
 #include "lipch.h"
-#include "Lithe/Renderer/GraphicsContext.h"
+#include "UniformBuffer.h"
 
 #include "Lithe/Renderer/Renderer.h"
-#include "Platform/OpenGL/OpenGLContext.h"
+#include "Platform/OpenGL/OpenGLUniformBuffer.h"
 
 namespace Lithe {
 
-    Scope<GraphicsContext> GraphicsContext::Create(void* window)
-    {
-        switch (Renderer::GetAPI())
-        {
+	Ref<UniformBuffer> UniformBuffer::Create(uint32_t size, uint32_t binding)
+	{
+		switch (Renderer::GetAPI())
+		{
 			case RendererAPI::API::None:	LI_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
-			case RendererAPI::API::OpenGL:  return CreateScope<OpenGLContext>(static_cast<GLFWwindow*>(window));
+			case RendererAPI::API::OpenGL:	return CreateRef<OpenGLUniformBuffer>(size, binding);
 			case RendererAPI::API::Vulcan:	LI_CORE_ASSERT(false, "RendererAPI::Vulcan is currently not supported!"); return nullptr;
 			case RendererAPI::API::DirectX:	LI_CORE_ASSERT(false, "RendererAPI::DirectX is currently not supported!"); return nullptr;
-        }
+		}
 
-        LI_CORE_ASSERT(false, "Unknown RendererAPI!");
-        return nullptr;
-    }
+		LI_CORE_ASSERT(false, "Unknown RendererAPI!");
+		return nullptr;
+	}
 
 }

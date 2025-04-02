@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Lithe/Core/Base.h"
 #include "Lithe/Renderer/RendererAPI.h"
 
 namespace Lithe {

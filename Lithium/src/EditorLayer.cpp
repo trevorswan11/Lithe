@@ -36,6 +36,14 @@ namespace Lithe {
 
 		m_ActiveScene = CreateRef<Scene>();
 
+		auto commandLineArgs = Application::Get().GetCommandLineArgs();
+		if (commandLineArgs.Count > 1)
+		{
+			auto sceneFilePath = commandLineArgs[1];
+			SceneSerializer serializer(m_ActiveScene);
+			serializer.Deserialize(sceneFilePath);
+		}
+
 		m_EditorCamera = EditorCamera(30.0f, 1.778f, 0.1f, 1000.0f);
 
 #if 0
@@ -393,7 +401,7 @@ namespace Lithe {
 		m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
 		m_SceneHierarchyPanel.SetContext(m_ActiveScene);
 		m_SaveSceneCache = std::nullopt;
-		LI_INFO("Creating Scene");
+		LITHIUM_INFO("Creating Scene");
 	}
 
 	void EditorLayer::OpenScene()
@@ -408,7 +416,7 @@ namespace Lithe {
 			SceneSerializer serializer(m_ActiveScene);
 			serializer.Deserialize(*filepath);
 			m_SaveSceneCache = filepath;
-			LI_CORE_INFO("Opening Scene: {0}", *m_SaveSceneCache);
+			LITHIUM_INFO("Opening Scene: {0}", *m_SaveSceneCache);
 		}
 	}
 
@@ -420,7 +428,7 @@ namespace Lithe {
 			SceneSerializer serializer(m_ActiveScene);
 			serializer.Serialize(*filepath);
 			m_SaveSceneCache = *filepath;
-			LI_CORE_INFO("Saving Scene: {0}", *m_SaveSceneCache);
+			LITHIUM_INFO("Saving Scene: {0}", *m_SaveSceneCache);
 		}
 	}
 
@@ -430,7 +438,7 @@ namespace Lithe {
 		{
 			SceneSerializer serializer(m_ActiveScene);
 			serializer.Serialize(*m_SaveSceneCache);
-			LI_CORE_INFO("Saving Scene: {0}", *m_SaveSceneCache);
+			LITHIUM_INFO("Saving Scene: {0}", *m_SaveSceneCache);
 		}
 		else
 			SaveSceneAs();

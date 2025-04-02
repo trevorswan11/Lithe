@@ -8,8 +8,8 @@
 #include "Lithe/Math/Math.h"
 
 #include "Lithe/Core/Timestep.h"
+#include "Lithe/Core/Timer.h"
 
-// You need to change keycodes if NOT using glfw
 #include "Lithe/Core/Input.h"
 #include "Lithe/Core/MouseCodes.h"
 #include "Lithe/Core/KeyCodes.h"

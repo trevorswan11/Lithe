@@ -238,7 +238,7 @@ namespace Lithe {
 				if (!m_SelectionContext.HasComponent<CameraComponent>())
 					m_SelectionContext.AddComponent<CameraComponent>();
 				else
-					LI_CORE_WARN("This entity already has the Camera Component!");
+					LITHIUM_WARN("This entity already has the Camera Component!");
 				ImGui::CloseCurrentPopup();
 			}
 
@@ -247,7 +247,7 @@ namespace Lithe {
 				if (!m_SelectionContext.HasComponent<SpriteRendererComponent>())
 					m_SelectionContext.AddComponent<SpriteRendererComponent>();
 				else
-					LI_CORE_WARN("This entity already has the Sprite Renderer Component!");
+					LITHIUM_WARN("This entity already has the Sprite Renderer Component!");
 				ImGui::CloseCurrentPopup();
 			}
 

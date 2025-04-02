@@ -3,9 +3,11 @@
 
 #include "Lithe/Renderer/VertexArray.h"
 #include "Lithe/Renderer/Shader.h"
+#include "Lithe/Renderer/UniformBuffer.h"
 #include "Lithe/Renderer/RenderCommand.h"
 
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 namespace Lithe {
 
@@ -43,6 +45,13 @@ namespace Lithe {
 		glm::vec4 QuadVertexPositions[4];
 
 		Renderer2D::Stats Stats;
+
+		struct CameraData
+		{
+			glm::mat4 ViewProjection;
+		};
+		CameraData CameraBuffer;
+		Ref<UniformBuffer> CameraUniformBuffer;
 	};
 
 	static Renderer2DData s_Data;
@@ -95,8 +104,6 @@ namespace Lithe {
 			samplers[i] = i;
 
 		s_Data.TextureShader = Shader::Create("assets/shaders/Texture.glsl");
-		s_Data.TextureShader->Bind();
-		s_Data.TextureShader->SetIntArray("u_Textures", samplers, s_Data.MAX_TEXTURE_SLOTS);
 
 		s_Data.TextureSlots[0] = s_Data.WhiteTexture;
 
@@ -104,6 +111,8 @@ namespace Lithe {
 		s_Data.QuadVertexPositions[1] = { 0.5, -0.5f, 0.0f, 1.0f };
 		s_Data.QuadVertexPositions[2] = { 0.5, 0.5f, 0.0f, 1.0f };
 		s_Data.QuadVertexPositions[3] = { -0.5, 0.5f, 0.0f, 1.0f };
+
+		s_Data.CameraUniformBuffer = UniformBuffer::Create(sizeof(Renderer2DData::CameraData), 0);
 	}
 
 	void Renderer2D::Shutdown()
@@ -127,8 +136,8 @@ namespace Lithe {
 	{
 		LI_PROFILE_FUNCTION();
 
-		s_Data.TextureShader->Bind();
-		s_Data.TextureShader->SetMat4("u_ViewProjection", camera.GetViewProjection());
+		s_Data.CameraBuffer.ViewProjection = camera.GetViewProjection();
+		s_Data.CameraUniformBuffer->SetData(&s_Data.CameraBuffer, sizeof(Renderer2DData::CameraData));
 
 		StartBatch();
 	}
@@ -137,10 +146,8 @@ namespace Lithe {
 	{
 		LI_PROFILE_FUNCTION();
 
-		glm::mat4 viewProj = camera.GetProjection() * glm::inverse(transform);
-
-		s_Data.TextureShader->Bind();
-		s_Data.TextureShader->SetMat4("u_ViewProjection", viewProj);
+		s_Data.CameraBuffer.ViewProjection = camera.GetProjection() * glm::inverse(transform);
+		s_Data.CameraUniformBuffer->SetData(&s_Data.CameraBuffer, sizeof(Renderer2DData::CameraData));
 
 		StartBatch();
 	}
@@ -172,6 +179,7 @@ namespace Lithe {
 		for (uint32_t i = 0; i < s_Data.TextureSlotIndex; i++)
 			s_Data.TextureSlots[i]->Bind(i);
 
+		s_Data.TextureShader->Bind();
 		RenderCommand::DrawIndexed(s_Data.QuadVertexArray, s_Data.QuadIndexCount);
 
 		#ifndef CLIENT_DISABLE_RENDERER_STATS

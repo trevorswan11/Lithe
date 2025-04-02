@@ -29,27 +29,41 @@ namespace Lithe {
 
 		virtual const std::string& GetName() const override { return m_Name; };
 
-		void UploadUniformInt(const std::string& name, int value);
-		void UploadUniformInt2(const std::string& name, const glm::vec2& values);
-		void UploadUniformInt3(const std::string& name, const glm::vec3& values);
-		void UploadUniformInt4(const std::string& name, const glm::vec4& values);
+		void UploadUniformInt(const std::string& name, int value) const;
+		void UploadUniformInt2(const std::string& name, const glm::vec2& values) const;
+		void UploadUniformInt3(const std::string& name, const glm::vec3& values) const;
+		void UploadUniformInt4(const std::string& name, const glm::vec4& values) const;
 
-		void UploadUniformIntArray(const std::string& name, int* values, uint32_t count);
+		void UploadUniformIntArray(const std::string& name, int* values, uint32_t count) const;
 
-		void UploadUniformFloat(const std::string& name, float value);
-		void UploadUniformFloat2(const std::string& name, const glm::vec2& values);
-		void UploadUniformFloat3(const std::string& name, const glm::vec3& values);
-		void UploadUniformFloat4(const std::string& name, const glm::vec4& values);
+		void UploadUniformFloat(const std::string& name, float value) const;
+		void UploadUniformFloat2(const std::string& name, const glm::vec2& values) const;
+		void UploadUniformFloat3(const std::string& name, const glm::vec3& values) const;
+		void UploadUniformFloat4(const std::string& name, const glm::vec4& values) const;
 
-		void UploadUniformMat3(const std::string& name, const glm::mat3& matrix);
-		void UploadUniformMat4(const std::string& name, const glm::mat4& matrix);
+		void UploadUniformMat3(const std::string& name, const glm::mat3& matrix) const;
+		void UploadUniformMat4(const std::string& name, const glm::mat4& matrix) const;
 	private:
+		// These private functions are incredibly complex compared to the rest of the project.
+		// Functions were mostly written by The Cherno, as I do not understand the Vulkan API
+		// as much as I understood OpenGL. Vulkan is the way though.
+
 		std::string ReadFile(const std::string& filepath);
 		std::unordered_map<GLenum, std::string> PreProcess(const std::string& source);
-		void Compile(const std::unordered_map<GLenum, std::string>& shaderSources);
+		
+		void CompileOrGetVulkanBinaries(const std::unordered_map<GLenum, std::string>& shaderSources);
+		void CompileOrGetOpenGLBinaries();
+		void CreateProgram();
+		void Reflect(GLenum stage, const std::vector<uint32_t>& shaderData);
 	private:
 		uint32_t m_RendererID;
+		std::string m_FilePath;
 		std::string m_Name;
+
+		std::unordered_map<GLenum, std::vector<uint32_t>> m_VulkanSPIRV;
+		std::unordered_map<GLenum, std::vector<uint32_t>> m_OpenGLSPIRV;
+
+		std::unordered_map<GLenum, std::string> m_OpenGLSourceCode;
 	};
 
 }
