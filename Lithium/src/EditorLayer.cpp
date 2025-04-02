@@ -294,7 +294,6 @@ namespace Lithe {
 
 		if (ImGui::BeginDragDropTarget())
 		{
-			
 			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
 			{
 				const wchar_t* path = (const wchar_t*)payload->Data;
@@ -446,14 +445,21 @@ namespace Lithe {
 
 	void EditorLayer::OpenScene(const std::filesystem::path& path)
 	{
-		m_ActiveScene = CreateRef<Scene>();
-		m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
-		m_SceneHierarchyPanel.SetContext(m_ActiveScene);
+		try
+		{
+			m_ActiveScene = CreateRef<Scene>();
+			m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+			m_SceneHierarchyPanel.SetContext(m_ActiveScene);
 
-		SceneSerializer serializer(m_ActiveScene);
-		serializer.Deserialize(path.string());
-		m_SaveSceneCache = path.string();
-		LITHIUM_INFO("Opening Scene: {0}", *m_SaveSceneCache);
+			SceneSerializer serializer(m_ActiveScene);
+			serializer.Deserialize(path.string());
+			m_SaveSceneCache = path.string();
+			LITHIUM_INFO("Opening Scene: {0}", *m_SaveSceneCache);
+		}
+		catch (const std::exception& e)
+		{
+			LITHIUM_ERROR("Failed to open scene {0}: {1}", path.string(), e.what());
+		}
 	}
 
 	void EditorLayer::SaveSceneAs()
