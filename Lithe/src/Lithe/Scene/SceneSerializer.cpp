@@ -67,6 +67,13 @@ namespace YAML {
 }
 namespace Lithe {
 
+	YAML::Emitter& operator<<(YAML::Emitter& out, const glm::vec2& v)
+	{
+		out << YAML::Flow;
+		out << YAML::BeginSeq << v.x << v.y << YAML::EndSeq;
+		return out;
+	}
+
 	YAML::Emitter& operator<<(YAML::Emitter& out, const glm::vec3& v)
 	{
 		out << YAML::Flow;
@@ -141,7 +148,7 @@ namespace Lithe {
 		}
 
 		if (entity.HasComponent<SpriteRendererComponent>())
-		{
+		{  
 			out << YAML::Key << "SpriteRendererComponent";
 			out << YAML::BeginMap; // SpriteRendererComponent
 
@@ -150,9 +157,17 @@ namespace Lithe {
 
 			if (auto& srcTexture = spriteRendererComponent.Texture)
 			{
-				auto& texture = *srcTexture;
-				if (std::holds_alternative<Ref<Texture2D>>(texture))
-					out << YAML::Key << "TexturePath" << YAML::Value << (Ref<Texture2D>)(texture)->GetPath(); // TODO
+				if (auto texture2D = std::get_if<Ref<Texture2D>>(&*srcTexture))
+				{
+					out << YAML::Key << "TexturePath" << YAML::Value << texture2D->get()->GetPath(); // TODO
+				}
+				else if (auto subTexture2D = std::get_if<Ref<SubTexture2D>>(&*srcTexture))
+				{
+					out << YAML::Key << "SubTexturePath" << YAML::Value << subTexture2D->get()->GetTexture()->GetPath();
+					out << YAML::Key << "SubTextureCoords" << YAML::Value << subTexture2D->get()->GetRawTexCoords();
+					out << YAML::Key << "SubTextureCellSize" << YAML::Value;
+					out << YAML::Key << "SubTextureSpriteSize" << YAML::Value;
+				}
 			}
 
 			out << YAML::Key << "TilingFactor" << YAML::Value << spriteRendererComponent.TilingFactor;
@@ -266,6 +281,9 @@ namespace Lithe {
 
 					if (spriteRendererComponent["TexturePath"])
 						src.Texture = Texture2D::Create(spriteRendererComponent["TexturePath"].as<std::string>());
+					
+					if (spriteRendererComponent["SubTexturePath"])
+						src.Texture = SubTexture2D::Create(spriteRendererComponent["TexturePath"].as<std::string>());
 
 					if (spriteRendererComponent["TilingFactor"])
 						src.TilingFactor = spriteRendererComponent["TilingFactor"].as<float>();

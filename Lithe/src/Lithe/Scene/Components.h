@@ -53,6 +53,10 @@ namespace Lithe {
 		glm::vec4 Color{ 1.0f, 1.0f, 1.0f, 1.0f };
 		std::optional<std::variant<Ref<Texture2D>, Ref<SubTexture2D>>> Texture;
 		float TilingFactor = 1.0f;
+		glm::vec2 Coords{ 0.0f, 0.0f };
+		glm::vec2 CellSize{ 1.0f, 1.0f };
+		glm::vec2 SpriteSize{ 1.0f, 1.0f };
+		bool SubTextureUsed = false;
 
 		SpriteRendererComponent() = default;
 		SpriteRendererComponent(const SpriteRendererComponent&) = default;

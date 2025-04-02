@@ -330,20 +330,42 @@ namespace Lithe {
 		DrawComponent<SpriteRendererComponent>("Sprite Renderer", entity, [](auto& component)
 			{
 				ImGui::ColorEdit4("Color", glm::value_ptr(component.Color));
+				float buttonWidth = ImGui::GetContentRegionAvail().x / 2;
+				if (ImGui::Button("Reset Texture", ImVec2(buttonWidth / 2, 0.0f)))
+					component.Texture = std::nullopt;
+				ImGui::SameLine();
+				ImGui::Button("Texture", ImVec2(buttonWidth / 1.4f, 0.0f));
+				ImGui::SameLine();
+				ImGui::Checkbox("SubTexture", &component.SubTextureUsed);
+				if (component.SubTextureUsed)
+				{
+					ImGui::InputFloat2("Coords", glm::value_ptr(component.Coords), 3);
+					ImGui::InputFloat2("Cell Size", glm::value_ptr(component.CellSize), 3);
+					ImGui::InputFloat2("Sprite Size", glm::value_ptr(component.SpriteSize), 3);
+				}
 
-				ImGui::Button("Texture", ImVec2(ImGui::GetContentRegionAvail().x, 0.0f));
 				if (ImGui::BeginDragDropTarget())
 				{
 					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
 					{
 						const wchar_t* path = (const wchar_t*)payload->Data;
 						std::filesystem::path texturePath = std::filesystem::path(g_AssetPath) / path;
-						component.Texture = Texture2D::Create(texturePath.string());
+						if (component.SubTextureUsed)
+						{
+							component.Texture = SubTexture2D::CreateFromCoords(
+								Texture2D::Create(texturePath.string()),
+								component.Coords,
+								component.CellSize,
+								component.SpriteSize
+							);
+						}
+						else
+							component.Texture = Texture2D::Create(texturePath.string());
 					}
 					ImGui::EndDragDropTarget();
 				}
 				
-				ImGui::SliderFloat("Tiling Factor", &component.TilingFactor, 0.1f, 0.1f, 100.0f);
+				ImGui::SliderFloat("Tiling Factor", &component.TilingFactor, 0.1f, 100.0f);
 			});
 
 	}

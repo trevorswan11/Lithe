@@ -330,8 +330,17 @@ namespace Lithe {
 
 	void Renderer2D::DrawSprite(const glm::mat4& transform, SpriteRendererComponent& src, int entityID)
 	{
-		if (src.Texture)
-			DrawQuad(transform, src.Texture, src.Color, src.TilingFactor, entityID);
+		if (auto& srcTexture = src.Texture)
+		{
+			if (auto texture2D = std::get_if<Ref<Texture2D>>(&*srcTexture))
+			{
+				DrawQuad(transform, *texture2D, src.Color, src.TilingFactor, entityID);
+			}
+			else if (auto subTexture2D = std::get_if<Ref<SubTexture2D>>(&*srcTexture))
+			{
+				DrawQuad(transform, *subTexture2D, src.Color, src.TilingFactor, entityID);
+			}
+		}
 		else
 			DrawQuad(transform, src.Color, entityID);
 	}
