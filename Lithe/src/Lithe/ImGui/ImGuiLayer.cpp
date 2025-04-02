@@ -17,6 +17,8 @@
 
 namespace Lithe {
 
+	float ImGuiLayer::s_DefaultFontSize = 18.0f;
+
 	ImGuiLayer::ImGuiLayer()
 		: Layer("ImGuiLayer")
 	{
@@ -39,10 +41,10 @@ namespace Lithe {
 		//io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoTaskBarIcons;
 		//io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoMerge;
 
-		io.Fonts->AddFontFromFileTTF("assets/fonts/opensans/static/OpenSans-Bold.ttf", 18.0f);
-		io.Fonts->AddFontFromFileTTF("assets/fonts/opensans/static/OpenSans-Italic.ttf", 18.0f);
-		io.Fonts->AddFontFromFileTTF("assets/fonts/opensans/static/OpenSans-BoldItalic.ttf", 18.0f);
-		io.FontDefault = io.Fonts->AddFontFromFileTTF("assets/fonts/opensans/static/OpenSans-Regular.ttf", 18.0f);
+		io.Fonts->AddFontFromFileTTF("assets/fonts/opensans/static/OpenSans-Bold.ttf", s_DefaultFontSize);
+		io.Fonts->AddFontFromFileTTF("assets/fonts/opensans/static/OpenSans-Italic.ttf", s_DefaultFontSize);
+		io.Fonts->AddFontFromFileTTF("assets/fonts/opensans/static/OpenSans-BoldItalic.ttf", s_DefaultFontSize);
+		io.FontDefault = io.Fonts->AddFontFromFileTTF("assets/fonts/opensans/static/OpenSans-Regular.ttf", s_DefaultFontSize);
 
 		// Setup Dear ImGui style
 		ImGui::StyleColorsDark();

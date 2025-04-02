@@ -61,7 +61,8 @@ namespace Lithe {
 			{
 				if (directoryEntry.is_directory())
 					m_CurrentDirectory /= path.filename();
-
+				else
+					m_CurrentFile = path;
 			}
 			ImGui::TextWrapped(filenameString.c_str());
 
@@ -93,12 +94,21 @@ namespace Lithe {
 			}
 			ImGui::PopFont();
 
+			ImGui::Text("%s", m_CurrentDirectory.string().c_str());
+
 			ImGui::EndMenuBar();
 
 		}
 
 		// TODO: status bar
 		ImGui::End();
+	}
+
+	std::string ContentBrowserPanel::GetAndClearCurrentFile()
+	{
+		std::string path = m_CurrentFile.string();
+		m_CurrentFile = std::filesystem::path();
+		return path;
 	}
 
 }

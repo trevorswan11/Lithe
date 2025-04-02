@@ -4,12 +4,16 @@
 #include "Lithe/Scene/SceneCamera.h"
 
 #include "Lithe/Renderer/Texture.h"
+#include "Lithe/Renderer/SubTexture2D.h"
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/quaternion.hpp>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+
+#include <optional>
+#include <variant>
 
 namespace Lithe {
 
@@ -20,8 +24,7 @@ namespace Lithe {
 		TagComponent() = default;
 		TagComponent(const TagComponent&) = default;
 		TagComponent(const std::string& tag)
-			: Tag(tag) {
-		}
+			: Tag(tag) {}
 	};
 
 	struct TransformComponent
@@ -33,8 +36,7 @@ namespace Lithe {
 		TransformComponent() = default;
 		TransformComponent(const TransformComponent&) = default;
 		TransformComponent(const glm::vec3& translation)
-			: Translation(translation) {
-		}
+			: Translation(translation) {}
 
 		glm::mat4 GetTransform() const
 		{
@@ -49,15 +51,13 @@ namespace Lithe {
 	struct SpriteRendererComponent
 	{
 		glm::vec4 Color{ 1.0f, 1.0f, 1.0f, 1.0f };
-		Ref<Texture2D> Texture; // Todo: Make variant of Sub and normal, with optional wrapper
-		//glm::vec2 TextureCoordinates[4]; // Todo: Initialize to default coordinates
+		std::optional<std::variant<Ref<Texture2D>, Ref<SubTexture2D>>> Texture;
 		float TilingFactor = 1.0f;
 
 		SpriteRendererComponent() = default;
 		SpriteRendererComponent(const SpriteRendererComponent&) = default;
 		SpriteRendererComponent(const glm::vec4& color)
-			: Color(color) {
-		}
+			: Color(color) {}
 	};
 
 	struct CameraComponent

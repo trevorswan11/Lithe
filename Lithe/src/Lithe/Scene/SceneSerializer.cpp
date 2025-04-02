@@ -5,6 +5,7 @@
 #include "Lithe/Scene/Components.h"
 
 #include <fstream>
+#include <variant>
 
 #define YAML_CPP_STATIC_DEFINE
 #include <yaml-cpp/yaml.h>
@@ -84,7 +85,7 @@ namespace Lithe {
 		: m_Scene(scene)
 	{
 	}
-	// TODO: Texture serialization
+
 	static void SerializeEntity(YAML::Emitter& out, Entity entity)
 	{
 		out << YAML::BeginMap; // Entity
@@ -147,6 +148,15 @@ namespace Lithe {
 			auto& spriteRendererComponent = entity.GetComponent<SpriteRendererComponent>();
 			out << YAML::Key << "Color" << YAML::Value << spriteRendererComponent.Color;
 
+			if (auto& srcTexture = spriteRendererComponent.Texture)
+			{
+				auto& texture = *srcTexture;
+				if (std::holds_alternative<Ref<Texture2D>>(texture))
+					out << YAML::Key << "TexturePath" << YAML::Value << (Ref<Texture2D>)(texture)->GetPath(); // TODO
+			}
+
+			out << YAML::Key << "TilingFactor" << YAML::Value << spriteRendererComponent.TilingFactor;
+
 			out << YAML::EndMap; // SpriteRendererComponent
 		}
 
@@ -187,6 +197,15 @@ namespace Lithe {
 	bool SceneSerializer::Deserialize(const std::string& filepath)
 	{
 		YAML::Node data = YAML::LoadFile(filepath);
+		try
+		{
+			data = YAML::LoadFile(filepath);
+		}
+		catch (YAML::ParserException e)
+		{
+			LI_CORE_ERROR("Failed to load .hazel file '{0}'\n     {1}", filepath, e.what());
+			return false;
+		}
 		if (!data["Scene"])
 			return false;
 
@@ -244,6 +263,12 @@ namespace Lithe {
 				{
 					auto& src = deserializedEntity.AddComponent<SpriteRendererComponent>();
 					src.Color = spriteRendererComponent["Color"].as<glm::vec4>();
+
+					if (spriteRendererComponent["TexturePath"])
+						src.Texture = Texture2D::Create(spriteRendererComponent["TexturePath"].as<std::string>());
+
+					if (spriteRendererComponent["TilingFactor"])
+						src.TilingFactor = spriteRendererComponent["TilingFactor"].as<float>();
 				}
 			}
 		}

@@ -302,6 +302,10 @@ namespace Lithe {
 			ImGui::EndDragDropTarget();
 		}
 
+		std::string fileTarget = m_ContentBrowserPanel.GetAndClearCurrentFile();
+		if (!fileTarget.empty())
+			OpenScene(fileTarget);
+
 		// Gizmos
 		Entity selectedEntity = m_SceneHierarchyPanel.GetSelectedEntity();
 		if (selectedEntity && m_GizmoType != -1)
