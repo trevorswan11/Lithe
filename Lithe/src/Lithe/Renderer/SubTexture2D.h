@@ -16,8 +16,13 @@ namespace Lithe {
 		const glm::vec2* GetTexCoords() const { return m_TexCoords; }
 
 		const glm::vec2 GetRawTexCoords() const { return m_RawCoords; }
+		void SetRawTexCoords(const glm::vec2& rawTexCoords) { m_RawCoords = rawTexCoords; RecalculateTexCoords(); }
 		const glm::vec2 GetCellSize() const { return m_CellSize; }
+		void SetCellSize(const glm::vec2& cellSize) { m_CellSize = cellSize; RecalculateTexCoords(); }
 		const glm::vec2 GetSpriteSize() const { return m_SpriteSize; }
+		void SetSpriteSize(const glm::vec2& spriteSize) { m_SpriteSize = spriteSize; RecalculateTexCoords(); }
+
+		void RecalculateTexCoords();
 
 		static Ref<SubTexture2D> CreateFromCoords(const Ref<Texture2D>& texture, const glm::vec2& coords, const glm::vec2& cellSize, const glm::vec2& spriteSize = { 1, 1 });
 	private:

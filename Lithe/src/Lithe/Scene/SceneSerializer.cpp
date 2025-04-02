@@ -13,6 +13,29 @@
 namespace YAML {
 
 	template<>
+	struct convert<glm::vec2>
+	{
+		static Node encode(const glm::vec2& rhs)
+		{
+			Node node;
+			node.push_back(rhs.x);
+			node.push_back(rhs.y);
+			node.SetStyle(EmitterStyle::Flow);
+			return node;
+		}
+
+		static bool decode(const Node& node, glm::vec2& rhs)
+		{
+			if (!node.IsSequence() || node.size() != 2)
+				return false;
+
+			rhs.x = node[0].as<float>();
+			rhs.y = node[1].as<float>();
+			return true;
+		}
+	};
+
+	template<>
 	struct convert<glm::vec3>
 	{
 		static Node encode(const glm::vec3& rhs)
@@ -165,8 +188,8 @@ namespace Lithe {
 				{
 					out << YAML::Key << "SubTexturePath" << YAML::Value << subTexture2D->get()->GetTexture()->GetPath();
 					out << YAML::Key << "SubTextureCoords" << YAML::Value << subTexture2D->get()->GetRawTexCoords();
-					out << YAML::Key << "SubTextureCellSize" << YAML::Value;
-					out << YAML::Key << "SubTextureSpriteSize" << YAML::Value;
+					out << YAML::Key << "SubTextureCellSize" << YAML::Value << subTexture2D->get()->GetCellSize();
+					out << YAML::Key << "SubTextureSpriteSize" << YAML::Value << subTexture2D->get()->GetSpriteSize();
 				}
 			}
 
@@ -282,8 +305,16 @@ namespace Lithe {
 					if (spriteRendererComponent["TexturePath"])
 						src.Texture = Texture2D::Create(spriteRendererComponent["TexturePath"].as<std::string>());
 					
-					if (spriteRendererComponent["SubTexturePath"])
-						src.Texture = SubTexture2D::Create(spriteRendererComponent["TexturePath"].as<std::string>());
+					else if (spriteRendererComponent["SubTexturePath"])
+					{
+						src.SubTextureUsed = true;
+						src.Coords = spriteRendererComponent["SubTextureCoords"].as<glm::vec2>();
+						src.CellSize = spriteRendererComponent["SubTextureCellSize"].as<glm::vec2>();
+						src.SpriteSize = spriteRendererComponent["SubTextureSpriteSize"].as<glm::vec2>();
+						src.Texture = SubTexture2D::CreateFromCoords(
+						Texture2D::Create(spriteRendererComponent["SubTexturePath"].as<std::string>()),
+							src.Coords, src.CellSize, src.SpriteSize);
+					}
 
 					if (spriteRendererComponent["TilingFactor"])
 						src.TilingFactor = spriteRendererComponent["TilingFactor"].as<float>();

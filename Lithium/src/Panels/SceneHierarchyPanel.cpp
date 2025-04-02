@@ -335,14 +335,6 @@ namespace Lithe {
 					component.Texture = std::nullopt;
 				ImGui::SameLine();
 				ImGui::Button("Texture", ImVec2(buttonWidth / 1.4f, 0.0f));
-				ImGui::SameLine();
-				ImGui::Checkbox("SubTexture", &component.SubTextureUsed);
-				if (component.SubTextureUsed)
-				{
-					ImGui::InputFloat2("Coords", glm::value_ptr(component.Coords), 3);
-					ImGui::InputFloat2("Cell Size", glm::value_ptr(component.CellSize), 3);
-					ImGui::InputFloat2("Sprite Size", glm::value_ptr(component.SpriteSize), 3);
-				}
 
 				if (ImGui::BeginDragDropTarget())
 				{
@@ -358,14 +350,37 @@ namespace Lithe {
 								component.CellSize,
 								component.SpriteSize
 							);
+							if (!std::get_if<Ref<SubTexture2D>>(&*component.Texture)->get()->GetTexture()->IsLoaded())
+								component.Texture = std::nullopt;
 						}
 						else
+						{
 							component.Texture = Texture2D::Create(texturePath.string());
+							if (!std::get_if<Ref<Texture2D>>(&*component.Texture)->get()->IsLoaded())
+								component.Texture = std::nullopt;
+						}
 					}
 					ImGui::EndDragDropTarget();
 				}
-				
-				ImGui::SliderFloat("Tiling Factor", &component.TilingFactor, 0.1f, 100.0f);
+
+				ImGui::SameLine();
+				ImGui::Checkbox("SubTexture", &component.SubTextureUsed);
+				if (component.SubTextureUsed)
+				{
+					auto& subTexture2D = *std::get_if<Ref<SubTexture2D>>(&*component.Texture);
+					if (ImGui::InputFloat2("Coords", glm::value_ptr(component.Coords), 3))
+						subTexture2D.get()->SetRawTexCoords(component.Coords);
+					if (ImGui::InputFloat2("Cell Size", glm::value_ptr(component.CellSize), 3))
+						subTexture2D.get()->SetCellSize(component.CellSize);
+					if (ImGui::InputFloat2("Sprite Size", glm::value_ptr(component.SpriteSize), 3))
+						subTexture2D.get()->SetSpriteSize(component.SpriteSize);
+				}
+
+				if (component.Texture)
+				{
+					auto texture2D = std::get_if<Ref<Texture2D>>(&*component.Texture);
+					ImGui::SliderFloat("Tiling Factor", &component.TilingFactor, 0.1f, 100.0f);
+				}
 			});
 
 	}
