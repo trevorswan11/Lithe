@@ -8,7 +8,7 @@ If the repository was cloned non-recursively previously, use `git submodule upda
 
 ### Setup
 - To proceed with the rest of Lithe's setup, ensure you have [Python](https://www.python.org/downloads/) and [Microsoft Visual Studio](https://visualstudio.microsoft.com/) installed on your machine. 
-    - Python is *required* to run the setup scripts, and needed packages will be installed on their own. 
+    - Python is *required* to run the setup scripts, but needed packages will be installed on their own. 
 - Lithe has not been tested with other IDE's/build systems, nor has it been tested outside of a strictly windows environments. Visual Studio 2022 is recommended and is called by the Premake binary. Other versions may be functional, but require a manual change of `Win-GenProjects.bat` located in the `scripts` folder. 
 - Certain versions of Visual Studio may not be supported by Lithe's enforced Premake version, but you can download alternative binaries [here](https://github.com/premake/premake-core/releases/). 
 
