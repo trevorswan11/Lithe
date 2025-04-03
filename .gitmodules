@@ -19,3 +19,6 @@
 [submodule "Lithe/vendor/ImGuizmo"]
 	path = Lithe/vendor/ImGuizmo
 	url = https://github.com/trevorswan11/ImGuizmo
+[submodule "Lithe/vendor/Box2D"]
+	path = Lithe/vendor/Box2D
+	url = https://github.com/trevorswan11/box2d
