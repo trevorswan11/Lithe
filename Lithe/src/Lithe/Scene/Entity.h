@@ -1,7 +1,10 @@
 #pragma once
 
 #include "Lithe/Core/Base.h"
+#include "Lithe/Core/UUID.h"
+
 #include "Lithe/Scene/Scene.h"
+#include "Lithe/Scene/Components.h"
 
 #include <entt.hpp>
 
@@ -50,6 +53,8 @@ namespace Lithe {
 		operator bool() const { return m_EntityHandle != entt::null; }
 		operator entt::entity() const { return m_EntityHandle; }
 		operator uint32_t() const { return static_cast<uint32_t>(m_EntityHandle); }
+
+		UUID GetUUID() { return GetComponent<IDComponent>().ID; }
 
 		bool operator==(const Entity& other) const
 		{

@@ -43,6 +43,7 @@ namespace Lithe {
 		EditorCamera m_EditorCamera;
 
 		Ref<Scene> m_ActiveScene;
+		Ref<Scene> m_EditorScene, m_RuntimeScene;
 		std::optional<std::string> m_SaveSceneCache;
 
 		bool m_ViewportFocused = false, m_ViewportHovered = false;

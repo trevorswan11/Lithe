@@ -1,0 +1,23 @@
+Scene: Untitled
+Entities:
+  - Entity: 10053853431165738458
+    TagComponent:
+      Tag: Are you sure?
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [200, 200, 1]
+    SpriteRendererComponent:
+      Color: [0.999989986, 0.999991953, 1, 1]
+      TexturePath: assets\textures\are_you_shore.png
+      TilingFactor: 1
+    RigidBody2DComponent:
+      BodyType: Static
+      FixedRotation: false
+    BoxCollider2DComponent:
+      Offset: [0, 0]
+      Size: [0.5, 0.5]
+      Density: 1
+      Friction: 0.5
+      Restitution: 0
+      RestitutionThreshold: 0.5

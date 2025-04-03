@@ -45,12 +45,14 @@ project "Lithe"
 		"%{IncludeDir.entt}",
 		"%{IncludeDir.yaml_cpp}",
 		"%{IncludeDir.ImGuizmo}",
+		"%{IncludeDir.Box2D}",
 		"%{IncludeDir.VulkanSDK}"
 	}
 
 	links
 	{
 		"GLFW",
+		"Box2D",
 		-- "opengl32.lib",
 		"yaml-cpp",
 		"Glad",

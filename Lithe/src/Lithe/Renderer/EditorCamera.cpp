@@ -15,6 +15,28 @@ namespace Lithe {
 	EditorCamera::EditorCamera(float fov, float aspectRatio, float nearClip, float farClip)
 		: m_FOV(fov), m_AspectRatio(aspectRatio), m_NearClip(nearClip), m_FarClip(farClip), Camera(glm::perspective(glm::radians(fov), aspectRatio, nearClip, farClip))
 	{
+		m_FOVInit = fov;
+		m_AspectRatioInit = aspectRatio;
+		m_NearClipInit = nearClip;
+		m_FarClipInit = farClip;
+		UpdateView();
+	}
+
+	void EditorCamera::Reset()
+	{
+		m_FOV = m_FOVInit;
+		m_AspectRatio = m_AspectRatioInit;
+		m_NearClip = m_NearClipInit;
+		m_FarClip = m_FarClipInit;
+
+		m_Position = glm::vec3(0.0f);
+		m_FocalPoint = glm::vec3(0.0f);
+		m_InitialMousePosition = glm::vec2(0.0f);
+
+		m_Distance = 10.0f;
+		m_Pitch = 0.0f;
+		m_Yaw = 0.0f;
+
 		UpdateView();
 	}
 

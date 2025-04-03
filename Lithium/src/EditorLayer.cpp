@@ -247,6 +247,13 @@ namespace Lithe {
 				ImGui::EndMenu();
 			}
 
+			if (ImGui::BeginMenu("Editor Camera"))
+			{
+				if (ImGui::MenuItem("Reset Camera"))
+					m_EditorCamera.Reset();
+				ImGui::EndMenu();
+			}
+
 			ImGui::EndMenuBar();
 		}
 
@@ -460,6 +467,9 @@ namespace Lithe {
 
 	void EditorLayer::NewScene()
 	{
+		if (m_SceneState != SceneState::Edit)
+			OnSceneStop();
+
 		m_ActiveScene = CreateRef<Scene>();
 		m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
 		m_SceneHierarchyPanel.SetContext(m_ActiveScene);
@@ -482,6 +492,9 @@ namespace Lithe {
 			return;
 		}
 
+		if (m_SceneState != SceneState::Edit)
+			OnSceneStop();
+
 		try
 		{
 			m_ActiveScene = CreateRef<Scene>();
@@ -501,6 +514,9 @@ namespace Lithe {
 
 	void EditorLayer::SaveSceneAs()
 	{
+		if (m_SceneState != SceneState::Edit)
+			OnSceneStop();
+
 		std::optional<std::string> filepath = FileDialogs::SaveFile("Lithe Scene (*.lithe)\0*.lithe\0");
 		if (filepath)
 		{
@@ -525,11 +541,13 @@ namespace Lithe {
 
 	void EditorLayer::OnScenePlay()
 	{
+		m_ActiveScene->OnRuntimeStart();
 		m_SceneState = SceneState::Play;
 	}
 
 	void EditorLayer::OnSceneStop()
 	{
+		m_ActiveScene->OnRuntimeStop();
 		m_SceneState = SceneState::Edit;
 	}
 

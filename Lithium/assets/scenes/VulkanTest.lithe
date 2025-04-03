@@ -1,6 +1,6 @@
 Scene: Untitled
 Entities:
-  - Entity: 12837192831273
+  - Entity: 5247544818103623231
     TagComponent:
       Tag: Rect
     TransformComponent:
@@ -9,3 +9,4 @@ Entities:
       Scale: [7.6001296, 2.99999619, 1.00000012]
     SpriteRendererComponent:
       Color: [0.737451732, 0.330287278, 0.330287278, 1]
+      TilingFactor: 1

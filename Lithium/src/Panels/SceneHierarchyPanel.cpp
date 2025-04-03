@@ -1,6 +1,3 @@
-/* The Microsoft C++ compiler is non-compliant with the C++ standard and needs
- * the following definition to disable a security warning on std::strncpy().
- */
 #ifdef _MSVC_LANG
 	#define _CRT_SECURE_NO_WARNINGS
 #endif
@@ -224,9 +221,10 @@ namespace Lithe {
 			memset(buffer, 0, sizeof(buffer));
 			std::strncpy(buffer, tag.c_str(), sizeof(buffer));
 			if (ImGui::InputText("##Tag", buffer, sizeof(buffer)))
-			{
 				tag = std::string(buffer);
-			}
+
+			if (ImGui::IsItemHovered())
+				ImGui::SetTooltip("UUID: %s", std::to_string(entity.GetUUID()).c_str());
 		}
 
 		ImGui::SameLine();
@@ -237,23 +235,10 @@ namespace Lithe {
 
 		if (ImGui::BeginPopup("AddComponent"))
 		{
-			if (ImGui::MenuItem("Camera"))
-			{
-				if (!m_SelectionContext.HasComponent<CameraComponent>())
-					m_SelectionContext.AddComponent<CameraComponent>();
-				else
-					LITHIUM_WARN("This entity already has the Camera Component!");
-				ImGui::CloseCurrentPopup();
-			}
-
-			if (ImGui::MenuItem("Sprite Renderer"))
-			{
-				if (!m_SelectionContext.HasComponent<SpriteRendererComponent>())
-					m_SelectionContext.AddComponent<SpriteRendererComponent>();
-				else
-					LITHIUM_WARN("This entity already has the Sprite Renderer Component!");
-				ImGui::CloseCurrentPopup();
-			}
+			DisplayAddComponentEntry<CameraComponent>("Camera");
+			DisplayAddComponentEntry<SpriteRendererComponent>("Sprite Renderer");
+			DisplayAddComponentEntry<RigidBody2DComponent>("Rigidbody 2D");
+			DisplayAddComponentEntry<BoxCollider2DComponent>("Box Collider 2D");
 
 			ImGui::EndPopup();
 		}
@@ -413,6 +398,55 @@ namespace Lithe {
 				}
 			}
 		);
+
+		DrawComponent<RigidBody2DComponent>("RigidBody 2D", entity, [=](auto& component)
+			{
+				const char* bodyTypeTypeStrings[] = { "Static", "Dynamic", "Kinematic"};
+				const char* currentBodyTypeString = bodyTypeTypeStrings[(int)component.Type];
+				if (ImGui::BeginCombo("Body Type", currentBodyTypeString))
+				{
+					for (int i = 0; i < 3; i++)
+					{
+						bool isSelected = currentBodyTypeString == bodyTypeTypeStrings[i];
+						if (ImGui::Selectable(bodyTypeTypeStrings[i], isSelected))
+						{
+							currentBodyTypeString = bodyTypeTypeStrings[i];
+							component.Type = (RigidBody2DComponent::BodyType)i;
+						}
+
+						if (isSelected)
+							ImGui::SetItemDefaultFocus();
+					}
+
+					ImGui::EndCombo();
+				}
+
+				ImGui::Checkbox("Fixed Rotation", &component.FixedRotation);
+			}
+		);
+
+		DrawComponent<BoxCollider2DComponent>("Box Collider 2D", entity, [=](auto& component)
+			{
+				ImGui::DragFloat2("Offset", glm::value_ptr(component.Offset));
+				ImGui::DragFloat2("Size", glm::value_ptr(component.Size));
+				ImGui::DragFloat("Density", &component.Density, 0.01f, 0.0f, 1.0f);
+				ImGui::DragFloat("Friction", &component.Friction, 0.01f, 0.0f, 1.0f);
+				ImGui::DragFloat("Restituiton", &component.Restitution, 0.01f, 0.0f, 1.0f);
+				ImGui::DragFloat("Restituiton Threshold", &component.RestitutionThreshold, 0.01f, 0.0f);
+			}
+		);
+	}
+
+	template<typename T>
+	void SceneHierarchyPanel::DisplayAddComponentEntry(const std::string& entryName) {
+		if (!m_SelectionContext.HasComponent<T>())
+		{
+			if (ImGui::MenuItem(entryName.c_str()))
+			{
+				m_SelectionContext.AddComponent<T>();
+				ImGui::CloseCurrentPopup();
+			}
+		}
 	}
 
 }
