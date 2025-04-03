@@ -39,3 +39,4 @@ LitheProfile-Shutdown.json
 
 # MISC
 GenerateProjects.bat
+.env

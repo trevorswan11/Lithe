@@ -34,6 +34,7 @@ namespace Lithe {
 
 		ProjectionType GetProjectionType() const { return m_ProjectionType; }
 		void SetProjectionType(ProjectionType projectionType) { m_ProjectionType = projectionType; RecalculateProjection(); }
+		bool IsOrthographic() const { return m_ProjectionType == ProjectionType::Orthographic; }
 	private:
 		void RecalculateProjection();
 	private:

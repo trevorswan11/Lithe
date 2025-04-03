@@ -24,7 +24,8 @@ namespace Lithe {
 	{
 		LI_PROFILE_FUNCTION();
 
-		m_CheckerboardTexture = Texture2D::Create("assets/textures/CheckerboardExample.png");
+		m_IconPlay = Texture2D::Create("resources/PlayButton.png");
+		m_IconStop = Texture2D::Create("resources/StopButton.png");
 
 		FramebufferSpec fbSpec;
 		fbSpec.Attachments = {
@@ -123,13 +124,6 @@ namespace Lithe {
 			m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
 		}
 
-		// Update
-		if (m_ViewportFocused)
-		{
-			m_CameraController.OnUpdate(ts);
-		}
-		m_EditorCamera.OnUpdate(ts);
-
 		// Render
 		Renderer2D::ResetStats();
 		m_Framebuffer->Bind();
@@ -139,8 +133,24 @@ namespace Lithe {
 		// Clear the entity ID attachment to -1
 		m_Framebuffer->ClearAttachment(1, -1);
 
-		// Update scene
-		m_ActiveScene->OnUpdateEditor(ts, m_EditorCamera);
+		switch (m_SceneState)
+		{
+			case SceneState::Edit:
+			{
+				// Update
+				if (m_ViewportFocused)
+					m_CameraController.OnUpdate(ts);
+				m_EditorCamera.OnUpdate(ts);
+
+				m_ActiveScene->OnUpdateEditor(ts, m_EditorCamera);
+				break;
+			}
+			case SceneState::Play:
+			{
+				m_ActiveScene->OnUpdateRuntime(ts);
+				break;
+			}
+		}
 
 		auto [mx, my] = ImGui::GetMousePos();
 		mx -= m_ViewportBounds[0].x;
@@ -217,7 +227,7 @@ namespace Lithe {
 					SaveSceneAs();
 				if (ImGui::MenuItem("Save", "Ctrl+S"))
 					SaveScene();
-				if (ImGui::MenuItem("Reset"))
+				if (ImGui::MenuItem("Revert Changes"))
 					if (m_SaveSceneCache) OpenScene(*m_SaveSceneCache);
 				if (ImGui::MenuItem("Exit"))
 					Application::Get().Close();
@@ -312,24 +322,35 @@ namespace Lithe {
 		Entity selectedEntity = m_SceneHierarchyPanel.GetSelectedEntity();
 		if (selectedEntity && m_GizmoType != -1)
 		{
-			ImGuizmo::SetOrthographic(false);
+			glm::mat4& cameraProjection = glm::mat4(1.0f);
+			glm::mat4 cameraView = glm::mat4(1.0f);
+			switch (m_SceneState)
+			{
+				case SceneState::Edit:
+				{
+					// Editor Camera
+					cameraProjection = m_EditorCamera.GetProjection();
+					cameraView = m_EditorCamera.GetViewMatrix();
+					ImGuizmo::SetOrthographic(false);
+					break;
+				}
+				case SceneState::Play:
+				{
+					// Runtime Camera
+					auto cameraEntity = m_ActiveScene->GetPrimaryCameraEntity();
+					if (!cameraEntity) return;
+					const auto& camera = cameraEntity.GetComponent<CameraComponent>().Camera;
+					cameraProjection = camera.GetProjection();
+					cameraView = glm::inverse(cameraEntity.GetComponent<TransformComponent>().GetTransform());
+					ImGuizmo::SetOrthographic(camera.IsOrthographic());
+					break;
+				}
+			}
 			ImGuizmo::SetDrawlist();
 
 			float windowWidth = (float)ImGui::GetWindowWidth();
 			float windowHeight = (float)ImGui::GetWindowHeight();
 			ImGuizmo::SetRect(m_ViewportBounds[0].x, m_ViewportBounds[0].y, m_ViewportBounds[1].x - m_ViewportBounds[0].x, m_ViewportBounds[1].y - m_ViewportBounds[0].y);
-
-			// Runtime Camera
-#if 0
-			auto cameraEntity = m_ActiveScene->GetPrimaryCameraEntity();
-			const auto& camera = cameraEntity.GetComponent<CameraComponent>().Camera;
-			const glm::mat4& cameraProjection = camera.GetProjection();
-			glm::mat4 cameraView = glm::inverse(cameraEntity.GetComponent<TransformComponent>().GetTransform());
-#endif
-
-			// Editor Camera
-			const glm::mat4& cameraProjection = m_EditorCamera.GetProjection();
-			glm::mat4 cameraView = m_EditorCamera.GetViewMatrix();
 
 			auto& tc = selectedEntity.GetComponent<TransformComponent>();
 			glm::mat4 transform = tc.GetTransform();
@@ -359,13 +380,17 @@ namespace Lithe {
 		ImGui::End();
 		ImGui::PopStyleVar();
 
+		UI_Toolbar();
+
 		ImGui::End();
 	}
 
 	void EditorLayer::OnEvent(Event& e)
 	{
-		m_CameraController.OnEvent(e);
-		m_EditorCamera.OnEvent(e);
+		if (m_SceneState == SceneState::Edit)
+			m_EditorCamera.OnEvent(e);
+		else if (m_SceneState == SceneState::Play)
+			m_CameraController.OnEvent(e);
 
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<KeyPressedEvent>(LI_BIND_EVENT_FN(EditorLayer::OnKeyPressed));
@@ -451,6 +476,12 @@ namespace Lithe {
 
 	void EditorLayer::OpenScene(const std::filesystem::path& path)
 	{
+		if (path.extension().string() != ".lithe")
+		{
+			LITHIUM_WARN("Could not load {0} - not a scene file", path.filename().string());
+			return;
+		}
+
 		try
 		{
 			m_ActiveScene = CreateRef<Scene>();
@@ -490,6 +521,47 @@ namespace Lithe {
 		}
 		else
 			SaveSceneAs();
+	}
+
+	void EditorLayer::OnScenePlay()
+	{
+		m_SceneState = SceneState::Play;
+	}
+
+	void EditorLayer::OnSceneStop()
+	{
+		m_SceneState = SceneState::Edit;
+	}
+
+	void EditorLayer::UI_Toolbar()
+	{
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 2.0f));
+		ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, ImVec2(0.0f, 0.0f));
+		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
+		const auto& colors = ImGui::GetStyle().Colors;
+		const auto& buttonHovered = colors[ImGuiCol_ButtonHovered];
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, 
+			ImVec4(buttonHovered.x, buttonHovered.y, buttonHovered.z, 0.5f));
+		const auto& buttonActive = colors[ImGuiCol_ButtonActive];
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, 
+			ImVec4(buttonActive.x, buttonActive.y, buttonActive.z, 0.5f));
+
+		ImGui::Begin("##toolbar", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+		
+		float size = ImGui::GetWindowHeight() - 4.0f;
+		Ref<Texture2D> icon = m_SceneState == SceneState::Edit ? m_IconPlay : m_IconStop;
+		ImGui::SetCursorPosX((ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));
+		if (ImGui::ImageButton(reinterpret_cast<ImTextureID>(static_cast<uint64_t>(icon->GetRendererID())), ImVec2(size, size), ImVec2(0,0), ImVec2(1, 1), 0))
+		{
+			if (m_SceneState == SceneState::Edit)
+				OnScenePlay();
+			else if (m_SceneState == SceneState::Play)
+				OnSceneStop();
+		}
+		
+		ImGui::PopStyleVar(2);
+		ImGui::PopStyleColor(3);
+		ImGui::End();
 	}
 
 }
