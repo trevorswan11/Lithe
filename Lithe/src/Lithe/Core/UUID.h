@@ -16,6 +16,10 @@ namespace Lithe {
 		uint64_t m_UUID;
 	};
 
+	inline std::string format_as(const UUID& uuid)
+	{
+		return std::to_string(uuid);
+	}
 }
 
 namespace std {

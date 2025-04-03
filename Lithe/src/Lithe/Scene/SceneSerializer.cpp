@@ -87,6 +87,23 @@ namespace YAML {
 		}
 	};
 
+	template<>
+	struct convert<Lithe::UUID>
+	{
+		static Node encode(const Lithe::UUID& uuid)
+		{
+			Node node;
+			node.push_back((uint64_t)uuid);
+			return node;
+		}
+
+		static bool decode(const Node& node, Lithe::UUID& uuid)
+		{
+			uuid = node.as<uint64_t>();
+			return true;
+		}
+	};
+
 }
 namespace Lithe {
 
@@ -307,7 +324,7 @@ namespace Lithe {
 		{
 			for (auto entity : entities)
 			{
-				uint64_t uuid = entity["Entity"].as<uint64_t>();
+				UUID uuid = entity["Entity"].as<UUID>();
 
 				std::string name;
 				auto tagComponent = entity["TagComponent"];
