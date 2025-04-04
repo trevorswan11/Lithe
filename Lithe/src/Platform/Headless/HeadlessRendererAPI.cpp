@@ -1,8 +1,6 @@
 #include "lipch.h"
 #include "HeadlessRendererAPI.h"
 
-#include <glad/glad.h>
-
 namespace Lithe {
 
 	void HeadlessMessageCallback(

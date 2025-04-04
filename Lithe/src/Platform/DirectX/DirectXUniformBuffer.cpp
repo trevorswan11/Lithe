@@ -1,8 +1,6 @@
 #include "lipch.h"
 #include "DirectXUniformBuffer.h"
 
-#include <glad/glad.h>
-
 namespace Lithe {
 
 	DirectXUniformBuffer::DirectXUniformBuffer(uint32_t size, uint32_t binding)

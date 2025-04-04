@@ -16,12 +16,12 @@ namespace Lithe {
 		LI_CORE_ASSERT(!s_Instance, "Application already exists!");
 		s_Instance = this;
 
+		RendererAPI::SetRendererAPI((int)m_AppSpec.ApplicationRendererAPI);
 		m_Window = Scope<Window>(Window::Create(WindowProps(m_AppSpec.Name)));
 		m_Window->SetEventCallback(LI_BIND_EVENT_FN(Application::OnEvent));
 
 		if (!m_AppSpec.WorkingDirectory.empty())
 			std::filesystem::current_path(m_AppSpec.WorkingDirectory);
-		RendererAPI::SetRendererAPI((int)m_AppSpec.ApplicationRendererAPI);
 
 		Renderer::Init();
 

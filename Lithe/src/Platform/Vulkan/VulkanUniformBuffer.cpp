@@ -1,8 +1,6 @@
 #include "lipch.h"
 #include "VulkanUniformBuffer.h"
 
-#include <glad/glad.h>
-
 namespace Lithe {
 
 	VulkanUniformBuffer::VulkanUniformBuffer(uint32_t size, uint32_t binding)

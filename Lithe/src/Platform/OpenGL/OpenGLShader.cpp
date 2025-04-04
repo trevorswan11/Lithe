@@ -50,13 +50,15 @@ namespace Lithe {
 			return nullptr;
 		}
 
-		static const char* GetCacheDirectory() // TODO: make sure the assets directory is valid
+		static const char* GetCacheDirectory()
 		{
+			LI_CORE_ASSERT(std::filesystem::exists("assets"));
 			return "assets/cache/shader/opengl";
 		}
 
-		static const char* GetHashDirectory() // TODO: use for shader serialization
+		static const char* GetHashDirectory()
 		{
+			LI_CORE_ASSERT(std::filesystem::exists("assets"));
 			return "assets/cache/shader/opengl/hash";
 		}
 
@@ -162,7 +164,7 @@ namespace Lithe {
 		glDeleteProgram(m_RendererID);
 	}
 
-	std::string OpenGLShader::ReadFile(const std::string& filepath) // TODO: Add to FileUtils header
+	std::string OpenGLShader::ReadFile(const std::string& filepath)
 	{
 		LI_PROFILE_FUNCTION();
 
@@ -213,7 +215,6 @@ namespace Lithe {
 		return shaderSources;
 	}
 
-	// TODO: Shader serialization with hashing
 	void OpenGLShader::CompileOrGetVulkanBinaries(std::unordered_map<GLenum, std::pair<std::string, bool>>& shaderSources)
 	{
 		LI_PROFILE_FUNCTION();

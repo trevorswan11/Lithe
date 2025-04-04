@@ -2,15 +2,8 @@
 #include "HeadlessShader.h"
 
 #include <fstream>
-#include <glad/glad.h>
 
 #include <glm/gtc/type_ptr.hpp>
-
-#pragma warning(push, 0)
-#include <shaderc/shaderc.hpp>
-#include <spirv_cross/spirv_cross.hpp>
-#include <spirv_cross/spirv_glsl.hpp>
-#pragma warning(pop)
 
 #include "Lithe/Core/Timer.h"
 
@@ -18,32 +11,16 @@ namespace Lithe {
 
 	namespace Utils {
 
-		static int ShaderTypeFromString(const std::string& type)
+		static const char* GetCacheDirectory()
 		{
-			LI_CORE_ASSERT(false);
-			return 0;
+			LI_CORE_ASSERT(std::filesystem::exists("assets"));
+			return "assets/cache/shader/headless";
 		}
 
-		static shaderc_shader_kind GLShaderStageToShaderC(int stage)
+		static const char* GetHashDirectory()
 		{
-			LI_CORE_ASSERT(false);
-			return (shaderc_shader_kind)0;
-		}
-
-		static const char* GLShaderStageToString(int stage)
-		{
-			LI_CORE_ASSERT(false);
-			return nullptr;
-		}
-
-		static const char* GetCacheDirectory() // TODO: make sure the assets directory is valid
-		{
-			return "assets/cache/shader/vulkan";
-		}
-
-		static const char* GetHashDirectory() // TODO: use for shader serialization
-		{
-			return "assets/cache/shader/vulkan/hash";
+			LI_CORE_ASSERT(std::filesystem::exists("assets"));
+			return "assets/cache/shader/headless/hash";
 		}
 
 		static void CreateCacheDirectoryIfNeeded()
@@ -58,12 +35,6 @@ namespace Lithe {
 			std::string cacheDirectory = GetHashDirectory();
 			if (!std::filesystem::exists(cacheDirectory))
 				std::filesystem::create_directories(cacheDirectory);
-		}
-
-		static const char* HeadlessShaderStageCachedHeadlessFileExtension(uint32_t stage)
-		{
-			LI_CORE_ASSERT(false);
-			return "";
 		}
 
 	}

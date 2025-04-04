@@ -49,7 +49,7 @@ namespace Lithe {
 		static const uint32_t MAX_QUADS = 10000;
 		static const uint32_t MAX_VERTICES = MAX_QUADS * 4;
 		static const uint32_t MAX_INDICES = MAX_QUADS * 6;
-		static const uint32_t MAX_TEXTURE_SLOTS = 32; // TODO: RenderCaps
+		static const uint32_t MAX_TEXTURE_SLOTS = 32;
 
 		Ref<VertexArray> QuadVertexArray;
 		Ref<VertexBuffer> QuadVertexBuffer;

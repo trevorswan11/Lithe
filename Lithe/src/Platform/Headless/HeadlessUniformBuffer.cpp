@@ -1,8 +1,6 @@
 #include "lipch.h"
 #include "HeadlessUniformBuffer.h"
 
-#include <glad/glad.h>
-
 namespace Lithe {
 
 	HeadlessUniformBuffer::HeadlessUniformBuffer(uint32_t size, uint32_t binding)

@@ -26,7 +26,6 @@ namespace Lithe {
 			: TextureFormat(format) {}
 
 		FramebufferTextureFormat TextureFormat = FramebufferTextureFormat::None;
-		// TODO: filtering/wrap
 	};
 
 	struct FramebufferAttachmentSpec

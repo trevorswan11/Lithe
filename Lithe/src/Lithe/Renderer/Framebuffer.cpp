@@ -3,8 +3,10 @@
 
 #include "Lithe/Renderer/Renderer.h"
 
+#include "Platform/Headless/HeadlessFramebuffer.h"
 #include "Platform/OpenGL/OpenGLFramebuffer.h"
 #include "Platform/Vulkan/VulkanFramebuffer.h"
+#include "Platform/DirectX/DirectXFramebuffer.h"
 
 namespace Lithe {
 
@@ -12,10 +14,10 @@ namespace Lithe {
 	{
 		switch (Renderer::GetAPI())
 		{
-			case RendererAPI::API::None:	LI_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
-			case RendererAPI::API::OpenGL:	return CreateRef<OpenGLFramebuffer>(spec);
-			case RendererAPI::API::Vulkan:	return CreateRef<VulkanFramebuffer>(spec);
-			case RendererAPI::API::DirectX:	LI_CORE_ASSERT(false, "RendererAPI::DirectX is currently not supported!"); return nullptr;
+			case RendererAPI::API::Headless:	return CreateRef<HeadlessFramebuffer>(spec);
+			case RendererAPI::API::OpenGL:		return CreateRef<OpenGLFramebuffer>(spec);
+			case RendererAPI::API::Vulkan:		return CreateRef<VulkanFramebuffer>(spec);
+			case RendererAPI::API::DirectX:		return CreateRef<DirectXFramebuffer>(spec);
 		}
 
 		LI_CORE_ASSERT(false, "Unknown RendererAPI!");

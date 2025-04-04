@@ -1,8 +1,6 @@
 #include "lipch.h"
 #include "HeadlessVertexArray.h"
 
-#include <glad/glad.h>
-
 namespace Lithe {
 
 	static int ShaderDataTypeToHeadlessBaseType(ShaderDataType type)

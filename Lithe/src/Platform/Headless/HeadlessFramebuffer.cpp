@@ -1,8 +1,6 @@
 #include "lipch.h"
 #include "HeadlessFramebuffer.h"
 
-#include <glad/glad.h>
-
 namespace Lithe {
 
 	static const uint32_t s_MaxFramebufferSize = 8192;

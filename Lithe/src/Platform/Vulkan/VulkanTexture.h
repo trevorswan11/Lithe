@@ -2,8 +2,6 @@
 
 #include "Lithe/Renderer/Texture.h"
 
-#include <glad/glad.h>
-
 namespace Lithe {
 
 	class VulkanTexture2D : public Texture2D

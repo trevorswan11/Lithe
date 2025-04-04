@@ -1,8 +1,6 @@
 #include "lipch.h"
 #include "DirectXVertexArray.h"
 
-#include <glad/glad.h>
-
 namespace Lithe {
 
 	static int ShaderDataTypeToDirectXBaseType(ShaderDataType type)

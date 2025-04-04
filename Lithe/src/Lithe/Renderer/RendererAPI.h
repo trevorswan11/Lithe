@@ -13,7 +13,7 @@ namespace Lithe {
 	public:
 		enum class API
 		{
-			None = 0,
+			Headless = 0,
 			OpenGL = 1,
 			DirectX = 2,
 			Vulkan = 3
@@ -34,20 +34,46 @@ namespace Lithe {
 		static inline API GetAPI() { return s_API; }
 		static Scope<RendererAPI> Create();
 	private:
-		inline static void SetRendererAPI(int api)
+		static void SetRendererAPI(int api, bool forceOpenGL = true)
+		{
+			if (forceOpenGL)
+			{
+				s_API = API::OpenGL;
+			}
+			else
+			{
+				switch (api)
+				{
+					case 0:
+					case 1:
+					case 2:
+					case 3:
+						s_API = (API)api;
+						break;
+					default:
+						LI_CORE_ASSERT(false, "Failed to set Renderer API");
+				}
+			}
+			LI_CORE_WARN("Renderer API set to {0}.", IntToRendererAPIString(forceOpenGL ? 1 : api));
+		}
+
+		static std::string IntToRendererAPIString(int api)
 		{
 			switch (api)
 			{
 				case 0:
+					return "Headless";
 				case 1:
+					return "OpenGL";
 				case 2:
+					return "DirectX";
 				case 3:
-					s_API = (API)api;
-					break;
+					return "Vulkan";
 				default:
-					LI_CORE_ASSERT(false);
+					return std::string();
 			}
 		}
+	private:
 		static API s_API;
 
 		friend class Application;

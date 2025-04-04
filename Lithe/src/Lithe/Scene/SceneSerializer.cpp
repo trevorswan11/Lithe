@@ -223,7 +223,7 @@ namespace Lithe {
 			{
 				if (auto texture2D = std::get_if<Ref<Texture2D>>(&*srcTexture))
 				{
-					out << YAML::Key << "TexturePath" << YAML::Value << texture2D->get()->GetPath(); // TODO
+					out << YAML::Key << "TexturePath" << YAML::Value << texture2D->get()->GetPath();
 				}
 				else if (auto subTexture2D = std::get_if<Ref<SubTexture2D>>(&*srcTexture))
 				{

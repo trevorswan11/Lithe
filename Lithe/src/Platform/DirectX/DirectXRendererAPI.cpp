@@ -1,8 +1,6 @@
 #include "lipch.h"
 #include "DirectXRendererAPI.h"
 
-#include <glad/glad.h>
-
 namespace Lithe {
 
 	void DirectXMessageCallback(

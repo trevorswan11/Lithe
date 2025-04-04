@@ -1,8 +1,6 @@
 #include "lipch.h"
 #include "DirectXBuffer.h"
 
-#include <glad/glad.h>
-
 namespace Lithe {
 
 	// --------------------------- VERTEX BUFFER ---------------------------

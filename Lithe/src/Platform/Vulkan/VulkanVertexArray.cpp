@@ -1,8 +1,6 @@
 #include "lipch.h"
 #include "VulkanVertexArray.h"
 
-#include <glad/glad.h>
-
 namespace Lithe {
 
 	static int ShaderDataTypeToVulkanBaseType(ShaderDataType type)

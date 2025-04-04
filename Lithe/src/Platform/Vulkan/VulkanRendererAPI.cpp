@@ -1,8 +1,6 @@
 #include "lipch.h"
 #include "VulkanRendererAPI.h"
 
-#include <glad/glad.h>
-
 namespace Lithe {
 
 	void VulkanMessageCallback(

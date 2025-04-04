@@ -2,7 +2,6 @@
 #include "VulkanShader.h"
 
 #include <fstream>
-#include <glad/glad.h>
 
 #include <glm/gtc/type_ptr.hpp>
 
@@ -18,31 +17,15 @@ namespace Lithe {
 
 	namespace Utils {
 
-		static int ShaderTypeFromString(const std::string& type)
+		static const char* GetCacheDirectory()
 		{
-			LI_CORE_ASSERT(false);
-			return 0;
-		}
-
-		static shaderc_shader_kind GLShaderStageToShaderC(int stage)
-		{
-			LI_CORE_ASSERT(false);
-			return (shaderc_shader_kind)0;
-		}
-
-		static const char* GLShaderStageToString(int stage)
-		{
-			LI_CORE_ASSERT(false);
-			return nullptr;
-		}
-
-		static const char* GetCacheDirectory() // TODO: make sure the assets directory is valid
-		{
+			LI_CORE_ASSERT(std::filesystem::exists("assets"));
 			return "assets/cache/shader/vulkan";
 		}
 
-		static const char* GetHashDirectory() // TODO: use for shader serialization
+		static const char* GetHashDirectory()
 		{
+			LI_CORE_ASSERT(std::filesystem::exists("assets"));
 			return "assets/cache/shader/vulkan/hash";
 		}
 
@@ -58,12 +41,6 @@ namespace Lithe {
 			std::string cacheDirectory = GetHashDirectory();
 			if (!std::filesystem::exists(cacheDirectory))
 				std::filesystem::create_directories(cacheDirectory);
-		}
-
-		static const char* VulkanShaderStageCachedVulkanFileExtension(uint32_t stage)
-		{
-			LI_CORE_ASSERT(false);
-			return "";
 		}
 
 	}
