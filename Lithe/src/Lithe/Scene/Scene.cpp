@@ -15,6 +15,28 @@
 
 namespace Lithe {
 
+	namespace Utils {
+
+		const std::string WHITESPACE = " \n\r\t\f\v";
+
+		static std::string string_ltrim(const std::string& s)
+		{
+			size_t start = s.find_first_not_of(WHITESPACE);
+			return (start == std::string::npos) ? "" : s.substr(start);
+		}
+
+		static std::string string_rtrim(const std::string& s)
+		{
+			size_t end = s.find_last_not_of(WHITESPACE);
+			return (end == std::string::npos) ? "" : s.substr(0, end + 1);
+		}
+
+		static std::string string_trim(const std::string& s) {
+			return string_rtrim(string_ltrim(s));
+		}
+
+	}
+
 	static b2BodyType RigidBody2DTypeToBox2DBody(RigidBody2DComponent::BodyType bodyType)
 	{
 		switch (bodyType)
@@ -120,7 +142,7 @@ namespace Lithe {
 	Entity Scene::CloneEntity(Entity entity)
 	{
 		std::string name = entity.GetComponent<TagComponent>().Tag;
-		Entity newEntity = CreateEntity(name + " - Copy");
+		Entity newEntity = CreateEntity(Utils::string_trim(name) + " - Copy");
 		CopyComponentIfExists(AllComponents{}, newEntity, entity);
 		m_EntityCount++;
 		return newEntity;
@@ -180,13 +202,32 @@ namespace Lithe {
 	{
 		Renderer2D::BeginScene(camera);
 
-		auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
-		for (auto entity : group)
 		{
-			auto [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
+			LI_PROFILE_SCOPE("Editor Draw Sprites");
 
-			Renderer2D::DrawSprite(transform.GetTransform(), sprite, (int)entity);
+			auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
+			for (auto entity : group)
+			{
+				auto [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
+
+				Renderer2D::DrawSpriteComponent(transform.GetTransform(), sprite, (int)entity);
+			}
 		}
+
+		{
+			LI_PROFILE_SCOPE("Editor Draw Circles");
+
+			auto circleView = m_Registry.view<TransformComponent, CircleRendererComponent>();
+			for (auto entity : circleView) // Intellisense may be angry here, but I swear it compiles
+			{
+				auto [transform, circle] = circleView.get<TransformComponent, CircleRendererComponent>(entity);
+
+				Renderer2D::DrawCircleComponent(transform.GetTransform(), circle, (int)entity);
+			}
+		}
+
+		/*Renderer2D::DrawLine(glm::vec3(2.0f), glm::vec3(5.0f), glm::vec4(1, 0, 1, 1));
+		Renderer2D::DrawRect(glm::vec3(0.0f), glm::vec2(5.0f), glm::vec4(1, 0.5, 1, 1));*/
 
 		Renderer2D::EndScene();
 	}
@@ -256,12 +297,28 @@ namespace Lithe {
 		{
 			Renderer2D::BeginScene(*primaryCamera, primaryCameraTransform);
 
-			auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
-			for (auto entity : group)
 			{
-				auto [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
+				LI_PROFILE_SCOPE("Runtime Draw Sprites");
 
-				Renderer2D::DrawSprite(transform.GetTransform(), sprite, (int)entity);
+				auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
+				for (auto entity : group)
+				{
+					auto [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
+
+					Renderer2D::DrawSpriteComponent(transform.GetTransform(), sprite, (int)entity);
+				}
+			}
+
+			{
+				LI_PROFILE_SCOPE("Runtime Draw Circles");
+
+				auto circleView = m_Registry.view<TransformComponent, CircleRendererComponent>();
+				for (auto entity : circleView) // Intellisense may be angry here, but I swear it compiles
+				{
+					auto [transform, circle] = circleView.get<TransformComponent, CircleRendererComponent>(entity);
+
+					Renderer2D::DrawCircleComponent(transform.GetTransform(), circle, (int)entity);
+				}
 			}
 
 			Renderer2D::EndScene();
@@ -330,6 +387,11 @@ namespace Lithe {
 
 	template<>
 	void Scene::OnComponentAdded<SpriteRendererComponent>(Entity entity, SpriteRendererComponent& component)
+	{
+	}
+
+	template<>
+	void Scene::OnComponentAdded<CircleRendererComponent>(Entity entity, CircleRendererComponent& component)
 	{
 	}
 

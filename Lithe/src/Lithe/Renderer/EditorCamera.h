@@ -17,7 +17,7 @@ namespace Lithe {
 		EditorCamera() = default;
 		EditorCamera(float fov, float aspectRatio, float nearClip, float farClip);
 
-		void OnUpdate(Timestep ts);
+		void OnUpdate(Timestep ts, bool disable = false);
 		void OnEvent(Event& e);
 
 		inline float GetDistance() const { return m_Distance; }

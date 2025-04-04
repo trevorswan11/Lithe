@@ -2,6 +2,7 @@
 #include "ContentBrowserPanel.h"
 
 #include <imgui/imgui.h>
+#include <imgui/imgui_internal.h>
 
 namespace Lithe {
 
@@ -21,10 +22,10 @@ namespace Lithe {
 		auto boldFont = io.Fonts->Fonts[(int)ImGuiFonts::Bold];
 
 		ImGuiWindowClass window_class;
-		window_class.DockNodeFlagsOverrideSet = ImGuiDockNodeFlags_AutoHideTabBar;
+		window_class.DockNodeFlagsOverrideSet = ImGuiDockNodeFlags_NoTabBar;
 		ImGui::SetNextWindowClass(&window_class);
 		ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar;
-		ImGui::Begin("Content Browser", (bool*)0, window_flags);
+		ImGui::Begin("Content Browser", NULL, window_flags);
 
 		static float padding = 16.0f;
 		static float thumbnailSize = 128.0f;

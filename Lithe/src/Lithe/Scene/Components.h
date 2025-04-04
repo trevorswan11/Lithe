@@ -74,6 +74,17 @@ namespace Lithe {
 			: Color(color) {}
 	};
 
+	struct CircleRendererComponent
+	{
+		glm::vec4 Color{ 1.0f, 1.0f, 1.0f, 1.0f };
+		float Radius = 0.5;
+		float Thickness = 1.0f;
+		float Fade = 0.005f;
+
+		CircleRendererComponent() = default;
+		CircleRendererComponent(const CircleRendererComponent&) = default;
+	};
+
 	struct CameraComponent
 	{
 		SceneCamera Camera;
@@ -140,6 +151,7 @@ namespace Lithe {
 
 	using AllComponents =
 		ComponentGroup<TransformComponent, SpriteRendererComponent,
-		CameraComponent, NativeScriptComponent, RigidBody2DComponent, BoxCollider2DComponent>;
+		CameraComponent, NativeScriptComponent, RigidBody2DComponent,
+		CircleRendererComponent, BoxCollider2DComponent>;
 
 }

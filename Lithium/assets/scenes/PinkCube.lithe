@@ -1,35 +1,5 @@
 Scene: Untitled
 Entities:
-  - Entity: 8775573671476739255
-    TagComponent:
-      Tag: Top
-    TransformComponent:
-      Translation: [0, 0.5, 0]
-      Rotation: [1.57079637, 0.785398185, 0]
-      Scale: [1, 1, 1]
-    SpriteRendererComponent:
-      Color: [0.876447856, 0, 0.834712803, 1]
-      TilingFactor: 1
-  - Entity: 6816199703805368202
-    TagComponent:
-      Tag: Left
-    TransformComponent:
-      Translation: [-0.354999989, 0, 0.349999994]
-      Rotation: [0, -0.785398185, 0]
-      Scale: [1, 1, 1]
-    SpriteRendererComponent:
-      Color: [0.806949794, 0.271060348, 0.784491062, 1]
-      TilingFactor: 1
-  - Entity: 3506412353317065242
-    TagComponent:
-      Tag: Right
-    TransformComponent:
-      Translation: [0.351999998, 0, 0.349999994]
-      Rotation: [0, 0.785398245, 0]
-      Scale: [1, 1, 1]
-    SpriteRendererComponent:
-      Color: [0.54842025, 0, 0.586872578, 1]
-      TilingFactor: 1
   - Entity: 3522314245950498043
     TagComponent:
       Tag: Camera
@@ -48,3 +18,33 @@ Entities:
         OrthographicFar: 1
       Primary: true
       FixedAspectRatio: false
+  - Entity: 3506412353317065242
+    TagComponent:
+      Tag: Right
+    TransformComponent:
+      Translation: [0.351999998, 0, 0.349999994]
+      Rotation: [0, 0.785398245, 0]
+      Scale: [1, 1, 1]
+    SpriteRendererComponent:
+      Color: [0.54842025, 0, 0.586872578, 1]
+      TilingFactor: 1
+  - Entity: 6816199703805368202
+    TagComponent:
+      Tag: Left
+    TransformComponent:
+      Translation: [-0.354999989, 0, 0.349999994]
+      Rotation: [0, -0.785398185, 0]
+      Scale: [1, 1, 1]
+    SpriteRendererComponent:
+      Color: [0.806949794, 0.271060348, 0.784491062, 1]
+      TilingFactor: 1
+  - Entity: 8775573671476739255
+    TagComponent:
+      Tag: Top
+    TransformComponent:
+      Translation: [0, 0.5, 0]
+      Rotation: [1.57079637, 0.785398185, 0]
+      Scale: [1, 1, 1]
+    SpriteRendererComponent:
+      Color: [0.876447856, 0, 0.834712803, 1]
+      TilingFactor: 1

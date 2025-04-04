@@ -56,6 +56,11 @@ namespace Lithe {
 			return "assets/cache/shader/opengl";
 		}
 
+		static const char* GetHashDirectory() // TODO: use for shader serialization
+		{
+			return "assets/cache/shader/opengl/hash";
+		}
+
 		static void CreateCacheDirectoryIfNeeded()
 		{
 			std::string cacheDirectory = GetCacheDirectory();
@@ -186,6 +191,7 @@ namespace Lithe {
 		return shaderSources;
 	}
 
+	// TODO: Shader serialization with hashing
 	void OpenGLShader::CompileOrGetVulkanBinaries(const std::unordered_map<GLenum, std::string>& shaderSources)
 	{
 		LI_PROFILE_FUNCTION();

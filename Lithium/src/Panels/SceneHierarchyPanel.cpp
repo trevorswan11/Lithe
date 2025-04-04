@@ -239,6 +239,7 @@ namespace Lithe {
 			DisplayAddComponentEntry<SpriteRendererComponent>("Sprite Renderer");
 			DisplayAddComponentEntry<RigidBody2DComponent>("Rigidbody 2D");
 			DisplayAddComponentEntry<BoxCollider2DComponent>("Box Collider 2D");
+			DisplayAddComponentEntry<CircleRendererComponent>("Circle Renderer");
 
 			ImGui::EndPopup();
 		}
@@ -398,6 +399,16 @@ namespace Lithe {
 				}
 			}
 		);
+
+		DrawComponent<CircleRendererComponent>("Circle Renderer", entity, [=](auto& component)
+			{
+				ImGui::ColorEdit4("Color", glm::value_ptr(component.Color));
+				ImGui::DragFloat("Thickness", &component.Thickness, 0.025f, 0.0f, 1.0f);
+				ImGui::DragFloat("Fade", &component.Fade, 0.00025f, 0.0f, 1.0f);
+
+			}
+		);
+		
 
 		DrawComponent<RigidBody2DComponent>("RigidBody 2D", entity, [=](auto& component)
 			{

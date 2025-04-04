@@ -2,6 +2,7 @@
 #include "Lithe/Scene/SceneSerializer.h"
 
 #include <imgui/imgui.h>
+#include <imgui/imgui_internal.h>
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -37,13 +38,13 @@ namespace Lithe {
 		fbSpec.Height = 720;
 		m_Framebuffer = Framebuffer::Create(fbSpec);
 
-		m_ActiveScene = CreateRef<Scene>();
+		m_EditorScene = CreateRef<Scene>();
 
 		auto commandLineArgs = Application::Get().GetCommandLineArgs();
 		if (commandLineArgs.Count > 1)
 		{
 			auto sceneFilePath = commandLineArgs[1];
-			SceneSerializer serializer(m_ActiveScene);
+			SceneSerializer serializer(m_EditorScene);
 			serializer.Deserialize(sceneFilePath);
 		}
 
@@ -100,7 +101,7 @@ namespace Lithe {
 		m_SecondCamera.AddComponent<NativeScriptComponent>().Bind<CameraController>();
 #endif
 
-		m_SceneHierarchyPanel.SetContext(m_ActiveScene);
+		m_SceneHierarchyPanel.SetContext(m_EditorScene);
 	}
 
 	void EditorLayer::OnDetach()
@@ -121,7 +122,7 @@ namespace Lithe {
 			m_CameraController.OnResize(m_ViewportSize.x, m_ViewportSize.y);
 			m_EditorCamera.SetViewportSize(m_ViewportSize.x, m_ViewportSize.y);
 
-			m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+			m_EditorScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
 		}
 
 		// Render
@@ -140,9 +141,9 @@ namespace Lithe {
 				// Update
 				if (m_ViewportFocused)
 					m_CameraController.OnUpdate(ts);
-				m_EditorCamera.OnUpdate(ts);
+				m_EditorCamera.OnUpdate(ts, !m_ViewportHovered);
 
-				m_ActiveScene->OnUpdateEditor(ts, m_EditorCamera);
+				m_EditorScene->OnUpdateEditor(ts, m_EditorCamera);
 				break;
 			}
 			case SceneState::Play:
@@ -164,7 +165,8 @@ namespace Lithe {
 		if (mouseX >= 0 && mouseY >= 0 && mouseX < (int)viewportSize.x && mouseY < (int)viewportSize.y)
 		{
 			int pixelData = m_Framebuffer->ReadPixel(1, mouseX, mouseY);
-			m_HoveredEntity = pixelData == -1 ? Entity() : Entity{ (entt::entity)pixelData, m_ActiveScene.get() };
+			m_HoveredEntity = pixelData == -1 ? Entity() : Entity{ (entt::entity)pixelData, 
+				m_SceneState == SceneState::Edit ? m_EditorScene.get() : m_ActiveScene.get()};
 		}
 		
 		m_Framebuffer->Unbind();
@@ -266,6 +268,8 @@ namespace Lithe {
 		ImGui::Text("Renderer2D Stats:");
 		ImGui::Text("Draw Calls: %d", stats.DrawCalls);
 		ImGui::Text("Quads: %d", stats.QuadCount);
+		ImGui::Text("Circles: %d", stats.CircleCount);
+		ImGui::Text("Lines: %d", stats.LineCount);
 		ImGui::Text("Vertices: %d", stats.GetTotalVertexCount());
 		ImGui::Text("Indices: %d", stats.GetTotalIndexCount());
 
@@ -291,7 +295,7 @@ namespace Lithe {
 		ImGui::End();
 
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{ 0, 0 });
-		ImGui::Begin("Viewport");
+		ImGui::Begin("Viewport", NULL, ImGuiDockNodeFlags_NoTabBar);
 		auto viewportMinRegion = ImGui::GetWindowContentRegionMin();
 		auto viewportMaxRegion = ImGui::GetWindowContentRegionMax();
 		auto viewportOffset = ImGui::GetWindowPos();
@@ -395,7 +399,8 @@ namespace Lithe {
 	void EditorLayer::OnEvent(Event& e)
 	{
 		if (m_SceneState == SceneState::Edit)
-			m_EditorCamera.OnEvent(e);
+			if (m_ViewportHovered)
+				m_EditorCamera.OnEvent(e);
 		else if (m_SceneState == SceneState::Play)
 			m_CameraController.OnEvent(e);
 
@@ -431,7 +436,7 @@ namespace Lithe {
 			{
 				if (control && shift)
 					SaveSceneAs();
-				if (control)
+				else if (control)
 					SaveScene();
 				break;
 			}
@@ -601,7 +606,7 @@ namespace Lithe {
 		ImGui::PushStyleColor(ImGuiCol_ButtonActive, 
 			ImVec4(buttonActive.x, buttonActive.y, buttonActive.z, 0.5f));
 
-		ImGui::Begin("##toolbar", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+		ImGui::Begin("##toolbar", NULL, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiDockNodeFlags_NoTabBar);
 		
 		float size = ImGui::GetWindowHeight() - 4.0f;
 		Ref<Texture2D> icon = m_SceneState == SceneState::Edit ? m_IconPlay : m_IconStop;
