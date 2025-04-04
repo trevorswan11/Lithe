@@ -22,7 +22,7 @@ namespace Lithe {
 	Application* CreateApplication(ApplicationCommandLineArgs args)
 	{
 		ApplicationSpecification spec;
-		spec.Name = "Hazelnut";
+		spec.Name = "Lithium";
 		spec.CommandLineArgs = args;
 		return new Lithium(spec);
 	}
