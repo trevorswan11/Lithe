@@ -2,7 +2,9 @@
 #include "Texture.h"
 
 #include "Lithe/Renderer/Renderer.h"
+
 #include "Platform/OpenGL/OpenGLTexture.h"
+#include "Platform/Vulkan/VulkanTexture.h"
 
 namespace Lithe {
 	Ref<Texture2D> Texture2D::Create(uint32_t width, uint32_t height)
@@ -11,7 +13,7 @@ namespace Lithe {
 		{
 			case RendererAPI::API::None:	LI_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
 			case RendererAPI::API::OpenGL:	return CreateRef<OpenGLTexture2D>(width, height);
-			case RendererAPI::API::Vulcan:	LI_CORE_ASSERT(false, "RendererAPI::Vulcan is currently not supported!"); return nullptr;
+			case RendererAPI::API::Vulcan:	return CreateRef<VulkanTexture2D>(width, height);
 			case RendererAPI::API::DirectX:	LI_CORE_ASSERT(false, "RendererAPI::DirectX is currently not supported!"); return nullptr;
 		}
 
@@ -25,7 +27,7 @@ namespace Lithe {
 		{
 			case RendererAPI::API::None:	LI_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
 			case RendererAPI::API::OpenGL:	return CreateRef<OpenGLTexture2D>(path);
-			case RendererAPI::API::Vulcan:	LI_CORE_ASSERT(false, "RendererAPI::Vulcan is currently not supported!"); return nullptr;
+			case RendererAPI::API::Vulcan:	return CreateRef<VulkanTexture2D>(path);
 			case RendererAPI::API::DirectX:	LI_CORE_ASSERT(false, "RendererAPI::DirectX is currently not supported!"); return nullptr;
 		}
 

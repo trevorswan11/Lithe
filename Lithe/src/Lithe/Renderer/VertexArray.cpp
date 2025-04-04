@@ -2,7 +2,9 @@
 #include "VertexArray.h"
 
 #include "Lithe/Renderer/Renderer.h"
+
 #include "Platform/OpenGL/OpenGLVertexArray.h"
+#include "Platform/Vulkan/VulkanVertexArray.h"
 
 namespace Lithe {
 
@@ -12,7 +14,7 @@ namespace Lithe {
 		{
 			case RendererAPI::API::None:	LI_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
 			case RendererAPI::API::OpenGL:	return CreateRef<OpenGLVertexArray>();
-			case RendererAPI::API::Vulcan:	LI_CORE_ASSERT(false, "RendererAPI::Vulcan is currently not supported!"); return nullptr;
+			case RendererAPI::API::Vulcan:	return CreateRef<VulkanVertexArray>();
 			case RendererAPI::API::DirectX:	LI_CORE_ASSERT(false, "RendererAPI::DirectX is currently not supported!"); return nullptr;
 		}
 

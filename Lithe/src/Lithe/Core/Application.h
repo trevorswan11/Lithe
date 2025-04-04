@@ -29,11 +29,17 @@ namespace Lithe {
 		}
 	};
 
+	struct ApplicationSpecification
+	{
+		std::string Name = "Lithe Engine";
+		ApplicationCommandLineArgs CommandLineArgs = ApplicationCommandLineArgs();
+		RendererAPI::API RendererAPI = RendererAPI::API::OpenGL;
+	};
+
 	class Application
 	{
 	public:
-		Application(const std::string& name = "Lithe Engine",
-			ApplicationCommandLineArgs args = ApplicationCommandLineArgs());
+		Application(ApplicationSpecification appSpec);
 		virtual ~Application();
 
 		void OnEvent(Event& e);
@@ -51,14 +57,14 @@ namespace Lithe {
 
 		inline static Application& Get() { return *s_Instance; }
 
-		ApplicationCommandLineArgs GetCommandLineArgs() const { return m_CommandLineArgs; }
+		ApplicationCommandLineArgs GetCommandLineArgs() const { return m_AppSpec.CommandLineArgs; }
 	private:
 		void Run();
 
 		bool OnWindowClose(WindowCloseEvent& e);
 		bool OnWindowResize(WindowResizeEvent& e);
 	private:
-		ApplicationCommandLineArgs m_CommandLineArgs;
+		ApplicationSpecification m_AppSpec;
 		Scope<Window> m_Window;
 		ImGuiLayer* m_ImGuiLayer;
 		bool m_Running = true;

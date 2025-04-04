@@ -2,6 +2,7 @@
 #include "RendererAPI.h"
 
 #include "Platform/OpenGL/OpenGLRendererAPI.h"
+#include "Platform/Vulkan/VulkanRendererAPI.h"
 
 namespace Lithe {
 
@@ -13,7 +14,7 @@ namespace Lithe {
         {
             case RendererAPI::API::None:    LI_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
             case RendererAPI::API::OpenGL:  return CreateScope<OpenGLRendererAPI>();
-			case RendererAPI::API::Vulcan:	LI_CORE_ASSERT(false, "RendererAPI::Vulcan is currently not supported!"); return nullptr;
+			case RendererAPI::API::Vulcan:	return CreateScope<VulkanRendererAPI>();
 			case RendererAPI::API::DirectX:	LI_CORE_ASSERT(false, "RendererAPI::DirectX is currently not supported!"); return nullptr;
         }
 

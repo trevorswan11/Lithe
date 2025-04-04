@@ -11,6 +11,7 @@ int main(int argc, char** argv)
 	Lithe::Log::Init();
 
 	LI_PROFILE_BEGIN_SESSION("Startup", "LitheProfile-Startup.json");
+
 	auto app = Lithe::CreateApplication({ argc, argv });
 	LI_PROFILE_END_SESSION();
 

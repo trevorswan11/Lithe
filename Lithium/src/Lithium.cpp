@@ -8,8 +8,8 @@ namespace Lithe {
 	class Lithium : public Application
 	{
 	public:
-		Lithium(ApplicationCommandLineArgs args)
-			: Application("Lithium", args)
+		Lithium(ApplicationSpecification appSpec)
+			: Application(appSpec)
 		{
 			PushLayer(new EditorLayer());
 		}
@@ -21,7 +21,10 @@ namespace Lithe {
 
 	Application* CreateApplication(ApplicationCommandLineArgs args)
 	{
-		return new Lithium(args);
+		ApplicationSpecification spec;
+		spec.Name = "Hazelnut";
+		spec.CommandLineArgs = args;
+		return new Lithium(spec);
 	}
 
 }

@@ -4,6 +4,7 @@
 #include "Lithe/Renderer/Renderer.h"
 
 #include "Platform/OpenGL/OpenGLFramebuffer.h"
+#include "Platform/Vulkan/VulkanFramebuffer.h"
 
 namespace Lithe {
 
@@ -13,7 +14,7 @@ namespace Lithe {
 		{
 			case RendererAPI::API::None:	LI_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
 			case RendererAPI::API::OpenGL:	return CreateRef<OpenGLFramebuffer>(spec);
-			case RendererAPI::API::Vulcan:	LI_CORE_ASSERT(false, "RendererAPI::Vulcan is currently not supported!"); return nullptr;
+			case RendererAPI::API::Vulcan:	return CreateRef<VulkanFramebuffer>(spec);
 			case RendererAPI::API::DirectX:	LI_CORE_ASSERT(false, "RendererAPI::DirectX is currently not supported!"); return nullptr;
 		}
 

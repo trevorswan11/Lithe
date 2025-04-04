@@ -4,11 +4,11 @@
 
 namespace Lithe {
 
-	class OpenGLFramebuffer : public Framebuffer
+	class VulkanFramebuffer : public Framebuffer
 	{
 	public:
-		OpenGLFramebuffer(const FramebufferSpec& spec);
-		virtual ~OpenGLFramebuffer();
+		VulkanFramebuffer(const FramebufferSpec& spec);
+		virtual ~VulkanFramebuffer();
 
 		virtual void Bind() override;
 		virtual void Unbind() override;
