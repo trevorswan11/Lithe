@@ -16,6 +16,7 @@
 #include <utility>
 #include <algorithm>
 #include <functional>
+#include <xhash>
 
 #include <cstdint>
 #include <string>

@@ -49,9 +49,9 @@ namespace Lithe {
 		// as much as I understood OpenGL. Vulkan is the way though.
 
 		std::string ReadFile(const std::string& filepath);
-		std::unordered_map<GLenum, std::string> PreProcess(const std::string& source);
-		
-		void CompileOrGetVulkanBinaries(const std::unordered_map<GLenum, std::string>& shaderSources);
+		std::unordered_map<GLenum, std::pair<std::string, bool>> PreProcess(const std::string& source);
+
+		void CompileOrGetVulkanBinaries(std::unordered_map<GLenum, std::pair<std::string, bool>>& shaderSources);
 		void CompileOrGetOpenGLBinaries();
 		void CreateProgram();
 		void Reflect(GLenum stage, const std::vector<uint32_t>& shaderData);
@@ -60,10 +60,10 @@ namespace Lithe {
 		std::string m_FilePath;
 		std::string m_Name;
 
-		std::unordered_map<GLenum, std::vector<uint32_t>> m_VulkanSPIRV;
-		std::unordered_map<GLenum, std::vector<uint32_t>> m_OpenGLSPIRV;
+		std::unordered_map<GLenum, std::pair<std::vector<uint32_t>, bool>> m_VulkanSPIRV;
+		std::unordered_map<GLenum, std::pair<std::vector<uint32_t>, bool>> m_OpenGLSPIRV;
 
-		std::unordered_map<GLenum, std::string> m_OpenGLSourceCode;
+		std::unordered_map<GLenum, std::pair<std::string, bool>> m_OpenGLSourceCode;
 	};
 
 }

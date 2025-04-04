@@ -50,9 +50,8 @@ namespace Lithe {
 			return nullptr;
 		}
 
-		static const char* GetCacheDirectory()
+		static const char* GetCacheDirectory() // TODO: make sure the assets directory is valid
 		{
-			// TODO: make sure the assets directory is valid
 			return "assets/cache/shader/opengl";
 		}
 
@@ -61,11 +60,23 @@ namespace Lithe {
 			return "assets/cache/shader/opengl/hash";
 		}
 
+		static size_t HashShaderString(const std::string& source)
+		{
+			return std::hash<std::string>{}(source);
+		}
+
 		static void CreateCacheDirectoryIfNeeded()
 		{
 			std::string cacheDirectory = GetCacheDirectory();
 			if (!std::filesystem::exists(cacheDirectory))
 				std::filesystem::create_directories(cacheDirectory);
+		}
+
+		static void CreateHashDirectoryIfNeeded()
+		{
+			std::string hashDirectory = GetHashDirectory();
+			if (!std::filesystem::exists(hashDirectory))
+				std::filesystem::create_directories(hashDirectory);
 		}
 
 		static const char* GLShaderStageCachedOpenGLFileExtension(uint32_t stage)
@@ -89,6 +100,16 @@ namespace Lithe {
 			LI_CORE_ASSERT(false);
 			return "";
 		}
+
+		static std::filesystem::path GetOpenGLHashFilePath(const std::filesystem::path& basePath, GLenum stage)
+		{
+			return std::filesystem::path(Utils::GetHashDirectory()) / (basePath.filename().string() + Utils::GLShaderStageCachedOpenGLFileExtension(stage) + ".hash");
+		}
+
+		static std::filesystem::path GetVulkanHashFilePath(const std::filesystem::path& basePath, GLenum stage)
+		{
+			return std::filesystem::path(Utils::GetHashDirectory()) / (basePath.filename().string() + Utils::GLShaderStageCachedVulkanFileExtension(stage) + ".hash");
+		}
 	}
 
 
@@ -98,6 +119,7 @@ namespace Lithe {
 		LI_PROFILE_FUNCTION();
 
 		Utils::CreateCacheDirectoryIfNeeded();
+		Utils::CreateHashDirectoryIfNeeded();
 
 		std::string source = ReadFile(filepath);
 		auto shaderSources = PreProcess(source);
@@ -124,9 +146,9 @@ namespace Lithe {
 	{
 		LI_PROFILE_FUNCTION();
 
-		std::unordered_map<GLenum, std::string> sources;
-		sources[GL_VERTEX_SHADER] = vertexSrc;
-		sources[GL_FRAGMENT_SHADER] = fragmentSrc;
+		std::unordered_map<GLenum, std::pair<std::string, bool>> sources;
+		sources[GL_VERTEX_SHADER].first = vertexSrc;
+		sources[GL_FRAGMENT_SHADER].first = fragmentSrc;
 		
 		CompileOrGetVulkanBinaries(sources);
 		CompileOrGetOpenGLBinaries();
@@ -165,11 +187,11 @@ namespace Lithe {
 		return result;
 	}
 
-	std::unordered_map<GLenum, std::string> OpenGLShader::PreProcess(const std::string& source)
+	std::unordered_map<GLenum, std::pair<std::string, bool>> OpenGLShader::PreProcess(const std::string& source)
 	{
 		LI_PROFILE_FUNCTION();
 
-		std::unordered_map<GLenum, std::string> shaderSources;
+		std::unordered_map<GLenum, std::pair<std::string, bool>> shaderSources;
 
 		const char* typeToken = "#type";
 		size_t typeTokenLength = strlen(typeToken);
@@ -185,14 +207,14 @@ namespace Lithe {
 			size_t nextLinePos = source.find_first_not_of("\r\n", eol);
 			LI_CORE_ASSERT(nextLinePos != std::string::npos, "Syntax error");
 			pos = source.find(typeToken, nextLinePos);
-			shaderSources[Utils::ShaderTypeFromString(type)] = (pos == std::string::npos) ? source.substr(nextLinePos) : source.substr(nextLinePos, pos - nextLinePos);
+			shaderSources[Utils::ShaderTypeFromString(type)] = { (pos == std::string::npos) ? source.substr(nextLinePos) : source.substr(nextLinePos, pos - nextLinePos), true };
 		}
 
 		return shaderSources;
 	}
 
 	// TODO: Shader serialization with hashing
-	void OpenGLShader::CompileOrGetVulkanBinaries(const std::unordered_map<GLenum, std::string>& shaderSources)
+	void OpenGLShader::CompileOrGetVulkanBinaries(std::unordered_map<GLenum, std::pair<std::string, bool>>& shaderSources)
 	{
 		LI_PROFILE_FUNCTION();
 
@@ -213,40 +235,76 @@ namespace Lithe {
 		{
 			std::filesystem::path shaderFilePath = m_FilePath;
 			std::filesystem::path cachedPath = cacheDirectory / (shaderFilePath.filename().string() + Utils::GLShaderStageCachedVulkanFileExtension(stage));
-
-			std::ifstream in(cachedPath, std::ios::in | std::ios::binary);
-			if (in.is_open())
+			
+			// Check hash for serialization
+			size_t sourceHash = Utils::HashShaderString(source.first);
+			auto hashPath = Utils::GetVulkanHashFilePath(shaderFilePath, stage);
+			shaderData[stage].second = true;
+			if (std::filesystem::exists(hashPath))
 			{
-				in.seekg(0, std::ios::end);
-				auto size = in.tellg();
-				in.seekg(0, std::ios::beg);
-				auto& data = shaderData[stage];
-				data.resize(size / sizeof(uint32_t));
-				in.read((char*)data.data(), size);
+				std::ifstream hashIn(hashPath);
+				size_t cachedHash;
+				hashIn >> cachedHash;
+				if (cachedHash == sourceHash && std::filesystem::exists(cachedPath))
+				{
+					// Hashes match and cache exists, so we can load from disk
+					std::ifstream in(cachedPath, std::ios::in | std::ios::binary);
+					if (in.is_open())
+					{
+						in.seekg(0, std::ios::end);
+						auto size = in.tellg();
+						in.seekg(0, std::ios::beg);
+						auto& data = shaderData[stage].first;
+						data.resize(size / sizeof(uint32_t));
+						in.read((char*)data.data(), size);
+					}
+					LI_CORE_INFO("{0}: Compilation skipped as no changes were detected.", shaderFilePath.filename().string() + " - " + Utils::GLShaderStageToString(stage));
+					source.second = false;
+					shaderData[stage].second = false;
+				}
 			}
-			else
+			
+			if (source.second)
 			{
-				shaderc::SpvCompilationResult module = compiler.CompileGlslToSpv(source, Utils::GLShaderStageToShaderC(stage), m_FilePath.c_str(), options);
+				// Compile the shader as usual
+				LI_CORE_WARN("Compiling Shader: {0}", shaderFilePath.filename().string() + " - " + Utils::GLShaderStageToString(stage));
+				shaderc::SpvCompilationResult module = compiler.CompileGlslToSpv(source.first, Utils::GLShaderStageToShaderC(stage), m_FilePath.c_str(), options);
 				if (module.GetCompilationStatus() != shaderc_compilation_status_success)
 				{
 					LI_CORE_ERROR(module.GetErrorMessage());
 					LI_CORE_ASSERT(false);
 				}
 
-				shaderData[stage] = std::vector<uint32_t>(module.cbegin(), module.cend());
+				shaderData[stage].first = std::vector<uint32_t>(module.cbegin(), module.cend());
 
-				std::ofstream out(cachedPath, std::ios::out | std::ios::binary);
-				if (out.is_open())
 				{
-					auto& data = shaderData[stage];
-					out.write((char*)data.data(), data.size() * sizeof(uint32_t));
-					out.flush();
-					out.close();
+					LI_PROFILE_SCOPE("Write Shader Binary");
+
+					std::ofstream out(cachedPath, std::ios::out | std::ios::binary);
+					if (out.is_open())
+					{
+						auto& data = shaderData[stage].first;
+						out.write((char*)data.data(), data.size() * sizeof(uint32_t));
+						out.flush();
+						out.close();
+					}
+				}
+
+				{
+					LI_PROFILE_SCOPE("Write Shader Hash");
+
+					std::ofstream out(hashPath, std::ios::out);
+					if (out.is_open())
+					{
+						out << sourceHash;
+						out.flush();
+						out.close();
+					}
 				}
 			}
 
 			for (auto&& [stage, data] : shaderData)
-				Reflect(stage, data);
+				Reflect(stage, data.first);
 		}
 	}
 
@@ -273,21 +331,21 @@ namespace Lithe {
 			std::filesystem::path cachedPath = cacheDirectory / (shaderFilePath.filename().string() + Utils::GLShaderStageCachedOpenGLFileExtension(stage));
 
 			std::ifstream in(cachedPath, std::ios::in | std::ios::binary);
-			if (in.is_open())
+			if (!spirv.second && in.is_open())
 			{
 				in.seekg(0, std::ios::end);
 				auto size = in.tellg();
 				in.seekg(0, std::ios::beg);
 
-				auto& data = shaderData[stage];
+				auto& data = shaderData[stage].first;
 				data.resize(size / sizeof(uint32_t));
 				in.read((char*)data.data(), size);
 			}
 			else
 			{
-				spirv_cross::CompilerGLSL glslCompiler(spirv);
-				m_OpenGLSourceCode[stage] = glslCompiler.compile();
-				auto& source = m_OpenGLSourceCode[stage];
+				spirv_cross::CompilerGLSL glslCompiler(spirv.first);
+				m_OpenGLSourceCode[stage].first = glslCompiler.compile();
+				auto& source = m_OpenGLSourceCode[stage].first;
 
 				shaderc::SpvCompilationResult module = compiler.CompileGlslToSpv(source, Utils::GLShaderStageToShaderC(stage), m_FilePath.c_str());
 				if (module.GetCompilationStatus() != shaderc_compilation_status_success)
@@ -296,12 +354,12 @@ namespace Lithe {
 					LI_CORE_ASSERT(false);
 				}
 
-				shaderData[stage] = std::vector<uint32_t>(module.cbegin(), module.cend());
+				shaderData[stage].first = std::vector<uint32_t>(module.cbegin(), module.cend());
 
 				std::ofstream out(cachedPath, std::ios::out | std::ios::binary);
 				if (out.is_open())
 				{
-					auto& data = shaderData[stage];
+					auto& data = shaderData[stage].first;
 					out.write((char*)data.data(), data.size() * sizeof(uint32_t));
 					out.flush();
 					out.close();
@@ -320,7 +378,7 @@ namespace Lithe {
 		for (auto&& [stage, spirv] : m_OpenGLSPIRV)
 		{
 			GLuint shaderID = shaderIDs.emplace_back(glCreateShader(stage));
-			glShaderBinary(1, &shaderID, GL_SHADER_BINARY_FORMAT_SPIR_V, spirv.data(), (GLsizei)(spirv.size() * sizeof(uint32_t)));
+			glShaderBinary(1, &shaderID, GL_SHADER_BINARY_FORMAT_SPIR_V, spirv.first.data(), (GLsizei)(spirv.first.size() * sizeof(uint32_t)));
 			glSpecializeShader(shaderID, "main", 0, nullptr, nullptr);
 			glAttachShader(program, shaderID);
 		}
