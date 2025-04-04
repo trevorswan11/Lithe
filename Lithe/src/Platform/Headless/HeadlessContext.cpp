@@ -1,25 +1,25 @@
 #include "lipch.h"
-#include "VulkanContext.h"
+#include "HeadlessContext.h"
 
 #include <GLFW/glfw3.h>
 #include <glad/glad.h>
 
 namespace Lithe {
 
-	VulkanContext::VulkanContext(GLFWwindow* windowHandle)
+	HeadlessContext::HeadlessContext(GLFWwindow* windowHandle)
 		: m_WindowHandle(windowHandle)
 	{
 		LI_CORE_ASSERT(false);
 	}
 
-	void VulkanContext::Init()
+	void HeadlessContext::Init()
 	{
 		LI_PROFILE_FUNCTION();
 
 		LI_CORE_ASSERT(false);
 	}
 
-	void VulkanContext::SwapBuffers()
+	void HeadlessContext::SwapBuffers()
 	{
 		LI_PROFILE_FUNCTION();
 

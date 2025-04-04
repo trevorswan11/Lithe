@@ -1,51 +1,51 @@
 #include "lipch.h"
-#include "VulkanVertexArray.h"
+#include "DirectXVertexArray.h"
 
 #include <glad/glad.h>
 
 namespace Lithe {
 
-	static int ShaderDataTypeToVulkanBaseType(ShaderDataType type)
+	static int ShaderDataTypeToDirectXBaseType(ShaderDataType type)
 	{
 		LI_CORE_ASSERT(false);
 	}
 
-	VulkanVertexArray::VulkanVertexArray()
-	{
-		LI_PROFILE_FUNCTION();
-
-		LI_CORE_ASSERT(false);
-	}
-
-	VulkanVertexArray::~VulkanVertexArray()
+	DirectXVertexArray::DirectXVertexArray()
 	{
 		LI_PROFILE_FUNCTION();
 
 		LI_CORE_ASSERT(false);
 	}
 
-	void VulkanVertexArray::Bind() const
+	DirectXVertexArray::~DirectXVertexArray()
 	{
 		LI_PROFILE_FUNCTION();
 
 		LI_CORE_ASSERT(false);
 	}
 
-	void VulkanVertexArray::Unbind() const
+	void DirectXVertexArray::Bind() const
 	{
 		LI_PROFILE_FUNCTION();
 
 		LI_CORE_ASSERT(false);
 	}
 
-	void VulkanVertexArray::AddVertexBuffer(const Ref<VertexBuffer>& vertexBuffer)
+	void DirectXVertexArray::Unbind() const
 	{
 		LI_PROFILE_FUNCTION();
 
 		LI_CORE_ASSERT(false);
 	}
 
-	void VulkanVertexArray::SetIndexBuffer(const Ref<IndexBuffer>& indexBuffer)
+	void DirectXVertexArray::AddVertexBuffer(const Ref<VertexBuffer>& vertexBuffer)
+	{
+		LI_PROFILE_FUNCTION();
+
+		LI_CORE_ASSERT(false);
+	}
+
+	void DirectXVertexArray::SetIndexBuffer(const Ref<IndexBuffer>& indexBuffer)
 	{
 		LI_PROFILE_FUNCTION();
 

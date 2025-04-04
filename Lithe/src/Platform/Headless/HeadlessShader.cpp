@@ -1,5 +1,5 @@
 #include "lipch.h"
-#include "VulkanShader.h"
+#include "HeadlessShader.h"
 
 #include <fstream>
 #include <glad/glad.h>
@@ -60,7 +60,7 @@ namespace Lithe {
 				std::filesystem::create_directories(cacheDirectory);
 		}
 
-		static const char* VulkanShaderStageCachedVulkanFileExtension(uint32_t stage)
+		static const char* HeadlessShaderStageCachedHeadlessFileExtension(uint32_t stage)
 		{
 			LI_CORE_ASSERT(false);
 			return "";
@@ -69,7 +69,7 @@ namespace Lithe {
 	}
 
 
-	VulkanShader::VulkanShader(const std::string& filepath)
+	HeadlessShader::HeadlessShader(const std::string& filepath)
 		: m_FilePath(filepath)
 	{
 		LI_PROFILE_FUNCTION();
@@ -77,7 +77,7 @@ namespace Lithe {
 		LI_CORE_ASSERT(false);
 	}
 
-	VulkanShader::VulkanShader(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc)
+	HeadlessShader::HeadlessShader(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc)
 		: m_Name(name)
 	{
 		LI_PROFILE_FUNCTION();
@@ -85,14 +85,14 @@ namespace Lithe {
 		LI_CORE_ASSERT(false);
 	}
 
-	VulkanShader::~VulkanShader()
+	HeadlessShader::~HeadlessShader()
 	{
 		LI_PROFILE_FUNCTION();
 
 		LI_CORE_ASSERT(false);
 	}
 
-	std::string VulkanShader::ReadFile(const std::string& filepath)
+	std::string HeadlessShader::ReadFile(const std::string& filepath)
 	{
 		LI_PROFILE_FUNCTION();
 
@@ -100,7 +100,7 @@ namespace Lithe {
 		return std::string();
 	}
 
-	std::unordered_map<int, std::string> VulkanShader::PreProcess(const std::string& source)
+	std::unordered_map<int, std::string> HeadlessShader::PreProcess(const std::string& source)
 	{
 		LI_PROFILE_FUNCTION();
 
@@ -108,84 +108,84 @@ namespace Lithe {
 		return {};
 	}
 
-	void VulkanShader::CompileOrGetVulkanBinaries(const std::unordered_map<int, std::string>& shaderSources)
+	void HeadlessShader::CompileOrGetHeadlessBinaries(const std::unordered_map<int, std::string>& shaderSources)
 	{
 		LI_PROFILE_FUNCTION();
 
 		LI_CORE_ASSERT(false);
 	}
 
-	void VulkanShader::CompileOrGetVulkanBinaries()
+	void HeadlessShader::CompileOrGetHeadlessBinaries()
 	{
 		LI_PROFILE_FUNCTION();
 
 		LI_CORE_ASSERT(false);
 	}
 
-	void VulkanShader::CreateProgram()
+	void HeadlessShader::CreateProgram()
 	{
 		LI_PROFILE_FUNCTION();
 
 		LI_CORE_ASSERT(false);
 	}
 
-	void VulkanShader::Reflect(int stage, const std::vector<uint32_t>& shaderData)
+	void HeadlessShader::Reflect(int stage, const std::vector<uint32_t>& shaderData)
 	{
 		LI_PROFILE_FUNCTION();
 
 		LI_CORE_ASSERT(false);
 	}
 
-	void VulkanShader::Bind() const
+	void HeadlessShader::Bind() const
 	{
 		LI_PROFILE_FUNCTION();
 
 		LI_CORE_ASSERT(false);
 	}
 
-	void VulkanShader::Unbind() const
+	void HeadlessShader::Unbind() const
 	{
 		LI_PROFILE_FUNCTION();
 
 		LI_CORE_ASSERT(false);
 	}
 
-	void VulkanShader::SetInt(const std::string& name, int value)
+	void HeadlessShader::SetInt(const std::string& name, int value)
 	{
 		LI_PROFILE_FUNCTION();
 
 		LI_CORE_ASSERT(false);
 	}
 
-	void VulkanShader::SetIntArray(const std::string& name, int* values, uint32_t count)
-	{
-		LI_PROFILE_FUNCTION();
-	
-		LI_CORE_ASSERT(false);
-	}
-
-	void VulkanShader::SetFloat(const std::string& name, float value)
+	void HeadlessShader::SetIntArray(const std::string& name, int* values, uint32_t count)
 	{
 		LI_PROFILE_FUNCTION();
 	
 		LI_CORE_ASSERT(false);
 	}
 
-	void VulkanShader::SetFloat3(const std::string& name, const glm::vec3& values)
+	void HeadlessShader::SetFloat(const std::string& name, float value)
 	{
 		LI_PROFILE_FUNCTION();
 	
 		LI_CORE_ASSERT(false);
 	}
 
-	void VulkanShader::SetFloat4(const std::string& name, const glm::vec4& values)
+	void HeadlessShader::SetFloat3(const std::string& name, const glm::vec3& values)
+	{
+		LI_PROFILE_FUNCTION();
+	
+		LI_CORE_ASSERT(false);
+	}
+
+	void HeadlessShader::SetFloat4(const std::string& name, const glm::vec4& values)
 	{
 		LI_PROFILE_FUNCTION();
 
 		LI_CORE_ASSERT(false);
 	}
 
-	void VulkanShader::SetMat4(const std::string& name, const glm::mat4& values)
+	void HeadlessShader::SetMat4(const std::string& name, const glm::mat4& values)
 	{
 		LI_PROFILE_FUNCTION();
 

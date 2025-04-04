@@ -10,8 +10,8 @@
 class Sandbox : public Lithe::Application
 {
 public:
-	Sandbox(Lithe::ApplicationCommandLineArgs args)
-		: Application("Sandbox", args)
+	Sandbox(Lithe::ApplicationSpecification appSpec)
+		: Application(appSpec)
 	{
 		Lithe::Application::GetWindow().SetVSync(true);
 		Lithe::OrthographicCameraController camera(1280.0f / 720.0f, true);
@@ -29,5 +29,8 @@ public:
 
 Lithe::Application* Lithe::CreateApplication(ApplicationCommandLineArgs args)
 {
-	return new Sandbox(args);
+	Lithe::ApplicationSpecification spec;
+	spec.Name = "Sandbox";
+	spec.CommandLineArgs = args;
+	return new Sandbox(spec);
 }

@@ -29,11 +29,20 @@ namespace Lithe {
 		}
 	};
 
+	enum class ApplicationRendererAPI
+	{
+		None = 0,
+		OpenGL = 1,
+		DirectX = 2,
+		Vulkan = 3
+	};
+
 	struct ApplicationSpecification
 	{
 		std::string Name = "Lithe Engine";
 		ApplicationCommandLineArgs CommandLineArgs = ApplicationCommandLineArgs();
-		RendererAPI::API RendererAPI = RendererAPI::API::OpenGL;
+		ApplicationRendererAPI ApplicationRendererAPI = ApplicationRendererAPI::OpenGL;
+		std::string WorkingDirectory;
 	};
 
 	class Application
@@ -57,6 +66,7 @@ namespace Lithe {
 
 		inline static Application& Get() { return *s_Instance; }
 
+		ApplicationSpecification GetApplicationSpec() const { return m_AppSpec; }
 		ApplicationCommandLineArgs GetCommandLineArgs() const { return m_AppSpec.CommandLineArgs; }
 	private:
 		void Run();

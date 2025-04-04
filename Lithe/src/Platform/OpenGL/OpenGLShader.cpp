@@ -140,7 +140,7 @@ namespace Lithe {
 		glDeleteProgram(m_RendererID);
 	}
 
-	std::string OpenGLShader::ReadFile(const std::string& filepath)
+	std::string OpenGLShader::ReadFile(const std::string& filepath) // TODO: Add to FileUtils header
 	{
 		LI_PROFILE_FUNCTION();
 

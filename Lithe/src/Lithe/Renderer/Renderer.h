@@ -2,9 +2,9 @@
 
 #include "Lithe/Core/Base.h"
 
-#include "RenderCommand.h"
-#include "Shader.h"
-#include "OrthographicCamera.h"
+#include "Lithe/Renderer/RenderCommand.h"
+#include "Lithe/Renderer/Shader.h"
+#include "Lithe/Renderer/OrthographicCamera.h"
 
 namespace Lithe {
 

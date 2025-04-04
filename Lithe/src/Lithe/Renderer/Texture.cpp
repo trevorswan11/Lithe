@@ -13,7 +13,7 @@ namespace Lithe {
 		{
 			case RendererAPI::API::None:	LI_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
 			case RendererAPI::API::OpenGL:	return CreateRef<OpenGLTexture2D>(width, height);
-			case RendererAPI::API::Vulcan:	return CreateRef<VulkanTexture2D>(width, height);
+			case RendererAPI::API::Vulkan:	return CreateRef<VulkanTexture2D>(width, height);
 			case RendererAPI::API::DirectX:	LI_CORE_ASSERT(false, "RendererAPI::DirectX is currently not supported!"); return nullptr;
 		}
 
@@ -27,7 +27,7 @@ namespace Lithe {
 		{
 			case RendererAPI::API::None:	LI_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
 			case RendererAPI::API::OpenGL:	return CreateRef<OpenGLTexture2D>(path);
-			case RendererAPI::API::Vulcan:	return CreateRef<VulkanTexture2D>(path);
+			case RendererAPI::API::Vulkan:	return CreateRef<VulkanTexture2D>(path);
 			case RendererAPI::API::DirectX:	LI_CORE_ASSERT(false, "RendererAPI::DirectX is currently not supported!"); return nullptr;
 		}
 

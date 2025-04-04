@@ -1,5 +1,5 @@
 #include "lipch.h"
-#include "VulkanBuffer.h"
+#include "HeadlessBuffer.h"
 
 #include <glad/glad.h>
 
@@ -7,14 +7,14 @@ namespace Lithe {
 
 	// --------------------------- VERTEX BUFFER ---------------------------
 
-	VulkanVertexBuffer::VulkanVertexBuffer(uint32_t size)
+	HeadlessVertexBuffer::HeadlessVertexBuffer(uint32_t size)
 	{
 		LI_PROFILE_FUNCTION();
 
 		LI_CORE_ASSERT(false);
 	}
 
-	VulkanVertexBuffer::VulkanVertexBuffer(float* vertices, uint32_t size)
+	HeadlessVertexBuffer::HeadlessVertexBuffer(float* vertices, uint32_t size)
 	{
 		LI_PROFILE_FUNCTION();
 
@@ -22,28 +22,28 @@ namespace Lithe {
 
 	}
 
-	VulkanVertexBuffer::~VulkanVertexBuffer()
+	HeadlessVertexBuffer::~HeadlessVertexBuffer()
 	{
 		LI_PROFILE_FUNCTION();
 
 		LI_CORE_ASSERT(false);
 	}
 
-	void VulkanVertexBuffer::Bind() const
+	void HeadlessVertexBuffer::Bind() const
 	{
 		LI_PROFILE_FUNCTION();
 
 		LI_CORE_ASSERT(false);
 	}
 
-	void VulkanVertexBuffer::Unbind() const
+	void HeadlessVertexBuffer::Unbind() const
 	{
 		LI_PROFILE_FUNCTION();
 
 		LI_CORE_ASSERT(false);
 	}
 
-	void VulkanVertexBuffer::SetData(const void* data, uint32_t size)
+	void HeadlessVertexBuffer::SetData(const void* data, uint32_t size)
 	{
 		LI_PROFILE_FUNCTION();
 	
@@ -52,7 +52,7 @@ namespace Lithe {
 
 	// --------------------------- INDEX BUFFER ---------------------------
 
-	VulkanIndexBuffer::VulkanIndexBuffer(uint32_t* indices, uint32_t count)
+	HeadlessIndexBuffer::HeadlessIndexBuffer(uint32_t* indices, uint32_t count)
 		: m_Count(count)
 	{
 		LI_PROFILE_FUNCTION();
@@ -60,21 +60,21 @@ namespace Lithe {
 		LI_CORE_ASSERT(false);
 	}
 
-	VulkanIndexBuffer::~VulkanIndexBuffer()
+	HeadlessIndexBuffer::~HeadlessIndexBuffer()
 	{
 		LI_PROFILE_FUNCTION();
 
 		LI_CORE_ASSERT(false);
 	}
 
-	void VulkanIndexBuffer::Bind() const
+	void HeadlessIndexBuffer::Bind() const
 	{
 		LI_PROFILE_FUNCTION();
 
 		LI_CORE_ASSERT(false);
 	}
 
-	void VulkanIndexBuffer::Unbind() const
+	void HeadlessIndexBuffer::Unbind() const
 	{
 		LI_PROFILE_FUNCTION();
 

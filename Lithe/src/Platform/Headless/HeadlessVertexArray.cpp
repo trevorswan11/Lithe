@@ -1,51 +1,51 @@
 #include "lipch.h"
-#include "VulkanVertexArray.h"
+#include "HeadlessVertexArray.h"
 
 #include <glad/glad.h>
 
 namespace Lithe {
 
-	static int ShaderDataTypeToVulkanBaseType(ShaderDataType type)
+	static int ShaderDataTypeToHeadlessBaseType(ShaderDataType type)
 	{
 		LI_CORE_ASSERT(false);
 	}
 
-	VulkanVertexArray::VulkanVertexArray()
-	{
-		LI_PROFILE_FUNCTION();
-
-		LI_CORE_ASSERT(false);
-	}
-
-	VulkanVertexArray::~VulkanVertexArray()
+	HeadlessVertexArray::HeadlessVertexArray()
 	{
 		LI_PROFILE_FUNCTION();
 
 		LI_CORE_ASSERT(false);
 	}
 
-	void VulkanVertexArray::Bind() const
+	HeadlessVertexArray::~HeadlessVertexArray()
 	{
 		LI_PROFILE_FUNCTION();
 
 		LI_CORE_ASSERT(false);
 	}
 
-	void VulkanVertexArray::Unbind() const
+	void HeadlessVertexArray::Bind() const
 	{
 		LI_PROFILE_FUNCTION();
 
 		LI_CORE_ASSERT(false);
 	}
 
-	void VulkanVertexArray::AddVertexBuffer(const Ref<VertexBuffer>& vertexBuffer)
+	void HeadlessVertexArray::Unbind() const
 	{
 		LI_PROFILE_FUNCTION();
 
 		LI_CORE_ASSERT(false);
 	}
 
-	void VulkanVertexArray::SetIndexBuffer(const Ref<IndexBuffer>& indexBuffer)
+	void HeadlessVertexArray::AddVertexBuffer(const Ref<VertexBuffer>& vertexBuffer)
+	{
+		LI_PROFILE_FUNCTION();
+
+		LI_CORE_ASSERT(false);
+	}
+
+	void HeadlessVertexArray::SetIndexBuffer(const Ref<IndexBuffer>& indexBuffer)
 	{
 		LI_PROFILE_FUNCTION();
 

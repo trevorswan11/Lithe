@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Lithe/Core/Base.h"
+
 #include "Lithe/Renderer/VertexArray.h"
 
 #include <glm/glm.hpp>
@@ -15,7 +16,7 @@ namespace Lithe {
 			None = 0,
 			OpenGL = 1,
 			DirectX = 2,
-			Vulcan = 3
+			Vulkan = 3
 		};
 	public:
 		virtual ~RendererAPI() = default;
@@ -33,7 +34,23 @@ namespace Lithe {
 		static inline API GetAPI() { return s_API; }
 		static Scope<RendererAPI> Create();
 	private:
+		inline static void SetRendererAPI(int api)
+		{
+			switch (api)
+			{
+				case 0:
+				case 1:
+				case 2:
+				case 3:
+					s_API = (API)api;
+					break;
+				default:
+					LI_CORE_ASSERT(false);
+			}
+		}
 		static API s_API;
+
+		friend class Application;
 	};
 
 }

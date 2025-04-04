@@ -1,5 +1,5 @@
 #include "lipch.h"
-#include "VulkanFramebuffer.h"
+#include "HeadlessFramebuffer.h"
 
 #include <glad/glad.h>
 
@@ -46,7 +46,7 @@ namespace Lithe {
 
 	}
 
-	VulkanFramebuffer::VulkanFramebuffer(const FramebufferSpec& spec)
+	HeadlessFramebuffer::HeadlessFramebuffer(const FramebufferSpec& spec)
 		: m_Spec(spec)
 	{
 		LI_PROFILE_FUNCTION();
@@ -54,40 +54,40 @@ namespace Lithe {
 		LI_CORE_ASSERT(false);
 	}
 
-	VulkanFramebuffer::~VulkanFramebuffer()
+	HeadlessFramebuffer::~HeadlessFramebuffer()
 	{
 		LI_PROFILE_FUNCTION();
 
 		LI_CORE_ASSERT(false);
 	}
 
-	void VulkanFramebuffer::Bind()
+	void HeadlessFramebuffer::Bind()
 	{
 		LI_CORE_ASSERT(false);
 	}
 
-	void VulkanFramebuffer::Unbind()
+	void HeadlessFramebuffer::Unbind()
 	{
 		LI_CORE_ASSERT(false);
 	}
 
-	void VulkanFramebuffer::Invalidate()
+	void HeadlessFramebuffer::Invalidate()
 	{
 		LI_CORE_ASSERT(false);
 	}
 
-	void VulkanFramebuffer::Resize(uint32_t width, uint32_t height, bool invalidate)
+	void HeadlessFramebuffer::Resize(uint32_t width, uint32_t height, bool invalidate)
 	{
 		LI_CORE_ASSERT(false);
 	}
 
-	int VulkanFramebuffer::ReadPixel(uint32_t attachmentIndex, int x, int y)
+	int HeadlessFramebuffer::ReadPixel(uint32_t attachmentIndex, int x, int y)
 	{
 		LI_CORE_ASSERT(false);
 		return 0;
 	}
 
-	void VulkanFramebuffer::ClearAttachment(uint32_t attachmentIndex, int value)
+	void HeadlessFramebuffer::ClearAttachment(uint32_t attachmentIndex, int value)
 	{
 		LI_CORE_ASSERT(false);
 	}

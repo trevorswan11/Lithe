@@ -16,7 +16,7 @@ namespace Lithe {
 		{
 			case RendererAPI::API::None:	LI_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
 			case RendererAPI::API::OpenGL:	return CreateRef<OpenGLVertexBuffer>(size);
-			case RendererAPI::API::Vulcan:	LI_CORE_ASSERT(false, "RendererAPI::Vulcan is currently not supported!"); return nullptr;
+			case RendererAPI::API::Vulkan:	return CreateRef<VulkanVertexBuffer>(size);
 			case RendererAPI::API::DirectX:	LI_CORE_ASSERT(false, "RendererAPI::DirectX is currently not supported!"); return nullptr;
 		}
 
@@ -30,7 +30,7 @@ namespace Lithe {
 		{
 			case RendererAPI::API::None:	LI_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
 			case RendererAPI::API::OpenGL:	return CreateRef<OpenGLVertexBuffer>(vertices, size);
-			case RendererAPI::API::Vulcan:	return CreateRef<VulkanVertexBuffer>(vertices, size);
+			case RendererAPI::API::Vulkan:	return CreateRef<VulkanVertexBuffer>(vertices, size);
 			case RendererAPI::API::DirectX:	LI_CORE_ASSERT(false, "RendererAPI::DirectX is currently not supported!"); return nullptr;
 		}
 
@@ -46,7 +46,7 @@ namespace Lithe {
 		{
 			case RendererAPI::API::None:	LI_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
 			case RendererAPI::API::OpenGL:	return CreateRef<OpenGLIndexBuffer>(indices, count);
-			case RendererAPI::API::Vulcan:	return CreateRef<VulkanIndexBuffer>(indices, count);
+			case RendererAPI::API::Vulkan:	return CreateRef<VulkanIndexBuffer>(indices, count);
 			case RendererAPI::API::DirectX:	LI_CORE_ASSERT(false, "RendererAPI::DirectX is currently not supported!"); return nullptr;
 		}
 

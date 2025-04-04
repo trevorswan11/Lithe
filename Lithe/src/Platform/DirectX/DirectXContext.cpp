@@ -1,25 +1,25 @@
 #include "lipch.h"
-#include "VulkanContext.h"
+#include "DirectXContext.h"
 
 #include <GLFW/glfw3.h>
 #include <glad/glad.h>
 
 namespace Lithe {
 
-	VulkanContext::VulkanContext(GLFWwindow* windowHandle)
+	DirectXContext::DirectXContext(GLFWwindow* windowHandle)
 		: m_WindowHandle(windowHandle)
 	{
 		LI_CORE_ASSERT(false);
 	}
 
-	void VulkanContext::Init()
+	void DirectXContext::Init()
 	{
 		LI_PROFILE_FUNCTION();
 
 		LI_CORE_ASSERT(false);
 	}
 
-	void VulkanContext::SwapBuffers()
+	void DirectXContext::SwapBuffers()
 	{
 		LI_PROFILE_FUNCTION();
 

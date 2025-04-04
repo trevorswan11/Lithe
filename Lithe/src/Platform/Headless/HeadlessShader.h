@@ -6,12 +6,12 @@
 
 namespace Lithe {
 
-	class VulkanShader : public Shader
+	class HeadlessShader : public Shader
 	{
 	public:
-		VulkanShader(const std::string& filepath);
-		VulkanShader(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc);
-		virtual ~VulkanShader();
+		HeadlessShader(const std::string& filepath);
+		HeadlessShader(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc);
+		virtual ~HeadlessShader();
 
 		virtual void Bind() const override;
 		virtual void Unbind() const override;
@@ -28,8 +28,8 @@ namespace Lithe {
 		std::string ReadFile(const std::string& filepath);
 		std::unordered_map<int, std::string> PreProcess(const std::string& source);
 		
-		void CompileOrGetVulkanBinaries(const std::unordered_map<int, std::string>& shaderSources);
-		void CompileOrGetVulkanBinaries();
+		void CompileOrGetHeadlessBinaries(const std::unordered_map<int, std::string>& shaderSources);
+		void CompileOrGetHeadlessBinaries();
 		void CreateProgram();
 		void Reflect(int stage, const std::vector<uint32_t>& shaderData);
 	private:
@@ -37,9 +37,9 @@ namespace Lithe {
 		std::string m_FilePath;
 		std::string m_Name;
 
-		std::unordered_map<int, std::vector<uint32_t>> m_VulkanSPIRV;
+		std::unordered_map<int, std::vector<uint32_t>> m_HeadlessSPIRV;
 
-		std::unordered_map<int, std::string> m_VulkanSourceCode;
+		std::unordered_map<int, std::string> m_HeadlessSourceCode;
 	};
 
 }

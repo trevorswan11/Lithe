@@ -6,12 +6,12 @@
 
 namespace Lithe {
 
-	class VulkanTexture2D : public Texture2D
+	class HeadlessTexture2D : public Texture2D
 	{
 	public:
-		VulkanTexture2D(uint32_t width, uint32_t height);
-		VulkanTexture2D(const std::string& path);
-		virtual ~VulkanTexture2D();
+		HeadlessTexture2D(uint32_t width, uint32_t height);
+		HeadlessTexture2D(const std::string& path);
+		virtual ~HeadlessTexture2D();
 
 		virtual uint32_t GetWidth() const override { return m_Width; }
 		virtual uint32_t GetHeight() const override { return m_Height; }
@@ -27,7 +27,7 @@ namespace Lithe {
 		
 		virtual bool operator==(const Texture& other) const override
 		{
-			return m_RendererID == ((VulkanTexture2D&)other).m_RendererID;
+			return m_RendererID == ((HeadlessTexture2D&)other).m_RendererID;
 		}
 	private:
 		std::string m_Path;
