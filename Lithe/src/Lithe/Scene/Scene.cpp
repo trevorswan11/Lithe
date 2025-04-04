@@ -19,9 +19,9 @@ namespace Lithe {
 	{
 		switch (bodyType)
 		{
-			case RigidBody2DComponent::BodyType::Static: return b2_staticBody;
-			case RigidBody2DComponent::BodyType::Dynamic: return b2_dynamicBody;
-			case RigidBody2DComponent::BodyType::Kinematic: return b2_kinematicBody;
+		case RigidBody2DComponent::BodyType::Static: return b2_staticBody;
+		case RigidBody2DComponent::BodyType::Dynamic: return b2_dynamicBody;
+		case RigidBody2DComponent::BodyType::Kinematic: return b2_kinematicBody;
 		}
 
 		LI_CORE_ASSERT(false);
@@ -36,6 +36,70 @@ namespace Lithe {
 	{
 	}
 
+	template<typename... Component>
+	static void CopyComponent(entt::registry& dst, entt::registry& src, const std::unordered_map<UUID, entt::entity>& enttMap)
+	{
+		([&]()
+		{
+			auto view = src.view<Component>();
+			for (auto srcEntity : view)
+			{
+				entt::entity dstEntity = enttMap.at(src.get<IDComponent>(srcEntity).ID);
+
+				auto& srcComponent = src.get<Component>(srcEntity);
+				dst.emplace_or_replace<Component>(dstEntity, srcComponent);
+			}
+		}(), ...);
+	}
+
+	template<typename... Component>
+	static void CopyComponent(ComponentGroup<Component...>, entt::registry& dst, entt::registry& src, const std::unordered_map<UUID, entt::entity>& enttMap)
+	{
+		CopyComponent<Component...>(dst, src, enttMap);
+	}
+
+	template<typename... Component>
+	static void CopyComponentIfExists(Entity dst, Entity src)
+	{
+		([&]()
+		{
+			if (src.HasComponent<Component>())
+				dst.AddOrReplaceComponent<Component>(src.GetComponent<Component>());
+		}(), ...);
+	}
+
+	template<typename... Component>
+	static void CopyComponentIfExists(ComponentGroup<Component...>, Entity dst, Entity src)
+	{
+		CopyComponentIfExists<Component...>(dst, src);
+	}
+
+	Ref<Scene> Scene::Copy(Ref<Scene> srcScene)
+	{
+		if (!srcScene || !srcScene->m_ViewportWidth || !srcScene->m_ViewportHeight) 
+			return srcScene;
+		Ref<Scene> dstScene = CreateRef<Scene>();
+
+		dstScene->m_ViewportWidth = srcScene->m_ViewportWidth;
+		dstScene->m_ViewportHeight = srcScene->m_ViewportHeight;
+
+		auto& srcSceneRegistry = srcScene->m_Registry;
+		auto& dstSceneRegistry = dstScene->m_Registry;
+		std::unordered_map<UUID, entt::entity> enttMap;
+
+		auto idView = srcSceneRegistry.view<IDComponent>();
+		for (auto e : idView)
+		{
+			UUID uuid = srcSceneRegistry.get<IDComponent>(e).ID;
+			const auto& name = srcSceneRegistry.get<TagComponent>(e).Tag;
+			Entity newEntity = dstScene->CreateEntityWithUUID(uuid, name);
+			enttMap[uuid] = (entt::entity)newEntity;
+		}
+		CopyComponent(AllComponents{}, dstSceneRegistry, srcSceneRegistry, enttMap);
+
+		return dstScene;
+	}
+
 	Entity Scene::CreateEntity(const std::string& name)
 	{
 		return CreateEntityWithUUID(UUID(), name);
@@ -48,27 +112,24 @@ namespace Lithe {
 		entity.AddComponent<TransformComponent>();
 		auto& tag = entity.AddComponent<TagComponent>();
 		tag.Tag = name.empty() ? "Entity" : name;
+		m_EntityMap[uuid] = entity;
+		m_EntityCount++;
 		return entity;
 	}
 
 	Entity Scene::CloneEntity(Entity entity)
 	{
-		Entity copiedEntity = { m_Registry.create(), this };
-		copiedEntity.AddComponent<IDComponent>();
-		copiedEntity.AddComponent<TagComponent>(entity.GetComponent<TagComponent>().Tag + " Copy");
-		if (entity.HasComponent<CameraComponent>())
-			copiedEntity.AddComponent<CameraComponent>(entity.GetComponent<CameraComponent>());
-		if (entity.HasComponent<TransformComponent>())
-			copiedEntity.AddComponent<TransformComponent>(entity.GetComponent<TransformComponent>());
-		if (entity.HasComponent<SpriteRendererComponent>())
-			copiedEntity.AddComponent<SpriteRendererComponent>(entity.GetComponent<SpriteRendererComponent>());
-		if (entity.HasComponent<NativeScriptComponent>())
-			copiedEntity.AddComponent<NativeScriptComponent>(entity.GetComponent<NativeScriptComponent>());
-		return copiedEntity;
+		std::string name = entity.GetComponent<TagComponent>().Tag;
+		Entity newEntity = CreateEntity(name + " - Copy");
+		CopyComponentIfExists(AllComponents{}, newEntity, entity);
+		m_EntityCount++;
+		return newEntity;
 	}
 
 	void Scene::DestroyEntity(Entity entity)
 	{
+		m_EntityMap.erase(entity.GetUUID());
+		m_EntityCount--;
 		m_Registry.destroy(entity);
 	}
 
@@ -123,7 +184,7 @@ namespace Lithe {
 		for (auto entity : group)
 		{
 			auto [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
-			
+
 			Renderer2D::DrawSprite(transform.GetTransform(), sprite, (int)entity);
 		}
 
@@ -153,7 +214,7 @@ namespace Lithe {
 			// TODO: expose to editor
 			const int32_t velocityIterations = 6;
 			const int32_t positionsIterations = 2;
-			
+
 			m_PhysicsWorld->Step(ts, velocityIterations, positionsIterations);
 
 			// Retrieve transforms from Box2D
@@ -233,6 +294,11 @@ namespace Lithe {
 		}
 		return {};
 	}
+
+}
+
+// Fucking Slop -- do not touch unless you know EXACTLY what you are doing
+namespace Lithe {
 
 	template<typename T>
 	void Scene::OnComponentAdded(Entity entity, T& component)

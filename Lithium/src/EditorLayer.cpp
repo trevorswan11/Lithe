@@ -436,6 +436,14 @@ namespace Lithe {
 				break;
 			}
 
+			// Scene Shortcuts
+			case Key::D:
+			{
+				if (control)
+					DuplicateSelectedEntity(shift);
+				break;
+			}
+
 			// Gizmo Shortcuts
 			case Key::Q:
 				m_GizmoType = -1;
@@ -470,11 +478,14 @@ namespace Lithe {
 		if (m_SceneState != SceneState::Edit)
 			OnSceneStop();
 
-		m_ActiveScene = CreateRef<Scene>();
-		m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
-		m_SceneHierarchyPanel.SetContext(m_ActiveScene);
+		m_EditorScene = CreateRef<Scene>();
+		m_EditorScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+		m_SceneHierarchyPanel.SetContext(m_EditorScene);
 		m_SaveSceneCache = std::nullopt;
+
 		LITHIUM_INFO("Creating Scene");
+	
+		m_ActiveScene = m_EditorScene;
 	}
 
 	void EditorLayer::OpenScene()
@@ -497,14 +508,20 @@ namespace Lithe {
 
 		try
 		{
-			m_ActiveScene = CreateRef<Scene>();
-			m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
-			m_SceneHierarchyPanel.SetContext(m_ActiveScene);
+			Ref<Scene> newScene = CreateRef<Scene>();
+			SceneSerializer serializer(newScene);
+			
+			if (serializer.Deserialize(path.string()))
+			{
+				m_EditorScene = newScene;
+				m_EditorScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+				m_SaveSceneCache = path.string();
+				m_SceneHierarchyPanel.SetContext(m_EditorScene);
 
-			SceneSerializer serializer(m_ActiveScene);
-			serializer.Deserialize(path.string());
-			m_SaveSceneCache = path.string();
-			LITHIUM_INFO("Opening Scene: {0}", *m_SaveSceneCache);
+				LITHIUM_INFO("Opening Scene: {0}", *m_SaveSceneCache);
+
+				m_ActiveScene = m_EditorScene;
+			}
 		}
 		catch (const std::exception& e)
 		{
@@ -520,7 +537,7 @@ namespace Lithe {
 		std::optional<std::string> filepath = FileDialogs::SaveFile("Lithe Scene (*.lithe)\0*.lithe\0");
 		if (filepath)
 		{
-			SceneSerializer serializer(m_ActiveScene);
+			SceneSerializer serializer(m_EditorScene);
 			serializer.Serialize(*filepath);
 			m_SaveSceneCache = *filepath;
 			LITHIUM_INFO("Saving Scene: {0}", *m_SaveSceneCache);
@@ -531,7 +548,7 @@ namespace Lithe {
 	{
 		if (m_SaveSceneCache)
 		{
-			SceneSerializer serializer(m_ActiveScene);
+			SceneSerializer serializer(m_EditorScene);
 			serializer.Serialize(*m_SaveSceneCache);
 			LITHIUM_INFO("Saving Scene: {0}", *m_SaveSceneCache);
 		}
@@ -539,16 +556,36 @@ namespace Lithe {
 			SaveSceneAs();
 	}
 
+	void EditorLayer::DuplicateSelectedEntity(bool switchSelectedEntity)
+	{
+		if (m_SceneState != SceneState::Edit) return;
+
+		Entity selectedEntity = m_SceneHierarchyPanel.GetSelectedEntity();
+		if (selectedEntity)
+		{
+			Entity clonedEntity = m_EditorScene->CloneEntity(selectedEntity);
+			if (switchSelectedEntity) m_SceneHierarchyPanel.SetSelectedEntity(clonedEntity);
+		}
+	}
+
 	void EditorLayer::OnScenePlay()
 	{
-		m_ActiveScene->OnRuntimeStart();
-		m_SceneState = SceneState::Play;
+		if (m_EditorScene && m_EditorScene->GetEntityCount() > 0)
+		{
+			m_ActiveScene = Scene::Copy(m_EditorScene);
+			m_SceneState = SceneState::Play;
+			m_SceneHierarchyPanel.SetContext(m_ActiveScene);
+			m_ActiveScene->OnRuntimeStart();
+		}
 	}
 
 	void EditorLayer::OnSceneStop()
 	{
-		m_ActiveScene->OnRuntimeStop();
 		m_SceneState = SceneState::Edit;
+
+		m_SceneHierarchyPanel.SetContext(m_EditorScene);
+		m_ActiveScene->OnRuntimeStop();
+		m_ActiveScene = m_EditorScene;
 	}
 
 	void EditorLayer::UI_Toolbar()
