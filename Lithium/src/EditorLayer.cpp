@@ -25,8 +25,8 @@ namespace Lithe {
 	{
 		LI_PROFILE_FUNCTION();
 
-		m_IconPlay = Texture2D::Create("resources/PlayButton.png");
-		m_IconStop = Texture2D::Create("resources/StopButton.png");
+		m_IconPlay = Texture2D::Create("assets/resources/PlayButton.png");
+		m_IconStop = Texture2D::Create("assets/resources/StopButton.png");
 
 		FramebufferSpec fbSpec;
 		fbSpec.Attachments = {
@@ -47,6 +47,8 @@ namespace Lithe {
 			SceneSerializer serializer(m_EditorScene);
 			serializer.Deserialize(sceneFilePath);
 		}
+		else
+			NewScene();
 
 		m_EditorCamera = EditorCamera(30.0f, 1.778f, 0.1f, 1000.0f);
 
@@ -168,6 +170,8 @@ namespace Lithe {
 			m_HoveredEntity = pixelData == -1 ? Entity() : Entity{ (entt::entity)pixelData, 
 				m_SceneState == SceneState::Edit ? m_EditorScene.get() : m_ActiveScene.get()};
 		}
+
+		OnOverlayRender();
 		
 		m_Framebuffer->Unbind();
 	}
@@ -294,6 +298,28 @@ namespace Lithe {
 
 		ImGui::End();
 
+		ImGui::Begin("Settings");
+
+		if (m_ActiveScene)
+		{
+			if (m_SceneState == SceneState::Play)
+				ImGui::Text("Playing Scene: %s", m_ActiveScene->GetName().c_str());
+			else
+			{
+				char buffer[256];
+				memset(buffer, 0, sizeof(buffer));
+				std::strncpy(buffer, m_ActiveScene->GetName().c_str(), sizeof(buffer));
+				if (ImGui::InputText("Scene Name", buffer, sizeof(buffer)))
+				{
+					std::string newName = std::string(buffer);
+					if (!newName.empty()) m_ActiveScene->SetName(newName);
+				}
+			}
+		}
+
+		ImGui::Checkbox("Show Physics Colliders", &m_ShowPhysicsColliders);
+		ImGui::End();
+
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{ 0, 0 });
 		ImGui::Begin("Viewport", NULL, ImGuiDockNodeFlags_NoTabBar);
 		auto viewportMinRegion = ImGui::GetWindowContentRegionMin();
@@ -412,7 +438,7 @@ namespace Lithe {
 	bool EditorLayer::OnKeyPressed(KeyPressedEvent& e)
 	{
 		// Shortcuts
-		if (e.GetRepeatCount() > 0)
+		if (e.IsRepeat())
 			return false;
 
 		bool control = Input::IsKeyPressed(Key::LeftControl) || Input::IsKeyPressed(Key::RightControl);
@@ -478,17 +504,70 @@ namespace Lithe {
 		return false;
 	}
 
+	void EditorLayer::OnOverlayRender()
+	{
+		if (!m_ActiveScene || m_ActiveScene->Empty()) return;
+		if (m_SceneState == SceneState::Play)
+		{
+			Entity camera = m_ActiveScene->GetPrimaryCameraEntity();
+			Renderer2D::BeginScene(camera.GetComponent<CameraComponent>().Camera, camera.GetComponent<TransformComponent>().GetTransform());
+		}
+		else
+			Renderer2D::BeginScene(m_EditorCamera);
+
+		if (m_ShowPhysicsColliders)
+		{
+			LI_PROFILE_SCOPE("Draw Physics Colliders");
+			{
+				LI_PROFILE_SCOPE("Circle Collider Rendering");
+
+				auto view = m_ActiveScene->GetAllEntitiesWith<TransformComponent, CircleCollider2DComponent>();
+				for (auto entity : view)
+				{
+					auto [tc, cc2d] = view.get<TransformComponent, CircleCollider2DComponent>(entity);
+
+					glm::vec3 translation = tc.Translation + glm::vec3(cc2d.Offset, 0.001f);
+					glm::vec3 scale = tc.Scale * glm::vec3(cc2d.Radius * 2.0f);
+					glm::mat4 transform = glm::translate(glm::mat4(1.0f), translation)
+						* glm::scale(glm::mat4(1.0f), scale);
+
+					Renderer2D::DrawCircle(transform, { 0.0f, 1.0f, 0.0f, 1.0f }, 0.005f);
+				}
+			}
+
+			{
+				LI_PROFILE_SCOPE("Box Collider Rendering");
+
+				auto view = m_ActiveScene->GetAllEntitiesWith<TransformComponent, BoxCollider2DComponent>();
+				for (auto entity : view)
+				{
+					auto [tc, bc2d] = view.get<TransformComponent, BoxCollider2DComponent>(entity);
+
+					glm::vec3 translation = tc.Translation + glm::vec3(bc2d.Offset, 0.001f);
+					glm::vec3 scale = tc.Scale * glm::vec3(bc2d.Size * 2.0f, 1.0f);
+					glm::mat4 transform = glm::translate(glm::mat4(1.0f), translation)
+						* glm::rotate(glm::mat4(1.0f), tc.Rotation.z, glm::vec3(0.0f, 0.0f, 1.0f))
+						* glm::scale(glm::mat4(1.0f), scale);
+
+					Renderer2D::DrawRect(transform, { 0.0f, 1.0f, 0.0f, 1.0f });
+				}
+			}
+		}
+
+		Renderer2D::EndScene();
+	}
+
 	void EditorLayer::NewScene()
 	{
 		if (m_SceneState != SceneState::Edit)
 			OnSceneStop();
 
+		LITHIUM_INFO("Creating Scene");
 		m_EditorScene = CreateRef<Scene>();
 		m_EditorScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
 		m_SceneHierarchyPanel.SetContext(m_EditorScene);
 		m_SaveSceneCache = std::nullopt;
 
-		LITHIUM_INFO("Creating Scene");
 	
 		m_ActiveScene = m_EditorScene;
 	}

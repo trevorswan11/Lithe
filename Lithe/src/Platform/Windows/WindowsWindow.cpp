@@ -106,7 +106,7 @@ namespace Lithe {
 				}
 				case GLFW_REPEAT:
 				{
-					KeyPressedEvent event(keyCode, 1);
+					KeyPressedEvent event(keyCode, true);
 					data.EventCallback(event);
 					break;
 				}

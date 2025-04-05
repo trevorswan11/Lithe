@@ -25,6 +25,7 @@ namespace Lithe {
 	private:
 		bool OnKeyPressed(KeyPressedEvent& e);
 		bool OnMouseButtonPressed(MouseButtonPressedEvent& e);
+		void OnOverlayRender();
 
 		void NewScene();
 		void OpenScene();
@@ -54,6 +55,7 @@ namespace Lithe {
 
 		int m_GizmoType = -1;
 		Entity m_HoveredEntity;
+		bool m_ShowPhysicsColliders = false;
 
 		// Panels
 		SceneHierarchyPanel m_SceneHierarchyPanel;

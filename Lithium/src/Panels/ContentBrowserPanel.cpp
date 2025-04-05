@@ -12,8 +12,8 @@ namespace Lithe {
 	ContentBrowserPanel::ContentBrowserPanel()
 		: m_CurrentDirectory(g_AssetPath)
 	{
-		m_DirectoryIcon = Texture2D::Create("Resources/DirectoryIcon.png");
-		m_FileIcon = Texture2D::Create("Resources/FileIcon.png");
+		m_DirectoryIcon = Texture2D::Create("assets/resources/DirectoryIcon.png");
+		m_FileIcon = Texture2D::Create("assets/resources/FileIcon.png");
 	}
 
 	void ContentBrowserPanel::OnImGuiRender()

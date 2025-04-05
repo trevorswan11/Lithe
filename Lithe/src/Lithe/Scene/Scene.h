@@ -35,6 +35,11 @@ namespace Lithe {
 
 		Entity GetPrimaryCameraEntity();
 		uint32_t GetEntityCount() const { return m_EntityCount; }
+		bool Empty() const { return m_EntityCount == 0; }
+
+		std::string GetName() const { return m_Name; }
+		std::string& GetName() { return m_Name; }
+		void SetName(const std::string& name) { m_Name = name; }
 
 		template<typename... Components>
 		auto GetAllEntitiesWith()
@@ -45,6 +50,7 @@ namespace Lithe {
 		template<typename T>
 		void OnComponentAdded(Entity entity, T& component);
 	private:
+		std::string m_Name = "Untitled";
 		entt::registry m_Registry;
 		uint32_t m_ViewportWidth = 0;
 		uint32_t m_ViewportHeight = 0;

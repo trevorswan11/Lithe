@@ -240,6 +240,7 @@ namespace Lithe {
 			DisplayAddComponentEntry<RigidBody2DComponent>("Rigidbody 2D");
 			DisplayAddComponentEntry<BoxCollider2DComponent>("Box Collider 2D");
 			DisplayAddComponentEntry<CircleRendererComponent>("Circle Renderer");
+			DisplayAddComponentEntry<CircleCollider2DComponent>("Circle Collider 2D");
 
 			ImGui::EndPopup();
 		}
@@ -440,6 +441,17 @@ namespace Lithe {
 			{
 				ImGui::DragFloat2("Offset", glm::value_ptr(component.Offset));
 				ImGui::DragFloat2("Size", glm::value_ptr(component.Size));
+				ImGui::DragFloat("Density", &component.Density, 0.01f, 0.0f, 1.0f);
+				ImGui::DragFloat("Friction", &component.Friction, 0.01f, 0.0f, 1.0f);
+				ImGui::DragFloat("Restituiton", &component.Restitution, 0.01f, 0.0f, 1.0f);
+				ImGui::DragFloat("Restituiton Threshold", &component.RestitutionThreshold, 0.01f, 0.0f);
+			}
+		);
+
+		DrawComponent<CircleCollider2DComponent>("Circle Collider 2D", entity, [=](auto& component)
+			{
+				ImGui::DragFloat2("Offset", glm::value_ptr(component.Offset));
+				ImGui::DragFloat("Radius", &component.Radius);
 				ImGui::DragFloat("Density", &component.Density, 0.01f, 0.0f, 1.0f);
 				ImGui::DragFloat("Friction", &component.Friction, 0.01f, 0.0f, 1.0f);
 				ImGui::DragFloat("Restituiton", &component.Restitution, 0.01f, 0.0f, 1.0f);
