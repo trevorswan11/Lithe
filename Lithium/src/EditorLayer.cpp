@@ -317,8 +317,14 @@ namespace Lithe {
 			}
 		}
 
+		ImGui::Separator();
+
 		ImGui::Checkbox("Show Physics Colliders", &m_ShowPhysicsColliders);
+		if (m_ShowPhysicsColliders)
+			ImGui::ColorEdit4("Color", glm::value_ptr(m_PhysicsColliderColor));
 		ImGui::End();
+
+		ImGui::Separator();
 
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{ 0, 0 });
 		ImGui::Begin("Viewport", NULL, ImGuiDockNodeFlags_NoTabBar);
@@ -531,7 +537,7 @@ namespace Lithe {
 					glm::mat4 transform = glm::translate(glm::mat4(1.0f), translation)
 						* glm::scale(glm::mat4(1.0f), scale);
 
-					Renderer2D::DrawCircle(transform, { 0.0f, 1.0f, 0.0f, 1.0f }, 0.005f);
+					Renderer2D::DrawCircle(transform, m_PhysicsColliderColor, 0.005f);
 				}
 			}
 
@@ -549,7 +555,7 @@ namespace Lithe {
 						* glm::rotate(glm::mat4(1.0f), tc.Rotation.z, glm::vec3(0.0f, 0.0f, 1.0f))
 						* glm::scale(glm::mat4(1.0f), scale);
 
-					Renderer2D::DrawRect(transform, { 0.0f, 1.0f, 0.0f, 1.0f });
+					Renderer2D::DrawRect(transform, m_PhysicsColliderColor);
 				}
 			}
 		}

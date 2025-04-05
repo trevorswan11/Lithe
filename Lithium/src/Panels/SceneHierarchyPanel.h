@@ -1,5 +1,9 @@
 #pragma once
 
+#ifdef _MSVC_LANG
+	#define _CRT_SECURE_NO_WARNINGS
+#endif
+
 #include <Lithe.h>
 
 namespace Lithe {

@@ -1,5 +1,9 @@
 #pragma once
 
+#ifdef _MSVC_LANG
+	#define _CRT_SECURE_NO_WARNINGS
+#endif
+
 #include <Lithe.h>
 #include "Lithe/Renderer/EditorCamera.h"
 
@@ -56,6 +60,7 @@ namespace Lithe {
 		int m_GizmoType = -1;
 		Entity m_HoveredEntity;
 		bool m_ShowPhysicsColliders = false;
+		glm::vec4 m_PhysicsColliderColor = { 0.0f, 1.0f, 0.0f, 1.0f };
 
 		// Panels
 		SceneHierarchyPanel m_SceneHierarchyPanel;

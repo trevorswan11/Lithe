@@ -1,7 +1,3 @@
-#ifdef _MSVC_LANG
-	#define _CRT_SECURE_NO_WARNINGS
-#endif
-
 #include "SceneHierarchyPanel.h"
 
 #include "Lithe/Scene/Components.h"
