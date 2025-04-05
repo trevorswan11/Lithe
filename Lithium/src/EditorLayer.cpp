@@ -522,7 +522,7 @@ namespace Lithe {
 				LI_PROFILE_SCOPE("Circle Collider Rendering");
 
 				auto view = m_ActiveScene->GetAllEntitiesWith<TransformComponent, CircleCollider2DComponent>();
-				for (auto entity : view)
+				for (auto entity : view) // Intellisense may be angry here, but I swear it compiles
 				{
 					auto [tc, cc2d] = view.get<TransformComponent, CircleCollider2DComponent>(entity);
 
@@ -539,7 +539,7 @@ namespace Lithe {
 				LI_PROFILE_SCOPE("Box Collider Rendering");
 
 				auto view = m_ActiveScene->GetAllEntitiesWith<TransformComponent, BoxCollider2DComponent>();
-				for (auto entity : view)
+				for (auto entity : view) // Intellisense may be angry here, but I swear it compiles
 				{
 					auto [tc, bc2d] = view.get<TransformComponent, BoxCollider2DComponent>(entity);
 

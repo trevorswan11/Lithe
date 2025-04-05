@@ -15,8 +15,7 @@ If the repository was cloned non-recursively previously, use `git submodule upda
 ### Dependencies
 1. Run the `Setup.bat` file found in scripts folder from **your file explorer**. This will download the required prerequisites for the project if they are not present yet.
     - Among general dependency installation prompts, the script will ask you if you would like to update submodules. This is only necessary if you are not working off of a fresh clone of this repository.
-2. One prerequisite is the [Vulkan SDK](https://vulkan.lunarg.com/). If it is not installed, the script will execute the VulkanSDK.exe file, and will prompt the user to install the SDK (any location should work). Follow the instructions presented by the generated command prompt.
-3. After installation, run the `Setup.bat` file again. If the Vulkan SDK is installed properly, it will then download the Vulkan SDK Debug libraries.
-4. The Premake binary and license will also be downloaded automatically, and `Setup.bat` will call `Win-GenProjects.bat` to generate Visual Studio solution files.
+2. One prerequisite is the [Vulkan SDK](https://vulkan.lunarg.com/). If it is not installed, the script will execute the VulkanSDK.exe file, and will prompt the user to install the SDK (any location should work). When prompted through the Vulkan installer, ensure you install the debug libraries if you intend on running Lithe with the Debug configuration.
+3. The Premake binary and license will also be downloaded automatically, and `Setup.bat` will call `Win-GenProjects.bat` to generate Visual Studio solution files.
 
 If changes are made to any Premake configuration files (including dependencies and submodules), or if you want to regenerate project files, rerun the `Win-GenProjects.bat` script file found in scripts folder.
