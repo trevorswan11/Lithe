@@ -40,6 +40,8 @@ namespace Lithe {
 		void DuplicateSelectedEntity(bool switchSelectedEntity = false);
 
 		void OnScenePlay();
+		void OnSceneSimulate();
+
 		void OnSceneStop();
 
 		// UI Panels
@@ -60,6 +62,8 @@ namespace Lithe {
 		int m_GizmoType = -1;
 		Entity m_HoveredEntity;
 		bool m_ShowPhysicsColliders = false;
+		bool m_OnlyShowPhysicsColliders = false;
+		bool m_RenderPrimaryCameraIcon = true;
 		glm::vec4 m_PhysicsColliderColor = { 0.0f, 1.0f, 0.0f, 1.0f };
 
 		// Panels
@@ -68,13 +72,14 @@ namespace Lithe {
 
 		enum class SceneState
 		{
-			Edit = 0, Play = 1
+			Edit = 0, Play = 1, Simulate = 2
 		};
 
 		SceneState m_SceneState = SceneState::Edit;
 
 		// Editor Resources
-		Ref<Texture2D> m_IconPlay, m_IconStop;
+		Ref<Texture2D> m_IconPlay, m_IconStop, m_IconSimulate;
+		Ref<Texture2D> m_CameraIcon;
 	};
 
 }

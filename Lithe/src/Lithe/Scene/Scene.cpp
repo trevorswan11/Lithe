@@ -57,6 +57,7 @@ namespace Lithe {
 
 	Scene::~Scene()
 	{
+		delete m_PhysicsWorld;
 	}
 
 	template<typename... Component>
@@ -177,37 +178,6 @@ namespace Lithe {
 		OnPhysics2DStop();
 	}
 
-	void Scene::OnUpdateEditor(Timestep ts, EditorCamera& camera)
-	{
-		Renderer2D::BeginScene(camera);
-
-		{
-			LI_PROFILE_SCOPE("Editor Draw Sprites");
-
-			auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
-			for (auto entity : group)
-			{
-				auto [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
-
-				Renderer2D::DrawSpriteComponent(transform.GetTransform(), sprite, (int)entity);
-			}
-		}
-
-		{
-			LI_PROFILE_SCOPE("Editor Draw Circles");
-
-			auto circleView = m_Registry.view<TransformComponent, CircleRendererComponent>();
-			for (auto entity : circleView) // Intellisense may be angry here, but I swear it compiles
-			{
-				auto [transform, circle] = circleView.get<TransformComponent, CircleRendererComponent>(entity);
-
-				Renderer2D::DrawCircleComponent(transform.GetTransform(), circle, (int)entity);
-			}
-		}
-
-		Renderer2D::EndScene();
-	}
-
 	void Scene::OnUpdateRuntime(Timestep ts)
 	{
 		// Update Scripts
@@ -301,8 +271,45 @@ namespace Lithe {
 		}
 	}
 
-	void Scene::OnUpdateSimulation(Timestep ts, EditorCamera& camera)
+	void Scene::OnUpdateEditor(Timestep ts, EditorCamera& camera)
 	{
+		RenderScene(camera);
+	}
+
+	void Scene::OnUpdateSimulation(Timestep ts, EditorCamera& camera, bool onlyRenderColliders)
+	{
+		// Physics
+		{
+			// TODO: expose to editor
+			const int32_t velocityIterations = 6;
+			const int32_t positionsIterations = 2;
+
+			m_PhysicsWorld->Step(ts, velocityIterations, positionsIterations);
+
+			// Retrieve transforms from Box2D
+			auto view = m_Registry.view<RigidBody2DComponent>();
+			for (auto e : view)
+			{
+				Entity entity{ e, this };
+				auto& transform = entity.GetComponent<TransformComponent>();
+				auto& rb2d = entity.GetComponent<RigidBody2DComponent>();
+
+				b2Body* body = static_cast<b2Body*>(rb2d.RuntimeBody);
+				const auto& position = body->GetPosition();
+				transform.Translation.x = position.x;
+				transform.Translation.y = position.y;
+				transform.Rotation.z = body->GetAngle();
+			}
+		}
+
+		if (!onlyRenderColliders)
+			RenderScene(camera);
+	}
+
+	template<typename T>
+	void Scene::OnComponentAdded(Entity entity, T& component)
+	{
+		static_assert(false);
 	}
 
 	void Scene::OnViewportResize(uint32_t width, uint32_t height)
@@ -392,16 +399,39 @@ namespace Lithe {
 		m_PhysicsWorld = nullptr;
 	}
 
+	void Scene::RenderScene(EditorCamera& camera)
+	{
+		Renderer2D::BeginScene(camera);
+
+		// Draw Sprites
+		{
+			auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
+			for (auto entity : group)
+			{
+				auto [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
+
+				Renderer2D::DrawSpriteComponent(transform.GetTransform(), sprite, (int)entity);
+			}
+		}
+
+		// Draw Circles
+		{
+			auto circleView = m_Registry.view<TransformComponent, CircleRendererComponent>();
+			for (auto entity : circleView) // Intellisense may be angry here, but I swear it compiles
+			{
+				auto [transform, circle] = circleView.get<TransformComponent, CircleRendererComponent>(entity);
+
+				Renderer2D::DrawCircleComponent(transform.GetTransform(), circle, (int)entity);
+			}
+		}
+
+		Renderer2D::EndScene();
+	}
+
 }
 
 // Fucking Slop -- do not touch unless you know EXACTLY what you are doing
 namespace Lithe {
-
-	template<typename T>
-	void Scene::OnComponentAdded(Entity entity, T& component)
-	{
-		static_assert(false);
-	}
 
 	template<>
 	void Scene::OnComponentAdded<IDComponent>(Entity entity, IDComponent& component)

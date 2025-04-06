@@ -26,7 +26,9 @@ namespace Lithe {
 		LI_PROFILE_FUNCTION();
 
 		m_IconPlay = Texture2D::Create("assets/resources/PlayButton.png");
+		m_IconSimulate = Texture2D::Create("assets/resources/SimulateButton.png");
 		m_IconStop = Texture2D::Create("assets/resources/StopButton.png");
+		m_CameraIcon = Texture2D::Create("assets/resources/CameraIcon.png");
 
 		FramebufferSpec fbSpec;
 		fbSpec.Attachments = {
@@ -39,6 +41,7 @@ namespace Lithe {
 		m_Framebuffer = Framebuffer::Create(fbSpec);
 
 		m_EditorScene = CreateRef<Scene>();
+		m_ActiveScene = m_EditorScene;
 
 		auto commandLineArgs = Application::Get().GetCommandLineArgs();
 		if (commandLineArgs.Count > 1)
@@ -140,12 +143,16 @@ namespace Lithe {
 		{
 			case SceneState::Edit:
 			{
-				// Update
-				if (m_ViewportFocused)
-					m_CameraController.OnUpdate(ts);
 				m_EditorCamera.OnUpdate(ts, !m_ViewportHovered);
 
 				m_EditorScene->OnUpdateEditor(ts, m_EditorCamera);
+				break;
+			}
+			case SceneState::Simulate:
+			{
+				m_EditorCamera.OnUpdate(ts, !m_ViewportHovered);
+
+				m_ActiveScene->OnUpdateSimulation(ts, m_EditorCamera, m_ShowPhysicsColliders && m_OnlyShowPhysicsColliders);
 				break;
 			}
 			case SceneState::Play:
@@ -304,6 +311,8 @@ namespace Lithe {
 		{
 			if (m_SceneState == SceneState::Play)
 				ImGui::Text("Playing Scene: %s", m_ActiveScene->GetName().c_str());
+			else if (m_SceneState == SceneState::Simulate)
+				ImGui::Text("Simulating Scene: %s", m_ActiveScene->GetName().c_str());
 			else
 			{
 				char buffer[256];
@@ -318,13 +327,28 @@ namespace Lithe {
 		}
 
 		ImGui::Separator();
-
 		ImGui::Checkbox("Show Physics Colliders", &m_ShowPhysicsColliders);
 		if (m_ShowPhysicsColliders)
 			ImGui::ColorEdit4("Color", glm::value_ptr(m_PhysicsColliderColor));
-		ImGui::End();
+		else
+		{
+			ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+			ImGui::ColorEdit4("Color", glm::value_ptr(m_PhysicsColliderColor));
+			ImGui::PopItemFlag();
+		}
 
 		ImGui::Separator();
+
+		if (ImGui::Checkbox("Only Show Colliders", &m_OnlyShowPhysicsColliders) && m_OnlyShowPhysicsColliders)
+			m_ShowPhysicsColliders = m_OnlyShowPhysicsColliders;
+
+		ImGui::Separator();
+
+		ImGui::Checkbox("Render Primary Camera Icon", &m_RenderPrimaryCameraIcon);
+
+		ImGui::Separator();
+		
+		ImGui::End();
 
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{ 0, 0 });
 		ImGui::Begin("Viewport", NULL, ImGuiDockNodeFlags_NoTabBar);
@@ -369,6 +393,7 @@ namespace Lithe {
 			glm::mat4 cameraView = glm::mat4(1.0f);
 			switch (m_SceneState)
 			{
+				case SceneState::Simulate:
 				case SceneState::Edit:
 				{
 					// Editor Camera
@@ -430,7 +455,7 @@ namespace Lithe {
 
 	void EditorLayer::OnEvent(Event& e)
 	{
-		if (m_SceneState == SceneState::Edit)
+		if (m_SceneState == SceneState::Edit || m_SceneState == SceneState::Simulate)
 			if (m_ViewportHovered)
 				m_EditorCamera.OnEvent(e);
 		else if (m_SceneState == SceneState::Play)
@@ -537,7 +562,7 @@ namespace Lithe {
 					glm::mat4 transform = glm::translate(glm::mat4(1.0f), translation)
 						* glm::scale(glm::mat4(1.0f), scale);
 
-					Renderer2D::DrawCircle(transform, m_PhysicsColliderColor, 0.005f);
+					Renderer2D::DrawCircle(transform, m_PhysicsColliderColor, 0.075f);
 				}
 			}
 
@@ -558,6 +583,21 @@ namespace Lithe {
 					Renderer2D::DrawRect(transform, m_PhysicsColliderColor);
 				}
 			}
+
+		}
+
+		if (m_RenderPrimaryCameraIcon)
+		{
+			LI_PROFILE_SCOPE("Camera Location Rendering");
+
+			auto cameraEntity = m_EditorScene->GetPrimaryCameraEntity();
+			if (cameraEntity && (m_SceneState == SceneState::Edit || m_SceneState == SceneState::Simulate))
+			{
+				const auto& cameraTransformComponent = cameraEntity.GetComponent<TransformComponent>();
+				const auto& cameraTranslation = cameraTransformComponent.Translation;
+
+				Renderer2D::DrawQuad(cameraTranslation, { 2.0f, 2.0f }, m_CameraIcon);
+			}
 		}
 
 		Renderer2D::EndScene();
@@ -573,7 +613,6 @@ namespace Lithe {
 		m_EditorScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
 		m_SceneHierarchyPanel.SetContext(m_EditorScene);
 		m_SaveSceneCache = std::nullopt;
-
 	
 		m_ActiveScene = m_EditorScene;
 	}
@@ -660,6 +699,9 @@ namespace Lithe {
 
 	void EditorLayer::OnScenePlay()
 	{
+		if (m_SceneState == SceneState::Simulate)
+			OnSceneStop();
+
 		if (m_EditorScene && m_EditorScene->GetEntityCount() > 0)
 		{
 			m_ActiveScene = Scene::Copy(m_EditorScene);
@@ -669,12 +711,30 @@ namespace Lithe {
 		}
 	}
 
+	void EditorLayer::OnSceneSimulate()
+	{
+		if (m_SceneState == SceneState::Play)
+			OnSceneStop();
+
+		if (m_EditorScene && m_EditorScene->GetEntityCount() > 0)
+		{
+			m_ActiveScene = Scene::Copy(m_EditorScene);
+			m_SceneState = SceneState::Simulate;
+			m_SceneHierarchyPanel.SetContext(m_ActiveScene);
+			m_ActiveScene->OnSimulationStart();
+		}
+	}
+
 	void EditorLayer::OnSceneStop()
 	{
+		LI_CORE_ASSERT(m_SceneState == SceneState::Play || m_SceneState == SceneState::Simulate);
 		m_SceneState = SceneState::Edit;
 
 		m_SceneHierarchyPanel.SetContext(m_EditorScene);
-		m_ActiveScene->OnRuntimeStop();
+		if (m_SceneState == SceneState::Play)
+			m_ActiveScene->OnRuntimeStop();
+		else if (m_SceneState == SceneState::Simulate)
+			m_ActiveScene->OnSimulationStop();
 		m_ActiveScene = m_EditorScene;
 	}
 
@@ -690,18 +750,35 @@ namespace Lithe {
 		const auto& buttonActive = colors[ImGuiCol_ButtonActive];
 		ImGui::PushStyleColor(ImGuiCol_ButtonActive, 
 			ImVec4(buttonActive.x, buttonActive.y, buttonActive.z, 0.5f));
-
 		ImGui::Begin("##toolbar", NULL, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiDockNodeFlags_NoTabBar);
-		
+
+		bool toolbarEnabled = !m_ActiveScene->Empty();
+		ImVec4 tintColor = ImVec4(1, 1, 1, 1);
+		if (!toolbarEnabled)
+			tintColor.w = 0.5f;
+
 		float size = ImGui::GetWindowHeight() - 4.0f;
-		Ref<Texture2D> icon = m_SceneState == SceneState::Edit ? m_IconPlay : m_IconStop;
 		ImGui::SetCursorPosX((ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));
-		if (ImGui::ImageButton(reinterpret_cast<ImTextureID>(static_cast<uint64_t>(icon->GetRendererID())), ImVec2(size, size), ImVec2(0,0), ImVec2(1, 1), 0))
 		{
-			if (m_SceneState == SceneState::Edit)
-				OnScenePlay();
-			else if (m_SceneState == SceneState::Play)
-				OnSceneStop();
+			Ref<Texture2D> icon = (m_SceneState == SceneState::Edit || m_SceneState == SceneState::Simulate) ? m_IconPlay : m_IconStop;
+			if (ImGui::ImageButton(reinterpret_cast<ImTextureID>(static_cast<uint64_t>(icon->GetRendererID())), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), 0, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), tintColor) && toolbarEnabled)
+			{
+				if (m_SceneState == SceneState::Edit || m_SceneState == SceneState::Simulate)
+					OnScenePlay();
+				else if (m_SceneState == SceneState::Play)
+					OnSceneStop();
+			}
+		}
+		ImGui::SameLine();
+		{
+			Ref<Texture2D> icon = (m_SceneState == SceneState::Edit || m_SceneState == SceneState::Play) ? m_IconSimulate : m_IconStop;
+			if (ImGui::ImageButton(reinterpret_cast<ImTextureID>(static_cast<uint64_t>(icon->GetRendererID())), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), 0, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), tintColor) && toolbarEnabled)
+			{
+				if (m_SceneState == SceneState::Edit || m_SceneState == SceneState::Play)
+					OnSceneSimulate();
+				else if (m_SceneState == SceneState::Simulate)
+					OnSceneStop();
+			}
 		}
 		
 		ImGui::PopStyleVar(2);
