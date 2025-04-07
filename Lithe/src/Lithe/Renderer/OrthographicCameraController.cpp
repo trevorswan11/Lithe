@@ -8,9 +8,7 @@ namespace Lithe {
 	
 	OrthographicCameraController::OrthographicCameraController(float aspectratio, bool rotation)
 		: m_AspectRatio(aspectratio), m_Camera(-m_AspectRatio * m_ZoomLevel, m_AspectRatio * m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel),
-		m_CameraBounds(-m_AspectRatio * m_ZoomLevel, m_AspectRatio* m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel), m_Rotation(rotation)
-	{
-	}
+		m_CameraBounds(-m_AspectRatio * m_ZoomLevel, m_AspectRatio* m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel), m_Rotation(rotation) {}
 
 	void OrthographicCameraController::OnUpdate(Timestep ts)
 	{

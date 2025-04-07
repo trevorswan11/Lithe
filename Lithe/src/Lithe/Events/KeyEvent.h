@@ -15,8 +15,7 @@ namespace Lithe {
 		EVENT_CLASS_CATEGORY(EventCategoryKeyboard | EventCategoryInput)
 	protected:
 		KeyEvent(KeyCode keycode)
-			: m_KeyCode(keycode) {
-		}
+			: m_KeyCode(keycode) {}
 
 		KeyCode m_KeyCode;
 	};
@@ -25,8 +24,7 @@ namespace Lithe {
 	{
 	public:
 		KeyPressedEvent(KeyCode keycode, bool isRepeat = false)
-			: KeyEvent(keycode), m_Repeat(isRepeat) {
-		}
+			: KeyEvent(keycode), m_Repeat(isRepeat) {}
 
 		inline bool IsRepeat() const { return m_Repeat; }
 
@@ -46,8 +44,7 @@ namespace Lithe {
 	{
 	public:
 		KeyReleasedEvent(KeyCode keycode)
-			: KeyEvent(keycode) {
-		}
+			: KeyEvent(keycode) {}
 
 		std::string ToString() const override
 		{
@@ -63,8 +60,7 @@ namespace Lithe {
 	{
 	public:
 		KeyTypedEvent(KeyCode keycode)
-			: KeyEvent(keycode) {
-		}
+			: KeyEvent(keycode) {}
 
 		std::string ToString() const override
 		{

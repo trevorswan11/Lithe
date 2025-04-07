@@ -51,10 +51,6 @@ namespace Lithe {
 		return b2_staticBody;
 	}
 
-	Scene::Scene()
-	{
-	}
-
 	Scene::~Scene()
 	{
 		delete m_PhysicsWorld;
@@ -121,6 +117,8 @@ namespace Lithe {
 			enttMap[uuid] = (entt::entity)newEntity;
 		}
 		CopyComponent(AllComponents{}, dstSceneRegistry, srcSceneRegistry, enttMap);
+		dstScene->SetVelocityIterations(srcScene->GetVelocityIterations());
+		dstScene->SetPositionIterations(srcScene->GetPositionIterations());
 
 		return dstScene;
 	}
@@ -160,11 +158,13 @@ namespace Lithe {
 
 	void Scene::OnRuntimeStart()
 	{
+		m_IsRunning = true;
 		OnPhysics2DStart();
 	}
 
 	void Scene::OnRuntimeStop()
 	{
+		m_IsRunning = false;
 		OnPhysics2DStop();
 	}
 
@@ -180,43 +180,43 @@ namespace Lithe {
 
 	void Scene::OnUpdateRuntime(Timestep ts)
 	{
-		// Update Scripts
+		if (!m_IsPaused || m_StepFrames-- > 0)
 		{
-			// Should be moved to a ScenePlay Func
-			m_Registry.view<NativeScriptComponent>().each([=](auto entity, auto& nsc)
-				{
-					if (!nsc.Instance)
-					{
-						nsc.Instance = nsc.InstantiateScript();
-						nsc.Instance->m_Entity = Entity{ entity, this };
-						nsc.Instance->OnCreate();
-					}
-					nsc.Instance->OnUpdate(ts);
-				}
-			);
-		}
-
-		// Physics
-		{
-			// TODO: expose to editor
-			const int32_t velocityIterations = 6;
-			const int32_t positionsIterations = 2;
-
-			m_PhysicsWorld->Step(ts, velocityIterations, positionsIterations);
-
-			// Retrieve transforms from Box2D
-			auto view = m_Registry.view<RigidBody2DComponent>();
-			for (auto e : view)
 			{
-				Entity entity{ e, this };
-				auto& transform = entity.GetComponent<TransformComponent>();
-				auto& rb2d = entity.GetComponent<RigidBody2DComponent>();
+				LI_PROFILE_SCOPE("Update Scripts Runtime");
 
-				b2Body* body = static_cast<b2Body*>(rb2d.RuntimeBody);
-				const auto& position = body->GetPosition();
-				transform.Translation.x = position.x;
-				transform.Translation.y = position.y;
-				transform.Rotation.z = body->GetAngle();
+				m_Registry.view<NativeScriptComponent>().each([=](auto entity, auto& nsc)
+					{
+						if (!nsc.Instance)
+						{
+							nsc.Instance = nsc.InstantiateScript();
+							nsc.Instance->m_Entity = Entity{ entity, this };
+							nsc.Instance->OnCreate();
+						}
+						nsc.Instance->OnUpdate(ts);
+					}
+				);
+			}
+
+			{
+				LI_PROFILE_SCOPE("2D Physics Runtime");
+				
+				m_PhysicsWorld->Step(ts, m_VelocityIterations, m_PositionsIterations);
+
+				// Retrieve transforms from Box2D
+				auto view = m_Registry.view<RigidBody2DComponent>();
+				for (auto e : view)
+				{
+					Entity entity{ e, this };
+					auto& transform = entity.GetComponent<TransformComponent>();
+					auto& rb2d = entity.GetComponent<RigidBody2DComponent>();
+
+					b2Body* body = static_cast<b2Body*>(rb2d.RuntimeBody);
+					const auto& position = body->GetPosition();
+					transform.Translation.x = position.x;
+					transform.Translation.y = position.y;
+					transform.Rotation.z = body->GetAngle();
+				}
 			}
 		}
 
@@ -278,13 +278,11 @@ namespace Lithe {
 
 	void Scene::OnUpdateSimulation(Timestep ts, EditorCamera& camera, bool onlyRenderColliders)
 	{
-		// Physics
+		if (!m_IsPaused || m_StepFrames-- > 0)
 		{
-			// TODO: expose to editor
-			const int32_t velocityIterations = 6;
-			const int32_t positionsIterations = 2;
+			LI_PROFILE_SCOPE("2D Physics Runtime");
 
-			m_PhysicsWorld->Step(ts, velocityIterations, positionsIterations);
+			m_PhysicsWorld->Step(ts, m_VelocityIterations, m_PositionsIterations);
 
 			// Retrieve transforms from Box2D
 			auto view = m_Registry.view<RigidBody2DComponent>();
@@ -337,6 +335,11 @@ namespace Lithe {
 				return Entity(entity, this);
 		}
 		return {};
+	}
+
+	void Scene::Step(int frames)
+	{
+		m_StepFrames = frames;
 	}
 
 	void Scene::OnPhysics2DStart()

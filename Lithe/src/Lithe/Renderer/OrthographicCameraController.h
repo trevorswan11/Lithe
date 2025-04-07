@@ -18,8 +18,7 @@ namespace Lithe {
 			float Left, Right;
 
 			CameraBounds(float left, float right, float bottom, float top)
-				: Top(top), Bottom(bottom), Left(left), Right(right) {
-			}
+				: Top(top), Bottom(bottom), Left(left), Right(right) {}
 
 			float GetWidth() const { return Right - Left; }
 			float GetHeight() const { return Top - Bottom; }

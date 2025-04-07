@@ -7,10 +7,7 @@ namespace Lithe {
 	class Timer
 	{
 	public:
-		Timer()
-		{
-			Reset();
-		}
+		Timer() { Reset(); }
 
 		void Timer::Reset()
 		{

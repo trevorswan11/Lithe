@@ -41,11 +41,15 @@ namespace Lithe {
 
 		void OnScenePlay();
 		void OnSceneSimulate();
+		void OnScenePause();
 
 		void OnSceneStop();
 
 		// UI Panels
 		void UI_Toolbar();
+		void UI_Stats();
+		void UI_MenuBar();
+		void UI_Settings();
 	private:
 		OrthographicCameraController m_CameraController;
 		Ref<Framebuffer> m_Framebuffer;
@@ -78,7 +82,7 @@ namespace Lithe {
 		SceneState m_SceneState = SceneState::Edit;
 
 		// Editor Resources
-		Ref<Texture2D> m_IconPlay, m_IconStop, m_IconSimulate;
+		Ref<Texture2D> m_IconPlay, m_IconSimulate, m_IconPause, m_IconStop, m_IconStep;
 		Ref<Texture2D> m_CameraIcon;
 	};
 

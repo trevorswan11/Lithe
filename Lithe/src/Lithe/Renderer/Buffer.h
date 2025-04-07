@@ -47,12 +47,10 @@ namespace Lithe {
 		bool Normalized;
 
 		BufferElements() 
-			: Name("NullElement"), Type(ShaderDataType::None), Size(0), Offset(0), Normalized(false) 
-		{}
+			: Name("NullElement"), Type(ShaderDataType::None), Size(0), Offset(0), Normalized(false) {}
 
 		BufferElements(ShaderDataType type, const std::string& name, bool normalized = false)
-			: Name(name), Type(type), Size(ShaderDataTypeSize(type)), Offset(0), Normalized(normalized)
-		{}
+			: Name(name), Type(type), Size(ShaderDataTypeSize(type)), Offset(0), Normalized(normalized) {}
 
 		uint32_t GetComponentCount() const
 		{

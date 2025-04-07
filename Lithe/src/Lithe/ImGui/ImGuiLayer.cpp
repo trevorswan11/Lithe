@@ -20,9 +20,7 @@ namespace Lithe {
 	float ImGuiLayer::s_DefaultFontSize = 18.0f;
 
 	ImGuiLayer::ImGuiLayer()
-		: Layer("ImGuiLayer")
-	{
-	}
+		: Layer("ImGuiLayer") {}
 
 	ImGuiLayer::~ImGuiLayer() {}
 

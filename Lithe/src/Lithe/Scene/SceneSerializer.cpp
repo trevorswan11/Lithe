@@ -152,9 +152,7 @@ namespace Lithe {
 	}
 
 	SceneSerializer::SceneSerializer(const Ref<Scene>& scene)
-		: m_Scene(scene)
-	{
-	}
+		: m_Scene(scene) {}
 
 	static void SerializeEntity(YAML::Emitter& out, Entity entity)
 	{

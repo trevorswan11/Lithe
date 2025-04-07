@@ -97,9 +97,7 @@ namespace Lithe {
 
 	private:
 		Instrumentor()
-			: m_CurrentSession(nullptr)
-		{
-		}
+			: m_CurrentSession(nullptr) {}
 
 		~Instrumentor()
 		{

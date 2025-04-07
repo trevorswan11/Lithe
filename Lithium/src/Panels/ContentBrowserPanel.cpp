@@ -20,7 +20,7 @@ namespace Lithe {
 	{
 		ImGuiIO& io = ImGui::GetIO();
 		auto boldFont = io.Fonts->Fonts[(int)ImGuiFonts::Bold];
-
+		
 		ImGuiWindowClass window_class;
 		window_class.DockNodeFlagsOverrideSet = ImGuiDockNodeFlags_NoTabBar;
 		ImGui::SetNextWindowClass(&window_class);
@@ -101,7 +101,6 @@ namespace Lithe {
 
 		}
 
-		// TODO: status bar
 		ImGui::End();
 	}
 

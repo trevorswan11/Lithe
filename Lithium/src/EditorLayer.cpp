@@ -27,7 +27,10 @@ namespace Lithe {
 
 		m_IconPlay = Texture2D::Create("assets/resources/PlayButton.png");
 		m_IconSimulate = Texture2D::Create("assets/resources/SimulateButton.png");
+		m_IconPause = Texture2D::Create("assets/resources/PauseButton.png");
 		m_IconStop = Texture2D::Create("assets/resources/StopButton.png");
+		m_IconStep = Texture2D::Create("assets/resources/StepButton.png");
+
 		m_CameraIcon = Texture2D::Create("assets/resources/CameraIcon.png");
 
 		FramebufferSpec fbSpec;
@@ -228,127 +231,8 @@ namespace Lithe {
 
 		style.WindowMinSize.x = minWinSizeX;
 
-		if (ImGui::BeginMenuBar())
-		{
-			if (ImGui::BeginMenu("File"))
-			{
-				if (ImGui::MenuItem("New", "Ctrl+N"))
-					NewScene();
-				if (ImGui::MenuItem("Open...", "Ctrl+O"))
-					OpenScene();
-				if (ImGui::MenuItem("Save As...", "Ctrl+Shift+S"))
-					SaveSceneAs();
-				if (ImGui::MenuItem("Save", "Ctrl+S"))
-					SaveScene();
-				if (ImGui::MenuItem("Revert Changes"))
-					if (m_SaveSceneCache) OpenScene(*m_SaveSceneCache);
-				if (ImGui::MenuItem("Exit"))
-					Application::Get().Close();
-				ImGui::EndMenu();
-			}
-
-			if (ImGui::BeginMenu("Gizmos"))
-			{
-				if (ImGui::MenuItem("None", "Q"))
-					m_GizmoType = -1;
-				if (ImGui::MenuItem("Translate", "W"))
-					m_GizmoType = ImGuizmo::OPERATION::TRANSLATE;
-				if (ImGui::MenuItem("Rotate", "E"))
-					m_GizmoType = ImGuizmo::OPERATION::ROTATE;
-				if (ImGui::MenuItem("Scale", "R"))
-					m_GizmoType = ImGuizmo::OPERATION::SCALE;
-				ImGui::EndMenu();
-			}
-
-			if (ImGui::BeginMenu("Editor Camera"))
-			{
-				if (ImGui::MenuItem("Reset Camera"))
-					m_EditorCamera.Reset();
-				ImGui::EndMenu();
-			}
-
-			ImGui::EndMenuBar();
-		}
-
 		m_SceneHierarchyPanel.OnImGuiRender();
 		m_ContentBrowserPanel.OnImGuiRender();
-
-		ImGui::Begin("Stats");
-
-		auto stats = Renderer2D::GetStats();
-		ImGui::Text("Renderer2D Stats:");
-		ImGui::Text("Draw Calls: %d", stats.DrawCalls);
-		ImGui::Text("Quads: %d", stats.QuadCount);
-		ImGui::Text("Circles: %d", stats.CircleCount);
-		ImGui::Text("Lines: %d", stats.LineCount);
-		ImGui::Text("Vertices: %d", stats.GetTotalVertexCount());
-		ImGui::Text("Indices: %d", stats.GetTotalIndexCount());
-
-		{
-			ImGui::Separator();
-			LI_PROFILE_SCOPE("ImGui Average FPS");
-
-			static float fpsHistory[100] = {};
-			static int fpsIndex = 0;
-			static float fpsSum = 0.0f;
-
-			float currentFps = 1.0f / ImGui::GetIO().DeltaTime;
-			fpsSum -= fpsHistory[fpsIndex];
-			fpsSum += currentFps;
-			fpsHistory[fpsIndex] = currentFps;
-
-			fpsIndex = (fpsIndex + 1) % 100;
-			float avgFps = fpsSum / 100.0f;
-			ImGui::Text("Avg FPS: %.1f", avgFps);
-			ImGui::Separator();
-		}
-
-		ImGui::End();
-
-		ImGui::Begin("Settings");
-
-		if (m_ActiveScene)
-		{
-			if (m_SceneState == SceneState::Play)
-				ImGui::Text("Playing Scene: %s", m_ActiveScene->GetName().c_str());
-			else if (m_SceneState == SceneState::Simulate)
-				ImGui::Text("Simulating Scene: %s", m_ActiveScene->GetName().c_str());
-			else
-			{
-				char buffer[256];
-				memset(buffer, 0, sizeof(buffer));
-				std::strncpy(buffer, m_ActiveScene->GetName().c_str(), sizeof(buffer));
-				if (ImGui::InputText("Scene Name", buffer, sizeof(buffer)))
-				{
-					std::string newName = std::string(buffer);
-					if (!newName.empty()) m_ActiveScene->SetName(newName);
-				}
-			}
-		}
-
-		ImGui::Separator();
-		ImGui::Checkbox("Show Physics Colliders", &m_ShowPhysicsColliders);
-		if (m_ShowPhysicsColliders)
-			ImGui::ColorEdit4("Color", glm::value_ptr(m_PhysicsColliderColor));
-		else
-		{
-			ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
-			ImGui::ColorEdit4("Color", glm::value_ptr(m_PhysicsColliderColor));
-			ImGui::PopItemFlag();
-		}
-
-		ImGui::Separator();
-
-		if (ImGui::Checkbox("Only Show Colliders", &m_OnlyShowPhysicsColliders) && m_OnlyShowPhysicsColliders)
-			m_ShowPhysicsColliders = m_OnlyShowPhysicsColliders;
-
-		ImGui::Separator();
-
-		ImGui::Checkbox("Render Primary Camera Icon", &m_RenderPrimaryCameraIcon);
-
-		ImGui::Separator();
-		
-		ImGui::End();
 
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{ 0, 0 });
 		ImGui::Begin("Viewport", NULL, ImGuiDockNodeFlags_NoTabBar);
@@ -449,6 +333,9 @@ namespace Lithe {
 		ImGui::PopStyleVar();
 
 		UI_Toolbar();
+		UI_MenuBar();
+		UI_Stats();
+		UI_Settings();
 
 		ImGui::End();
 	}
@@ -725,6 +612,14 @@ namespace Lithe {
 		}
 	}
 
+	void EditorLayer::OnScenePause()
+	{
+		if (m_SceneState == SceneState::Edit)
+			return;
+
+		m_ActiveScene->SetPaused(true);
+	}
+
 	void EditorLayer::OnSceneStop()
 	{
 		LI_CORE_ASSERT(m_SceneState == SceneState::Play || m_SceneState == SceneState::Simulate);
@@ -759,6 +654,12 @@ namespace Lithe {
 
 		float size = ImGui::GetWindowHeight() - 4.0f;
 		ImGui::SetCursorPosX((ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));
+
+		bool hasPlayButton = m_SceneState == SceneState::Edit || m_SceneState == SceneState::Play;
+		bool hasSimulateButton = m_SceneState == SceneState::Edit || m_SceneState == SceneState::Simulate;
+		bool hasPauseButton = m_SceneState != SceneState::Edit;
+
+		if (hasPlayButton)
 		{
 			Ref<Texture2D> icon = (m_SceneState == SceneState::Edit || m_SceneState == SceneState::Simulate) ? m_IconPlay : m_IconStop;
 			if (ImGui::ImageButton(reinterpret_cast<ImTextureID>(static_cast<uint64_t>(icon->GetRendererID())), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), 0, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), tintColor) && toolbarEnabled)
@@ -769,10 +670,13 @@ namespace Lithe {
 					OnSceneStop();
 			}
 		}
-		ImGui::SameLine();
+		
+		if (hasSimulateButton)
 		{
+			if (hasPlayButton) ImGui::SameLine();
 			Ref<Texture2D> icon = (m_SceneState == SceneState::Edit || m_SceneState == SceneState::Play) ? m_IconSimulate : m_IconStop;
-			if (ImGui::ImageButton(reinterpret_cast<ImTextureID>(static_cast<uint64_t>(icon->GetRendererID())), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), 0, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), tintColor) && toolbarEnabled)
+			if (ImGui::ImageButton(reinterpret_cast<ImTextureID>(static_cast<uint64_t>(icon->GetRendererID())),
+				ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), 0, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), tintColor) && toolbarEnabled)
 			{
 				if (m_SceneState == SceneState::Edit || m_SceneState == SceneState::Play)
 					OnSceneSimulate();
@@ -780,10 +684,188 @@ namespace Lithe {
 					OnSceneStop();
 			}
 		}
+
+		if (hasPauseButton)
+		{
+			bool isPaused = m_ActiveScene->IsPaused();
+			ImGui::SameLine();
+			{
+				Ref<Texture2D> icon = m_IconPause;
+				if (ImGui::ImageButton(reinterpret_cast<ImTextureID>(static_cast<uint64_t>(icon->GetRendererID())),
+					ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), 0, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), tintColor) && toolbarEnabled)
+				{
+					m_ActiveScene->SetPaused(!isPaused);
+				}
+			}
+
+			if (isPaused)
+			{
+				ImGui::SameLine();
+				{
+					Ref<Texture2D> icon = m_IconStep;
+					bool isPaused = m_ActiveScene->IsPaused();
+					if (ImGui::ImageButton(reinterpret_cast<ImTextureID>(static_cast<uint64_t>(icon->GetRendererID())),
+						ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), 0, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), tintColor) && toolbarEnabled)
+					{
+						m_ActiveScene->Step();
+					}
+				}
+			}
+		}
 		
 		ImGui::PopStyleVar(2);
 		ImGui::PopStyleColor(3);
 		ImGui::End();
+	}
+
+	void EditorLayer::UI_Settings()
+	{
+		ImGui::Begin("Settings");
+
+		if (m_ActiveScene)
+		{
+			if (m_SceneState == SceneState::Play)
+				ImGui::Text("Playing Scene: %s", m_ActiveScene->GetName().c_str());
+			else if (m_SceneState == SceneState::Simulate)
+				ImGui::Text("Simulating Scene: %s", m_ActiveScene->GetName().c_str());
+			else
+			{
+				char buffer[256];
+				memset(buffer, 0, sizeof(buffer));
+				std::strncpy(buffer, m_ActiveScene->GetName().c_str(), sizeof(buffer));
+				if (ImGui::InputText("Scene Name", buffer, sizeof(buffer)))
+				{
+					std::string newName = std::string(buffer);
+					if (!newName.empty()) m_ActiveScene->SetName(newName);
+				}
+			}
+		}
+
+		ImGui::Separator();
+		ImGui::Checkbox("Show Physics Colliders", &m_ShowPhysicsColliders);
+		if (m_ShowPhysicsColliders)
+			ImGui::ColorEdit4("Color", glm::value_ptr(m_PhysicsColliderColor));
+		else
+		{
+			ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+			ImGui::ColorEdit4("Color", glm::value_ptr(m_PhysicsColliderColor));
+			ImGui::PopItemFlag();
+		}
+
+		ImGui::Separator();
+
+		if (ImGui::Checkbox("Only Show Colliders on Simulate", &m_OnlyShowPhysicsColliders) && m_OnlyShowPhysicsColliders)
+			m_ShowPhysicsColliders = m_OnlyShowPhysicsColliders;
+
+		ImGui::Separator();
+
+		ImGui::Checkbox("Render Primary Camera Icon", &m_RenderPrimaryCameraIcon);
+
+		ImGui::Separator();
+
+		auto boldFont = ImGui::GetIO().Fonts->Fonts[(int)ImGuiFonts::Bold];
+		{
+			if (m_SceneState != SceneState::Edit)
+				ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+
+			ImGui::PushFont(boldFont);
+			ImGui::Text("Physics Velocity Iterations:");
+			ImGui::PopFont();
+			auto& sceneVelocityItr = m_EditorScene->GetVelocityIterations();
+			if (ImGui::SliderInt("##VelocityItr", &sceneVelocityItr, 6, 100))
+				m_EditorScene->SetVelocityIterations(sceneVelocityItr);
+			ImGui::PushFont(boldFont);
+			ImGui::Text("Physics Position Iterations:");
+			ImGui::PopFont();
+			auto& scenePositionItr = m_EditorScene->GetPositionIterations();
+			if (ImGui::SliderInt("##PositionItr", &scenePositionItr, 2, 100))
+				m_EditorScene->SetPositionIterations(scenePositionItr);
+
+			if (m_SceneState != SceneState::Edit)
+				ImGui::PopItemFlag();
+		}
+
+		ImGui::End();
+	}
+
+	void EditorLayer::UI_Stats()
+	{
+		ImGui::Begin("Stats");
+
+		auto stats = Renderer2D::GetStats();
+		ImGui::Text("Renderer2D Stats:");
+		ImGui::Text("Draw Calls: %d", stats.DrawCalls);
+		ImGui::Text("Quads: %d", stats.QuadCount);
+		ImGui::Text("Circles: %d", stats.CircleCount);
+		ImGui::Text("Lines: %d", stats.LineCount);
+		ImGui::Text("Vertices: %d", stats.GetTotalVertexCount());
+		ImGui::Text("Indices: %d", stats.GetTotalIndexCount());
+
+		{
+			ImGui::Separator();
+			LI_PROFILE_SCOPE("ImGui Average FPS");
+
+			static float fpsHistory[100] = {};
+			static int fpsIndex = 0;
+			static float fpsSum = 0.0f;
+
+			float currentFps = 1.0f / ImGui::GetIO().DeltaTime;
+			fpsSum -= fpsHistory[fpsIndex];
+			fpsSum += currentFps;
+			fpsHistory[fpsIndex] = currentFps;
+
+			fpsIndex = (fpsIndex + 1) % 100;
+			float avgFps = fpsSum / 100.0f;
+			ImGui::Text("Avg FPS: %.1f", avgFps);
+			ImGui::Separator();
+		}
+
+		ImGui::End();
+	}
+
+	void EditorLayer::UI_MenuBar()
+	{
+		if (ImGui::BeginMenuBar())
+		{
+			if (ImGui::BeginMenu("File"))
+			{
+				if (ImGui::MenuItem("New", "Ctrl+N"))
+					NewScene();
+				if (ImGui::MenuItem("Open...", "Ctrl+O"))
+					OpenScene();
+				if (ImGui::MenuItem("Save As...", "Ctrl+Shift+S"))
+					SaveSceneAs();
+				if (ImGui::MenuItem("Save", "Ctrl+S"))
+					SaveScene();
+				if (ImGui::MenuItem("Revert Changes"))
+					if (m_SaveSceneCache) OpenScene(*m_SaveSceneCache);
+				if (ImGui::MenuItem("Exit"))
+					Application::Get().Close();
+				ImGui::EndMenu();
+			}
+
+			if (ImGui::BeginMenu("Gizmos"))
+			{
+				if (ImGui::MenuItem("None", "Q"))
+					m_GizmoType = -1;
+				if (ImGui::MenuItem("Translate", "W"))
+					m_GizmoType = ImGuizmo::OPERATION::TRANSLATE;
+				if (ImGui::MenuItem("Rotate", "E"))
+					m_GizmoType = ImGuizmo::OPERATION::ROTATE;
+				if (ImGui::MenuItem("Scale", "R"))
+					m_GizmoType = ImGuizmo::OPERATION::SCALE;
+				ImGui::EndMenu();
+			}
+
+			if (ImGui::BeginMenu("Editor Camera"))
+			{
+				if (ImGui::MenuItem("Reset Camera"))
+					m_EditorCamera.Reset();
+				ImGui::EndMenu();
+			}
+
+			ImGui::EndMenuBar();
+		}
 	}
 
 }

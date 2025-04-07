@@ -36,8 +36,7 @@ namespace Lithe {
 	{
 	public:
 		MouseScrolledEvent(float x, float y)
-			: m_XOffset(x), m_YOffset(y) {
-		}
+			: m_XOffset(x), m_YOffset(y) {}
 
 		inline float GetXOffset() const { return m_XOffset; }
 		inline float GetYOffset() const { return m_YOffset; }
@@ -93,8 +92,7 @@ namespace Lithe {
 	{
 	public:
 		MouseButtonReleasedEvent(MouseCode button)
-			: MouseButtonEvent(button) {
-		}
+			: MouseButtonEvent(button) {}
 
 		// Formats the event with the buttons qualifier
 		std::string ToString() const override
