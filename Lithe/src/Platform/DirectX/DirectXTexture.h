@@ -8,12 +8,15 @@ namespace Lithe {
 	{
 	public:
 		DirectXTexture2D(uint32_t width, uint32_t height);
+		DirectXTexture2D(const TextureSpecification& specification);
 		DirectXTexture2D(const std::string& path);
 		virtual ~DirectXTexture2D();
 
 		virtual uint32_t GetWidth() const override { return m_Width; }
 		virtual uint32_t GetHeight() const override { return m_Height; }
 		virtual uint32_t GetRendererID() const override { return m_RendererID; }
+
+		virtual const TextureSpecification& GetSpecification() const override { return m_TextureSpec; }
 
 		virtual const std::string& GetPath() const override { return m_Path; }
 
@@ -28,11 +31,12 @@ namespace Lithe {
 			return m_RendererID == ((DirectXTexture2D&)other).m_RendererID;
 		}
 	private:
+		TextureSpecification m_TextureSpec;
 		std::string m_Path;
 		bool m_IsLoaded = false;
 		uint32_t m_Width, m_Height;
 		uint32_t m_RendererID;
-		int m_InternalForamt, m_DataFormat;
+		int m_InternalFormat, m_DataFormat;
 	};
 
 }

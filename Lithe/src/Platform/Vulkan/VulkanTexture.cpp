@@ -12,6 +12,14 @@ namespace Lithe {
 		LI_CORE_ASSERT(false);
 	}
 
+	VulkanTexture2D::VulkanTexture2D(const TextureSpecification& specification)
+		: m_TextureSpec(specification), m_Width(m_TextureSpec.Width), m_Height(m_TextureSpec.Height)
+	{
+		LI_PROFILE_FUNCTION();
+
+		LI_CORE_ASSERT(false);
+	}
+
 	VulkanTexture2D::VulkanTexture2D(const std::string& path)
 		: m_Path(path)
 	{

@@ -4,22 +4,63 @@
 #include <stb_image.h>
 
 namespace Lithe {
+
+	namespace Utils {
+
+		static GLenum LitheImageFormatToGLDataFormat(ImageFormat format)
+		{
+			switch (format)
+			{
+				case ImageFormat::RGB8:  return GL_RGB;
+				case ImageFormat::RGBA8: return GL_RGBA;
+			}
+
+			LI_CORE_ASSERT(false);
+			return 0;
+		}
+
+		static GLenum LitheImageFormatToGLInternalFormat(ImageFormat format)
+		{
+			switch (format)
+			{
+				case ImageFormat::RGB8:  return GL_RGB8;
+				case ImageFormat::RGBA8: return GL_RGBA8;
+			}
+
+			LI_CORE_ASSERT(false);
+			return 0;
+		}
+
+	}
+
 	OpenGLTexture2D::OpenGLTexture2D(uint32_t width, uint32_t height)
 		: m_Width(width), m_Height(height)
 	{
 		LI_PROFILE_FUNCTION();
 
-		m_InternalForamt = GL_RGBA8;
+		m_InternalFormat = GL_RGBA8;
 		m_DataFormat = GL_RGBA;
 
 		glCreateTextures(GL_TEXTURE_2D, 1, &m_RendererID);
-		glTextureStorage2D(m_RendererID, 1, m_InternalForamt, m_Width, m_Height);
+		glTextureStorage2D(m_RendererID, 1, m_InternalFormat, m_Width, m_Height);
 
 		glTextureParameteri(m_RendererID, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTextureParameteri(m_RendererID, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 		glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	}
+
+	OpenGLTexture2D::OpenGLTexture2D(const TextureSpecification& specification)
+		: m_TextureSpec(specification), m_Width(m_TextureSpec.Width), m_Height(m_TextureSpec.Height)
+	{
+		LI_PROFILE_FUNCTION();
+
+		m_InternalFormat = Utils::LitheImageFormatToGLInternalFormat(m_TextureSpec.Format);
+		m_DataFormat = Utils::LitheImageFormatToGLDataFormat(m_TextureSpec.Format);
+
+		glCreateTextures(GL_TEXTURE_2D, 1, &m_RendererID);
+		glTextureStorage2D(m_RendererID, 1, m_InternalFormat, m_Width, m_Height);
 	}
 
 	OpenGLTexture2D::OpenGLTexture2D(const std::string& path)
@@ -55,10 +96,10 @@ namespace Lithe {
 
 			LI_CORE_ASSERT(internalFormat, "Format not supported!");
 
-			m_InternalForamt = internalFormat;
+			m_InternalFormat = internalFormat;
 			m_DataFormat = dataFormat;
 			glCreateTextures(GL_TEXTURE_2D, 1, &m_RendererID);
-			glTextureStorage2D(m_RendererID, 1, m_InternalForamt, m_Width, m_Height);
+			glTextureStorage2D(m_RendererID, 1, m_InternalFormat, m_Width, m_Height);
 
 			glTextureParameteri(m_RendererID, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 			glTextureParameteri(m_RendererID, GL_TEXTURE_MAG_FILTER, GL_LINEAR);

@@ -50,6 +50,7 @@ namespace Lithe {
 		void UI_Stats();
 		void UI_MenuBar();
 		void UI_Settings();
+		void UI_Fonts();
 	private:
 		OrthographicCameraController m_CameraController;
 		Ref<Framebuffer> m_Framebuffer;

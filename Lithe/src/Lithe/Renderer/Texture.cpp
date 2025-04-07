@@ -23,6 +23,17 @@ namespace Lithe {
 		return nullptr;
 	}
 
+	Ref<Texture2D> Texture2D::Create(const TextureSpecification& specification)
+	{
+		switch (Renderer::GetAPI())
+		{
+			case RendererAPI::API::Headless:	return CreateRef<HeadlessTexture2D>(specification);
+			case RendererAPI::API::OpenGL:		return CreateRef<OpenGLTexture2D>(specification);
+			case RendererAPI::API::Vulkan:		return CreateRef<VulkanTexture2D>(specification);
+			case RendererAPI::API::DirectX:		return CreateRef<DirectXTexture2D>(specification);
+		}
+	}
+
 	Ref<Texture2D> Texture2D::Create(const std::string& path)
 	{
 		switch (Renderer::GetAPI())

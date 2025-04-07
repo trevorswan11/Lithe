@@ -33,6 +33,8 @@
 #include "Lithe/Renderer/Buffer.h"
 #include "Lithe/Renderer/VertexArray.h"
 
+#include "Lithe/Renderer/Font.h"
+
 #include "Lithe/Renderer/OrthographicCamera.h"
 #include "Lithe/Renderer/OrthographicCameraController.h"
 // -----------------

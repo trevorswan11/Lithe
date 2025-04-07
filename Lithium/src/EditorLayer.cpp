@@ -15,10 +15,12 @@
 namespace Lithe {
 
 	extern const std::filesystem::path g_AssetPath;
+	static Font* s_Font;
 
 	EditorLayer::EditorLayer()
 		: Layer("EditorLayer"), m_CameraController(1280.0f / 720.0f)
 	{
+		s_Font = new Font("assets/fonts/opensans/static/OpenSans-Regular.ttf");
 	}
 
 	void EditorLayer::OnAttach()
@@ -336,6 +338,7 @@ namespace Lithe {
 		UI_MenuBar();
 		UI_Stats();
 		UI_Settings();
+		UI_Fonts();
 
 		ImGui::End();
 	}
@@ -785,6 +788,14 @@ namespace Lithe {
 				ImGui::PopItemFlag();
 		}
 
+		ImGui::End();
+	}
+
+	void EditorLayer::UI_Fonts()
+	{
+		ImGui::Begin("Font Atlas");
+		ImGui::Image(reinterpret_cast<ImTextureID>(static_cast<uint64_t>(s_Font->GetAtlasTexture()->GetRendererID())),
+			{ 512,512 }, { 0, 1 }, { 1, 0 });
 		ImGui::End();
 	}
 
