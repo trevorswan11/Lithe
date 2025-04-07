@@ -34,6 +34,7 @@ group "Dependencies"
 	include "Lithe/vendor/imgui"
 	include "Lithe/vendor/yaml-cpp"
 	include "Lithe/vendor/Box2D"
+	include "Lithe/vendor/msdf-atlas-gen"
 group ""
 
 include "Lithe"

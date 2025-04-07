@@ -46,7 +46,9 @@ project "Lithe"
 		"%{IncludeDir.yaml_cpp}",
 		"%{IncludeDir.ImGuizmo}",
 		"%{IncludeDir.Box2D}",
-		"%{IncludeDir.VulkanSDK}"
+		"%{IncludeDir.VulkanSDK}",
+		"%{IncludeDir.msdfgen}",
+ 		"%{IncludeDir.msdf_atlas_gen}"
 	}
 
 	links
@@ -56,7 +58,8 @@ project "Lithe"
 		-- "opengl32.lib",
 		"yaml-cpp",
 		"Glad",
-		"ImGui"
+		"ImGui",
+		"msdf-atlas-gen"
 	}
 
 	filter "files:vendor/ImGuizmo/**.cpp"

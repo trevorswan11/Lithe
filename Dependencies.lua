@@ -15,6 +15,8 @@ IncludeDir["Box2D"] = "%{wks.location}/Lithe/vendor/Box2D/include"
 IncludeDir["shaderc"] = "%{wks.location}/Lithe/vendor/shaderc/include"
 IncludeDir["SPIRV_Cross"] = "%{wks.location}/Lithe/vendor/SPIRV-Cross"
 IncludeDir["VulkanSDK"] = "%{VULKAN_SDK}/Include"
+IncludeDir["msdfgen"] = "%{wks.location}/Lithe/vendor/msdf-atlas-gen/msdfgen"
+IncludeDir["msdf_atlas_gen"] = "%{wks.location}/Lithe/vendor/msdf-atlas-gen/msdf-atlas-gen"
 
 LibraryDir = {}
 
