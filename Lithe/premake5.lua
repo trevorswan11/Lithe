@@ -48,18 +48,21 @@ project "Lithe"
 		"%{IncludeDir.Box2D}",
 		"%{IncludeDir.VulkanSDK}",
 		"%{IncludeDir.msdfgen}",
- 		"%{IncludeDir.msdf_atlas_gen}"
+ 		"%{IncludeDir.msdf_atlas_gen}",
+		"%{IncludeDir.mono}",
+		"%{IncludeDir.filewatch}"
 	}
 
 	links
 	{
 		"GLFW",
 		"Box2D",
-		-- "opengl32.lib",
+		"opengl32.lib",
 		"yaml-cpp",
 		"Glad",
 		"ImGui",
-		"msdf-atlas-gen"
+		"msdf-atlas-gen",
+		"%{Library.mono}"
 	}
 
 	filter "files:vendor/ImGuizmo/**.cpp"
@@ -71,6 +74,16 @@ project "Lithe"
 		defines
 		{
 		}
+
+		links
+ 		{
+ 			"%{Library.WinSock}",
+ 			"%{Library.WinMM}",
+ 			"%{Library.WinVersion}",
+ 			"%{Library.BCrypt}",
+ 		}
+
+		linkoptions { "/IGNORE:4006" }
 
 	filter "configurations:Debug"
 		defines "LI_DEBUG"

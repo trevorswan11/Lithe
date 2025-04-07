@@ -15,7 +15,7 @@ CMakeUserPresets.json
 # Lithe Directories
 bin
 bin-int/
-Reference/
+Intermediates/
 Lithe/vendor/VulkanSDK
 vendor/VulkanSDK
 Lithium/assets/cache

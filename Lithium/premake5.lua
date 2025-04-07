@@ -28,7 +28,8 @@ project "Lithium"
 		"%{wks.location}/Lithe/vendor",
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.entt}",
-		"%{IncludeDir.ImGuizmo}"
+		"%{IncludeDir.ImGuizmo}",
+		"%{IncludeDir.filewatch}"
 	}
 
 	links
