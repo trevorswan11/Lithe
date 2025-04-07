@@ -153,10 +153,19 @@ namespace Lithe {
 		static void DrawLine(const glm::vec3& p0, const glm::vec3& p1, const glm::vec4& color, int entityID = -1);
 		static void DrawRect(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color, int entityID = -1);
 		static void DrawRect(const glm::mat4& transform, const glm::vec4& color, int entityID = -1);
+
+		struct TextParams
+		{
+			glm::vec4 Color{ 1.0f };
+			float Kerning = 0.0f;
+			float LineSpacing = 0.0f;
+		};
+		static void DrawString(const std::string& string, Ref<Font> font, const glm::mat4& transform, const TextParams& textParams, int entityID = -1);
 		
 		// Component System
 		static void DrawSpriteComponent(const glm::mat4& transform, SpriteRendererComponent& src, int entityID);
 		static void DrawCircleComponent(const glm::mat4& transform, CircleRendererComponent& crc, int entityID);
+		static void DrawString(const std::string& string, const glm::mat4& transform, const TextComponent& component, int entityID = -1);
 	public:
 		// --- Stats ---
 
@@ -166,14 +175,15 @@ namespace Lithe {
 			uint32_t QuadCount = 0;
 			uint32_t CircleCount = 0;
 			uint32_t LineCount = 0;
+			uint32_t TextCount = 0;
 
 			uint32_t GetTotalVertexCount() const 
 			{
-				return LineCount * 2 + (QuadCount + CircleCount) * 4;
+				return LineCount * 2 + (QuadCount + CircleCount + TextCount) * 4;
 			};
 			uint32_t GetTotalIndexCount() const
 			{
-				return (QuadCount + CircleCount) * 6;
+				return (QuadCount + CircleCount + TextCount) * 6;
 			};
 		};
 		static void ResetStats();

@@ -3,18 +3,15 @@
 
 #include "Lithe/Core/Timer.h"
 
+#include "Lithe/Renderer/MSDFData.h"
+
 #undef INFINITE
 #include <msdf-atlas-gen.h>
 #include <FontGeometry.h>
 #include <GlyphGeometry.h>
 
-namespace Lithe {
 
-	struct MSDFData
-	{
-		std::vector<msdf_atlas::GlyphGeometry> Glyphs;
-		msdf_atlas::FontGeometry FontGeometry;
-	};
+namespace Lithe {
 
 	template<typename T, typename S, int N, msdf_atlas::GeneratorFunction<S, N> GenFunc>
 	static Ref<Texture2D> CreateAndCacheAtlas(const std::string& fontName, float fontSize, const std::vector<msdf_atlas::GlyphGeometry>& glyphs,
@@ -48,21 +45,25 @@ namespace Lithe {
 		: m_Data(new MSDFData())
 	{
 		LI_PROFILE_FUNCTION();
+#if 0
+		std::string cachePath = GetCachePath(filepath);
+		if (TryLoadFromCache(cachePath))
+		{
+			LI_CORE_INFO("Loaded font atlas from cache: {0}", cachePath);
+			return;
+		}
+#endif
 
 		Timer timer;
 		msdfgen::FreetypeHandle* ft = msdfgen::initializeFreetype();
 		LI_CORE_ASSERT(ft);
-		if (!ft)
-		{
-			LI_CORE_CRITICAL("Fatal error initializing freetype.");
-			return;
-		}
-		std::string filestring = filepath.string();
-		msdfgen::FontHandle* font = msdfgen::loadFont(ft, filestring.c_str());
-		LI_CORE_ASSERT(font);
+
+		std::string fileString = filepath.string();
+
+		msdfgen::FontHandle* font = msdfgen::loadFont(ft, fileString.c_str());
 		if (!font)
 		{
-			LI_CORE_CRITICAL("Fatal error loading font: {0}", filestring);
+			LI_CORE_ERROR("Failed to load font: {0}", fileString);
 			return;
 		}
 
@@ -71,15 +72,17 @@ namespace Lithe {
 			uint32_t Begin, End;
 		};
 
-		// imgui_draw.cpp
+		// From imgui_draw.cpp
 		static const CharsetRange charsetRanges[] =
 		{
 			{ 0x0020, 0x00FF }
 		};
+
 		msdf_atlas::Charset charset;
-		for (CharsetRange cr : charsetRanges)
+		for (CharsetRange range : charsetRanges)
 		{
-			for (uint32_t c = cr.Begin; c <= cr.End; c++) charset.add(c);
+			for (uint32_t c = range.Begin; c <= range.End; c++)
+				charset.add(c);
 		}
 
 		double fontScale = 1.0;
@@ -102,16 +105,127 @@ namespace Lithe {
 		atlasPacker.getDimensions(width, height);
 		emSize = atlasPacker.getScale();
 
+		#define DEFAULT_ANGLE_THRESHOLD 3.0
+		#define LCG_MULTIPLIER 6364136223846793005ull
+		#define LCG_INCREMENT 1442695040888963407ull
+		#define THREAD_COUNT 8
+		// if MSDF || MTSDF
+
+		uint64_t coloringSeed = 0;
+		bool expensiveColoring = false;
+		if (expensiveColoring)
+		{
+			msdf_atlas::Workload([&glyphs = m_Data->Glyphs, &coloringSeed](int i, int threadNo) -> bool {
+				unsigned long long glyphSeed = (LCG_MULTIPLIER * (coloringSeed ^ i) + LCG_INCREMENT) * !!coloringSeed;
+				glyphs[i].edgeColoring(msdfgen::edgeColoringInkTrap, DEFAULT_ANGLE_THRESHOLD, glyphSeed);
+				return true;
+				}, (int)m_Data->Glyphs.size()).finish(THREAD_COUNT);
+		}
+		else {
+			unsigned long long glyphSeed = coloringSeed;
+			for (msdf_atlas::GlyphGeometry& glyph : m_Data->Glyphs)
+			{
+				glyphSeed *= LCG_MULTIPLIER;
+				glyph.edgeColoring(msdfgen::edgeColoringInkTrap, DEFAULT_ANGLE_THRESHOLD, glyphSeed);
+			}
+		}
+
 		m_AtlasTexture = CreateAndCacheAtlas<uint8_t, float, 3, msdf_atlas::msdfGenerator>("Test", (float)emSize, m_Data->Glyphs, m_Data->FontGeometry, width, height);
 
 		msdfgen::destroyFont(font);
 		msdfgen::deinitializeFreetype(ft);
-		LI_CORE_WARN("Font generation took {0} ms", timer.ElapsedMillis());
+
+#if 0
+		SaveToCache(cachePath);
+#endif
+		LI_CORE_WARN("Font {0} loaded in {1}", filepath.filename().string(), timer.ElapsedMillis());
 	}
 
 	Font::~Font()
 	{
 		delete m_Data;
+	}
+
+
+	Ref<Font> Font::GetDefault()
+	{
+		static Ref<Font> DefaultFont;
+		if (!DefaultFont)
+			DefaultFont = CreateRef<Font>("assets/fonts/opensans/static/OpenSans-Regular.ttf");
+
+		return DefaultFont;
+	}
+
+	std::string Font::GetCachePath(const std::filesystem::path& fontPath)
+	{
+		std::filesystem::path cacheDir = "assets/cache/fonts";
+		std::filesystem::create_directories(cacheDir);
+
+		std::string filename = fontPath.stem().string() + ".msdfcache";
+		return (cacheDir / filename).string();
+	}
+
+	// TODO: Font serialization/deserialization not functional
+
+	bool Font::TryLoadFromCache(const std::filesystem::path& filepath)
+	{
+		LI_PROFILE_FUNCTION();
+
+		if (!std::filesystem::exists(filepath))
+			return false;
+
+		std::ifstream in(filepath, std::ios::binary);
+		if (!in.is_open())
+			return false;
+
+		int width, height, glyphCount;
+		in.read((char*)&width, sizeof(int));
+		in.read((char*)&height, sizeof(int));
+		in.read((char*)&glyphCount, sizeof(int));
+
+		std::vector<msdf_atlas::GlyphGeometry> glyphs(glyphCount);
+		in.read((char*)glyphs.data(), glyphCount * sizeof(msdf_atlas::GlyphGeometry));
+
+		size_t pixelDataSize = width * height * 3;
+		std::vector<uint8_t> pixelData(pixelDataSize);
+		in.read((char*)pixelData.data(), pixelDataSize);
+
+		in.close();
+
+		TextureSpecification spec;
+		spec.Width = width;
+		spec.Height = height;
+		spec.Format = ImageFormat::RGB8;
+		spec.GenerateMips = false;
+
+		m_AtlasTexture = Texture2D::Create(spec);
+		m_AtlasTexture->SetData(pixelData.data(), (uint32_t)pixelDataSize);
+
+		m_Data->Glyphs = std::move(glyphs);
+
+		return true;
+	}
+
+	void Font::SaveToCache(const std::filesystem::path& filepath)
+	{
+		LI_PROFILE_FUNCTION();
+		
+		LI_CORE_INFO("Saving font atlas to cache: {0}", filepath.string());
+
+		int width = m_AtlasTexture->GetWidth();
+		int height = m_AtlasTexture->GetHeight();
+		int glyphCount = (int)m_Data->Glyphs.size();
+
+		std::vector<uint8_t> pixelData(width * height * 3);
+		m_AtlasTexture->ReadData(pixelData.data());
+
+		std::ofstream out(filepath, std::ios::binary);
+		out.write((char*)&width, sizeof(int));
+		out.write((char*)&height, sizeof(int));
+		out.write((char*)&glyphCount, sizeof(int));
+		out.write((char*)m_Data->Glyphs.data(), glyphCount * sizeof(msdf_atlas::GlyphGeometry));
+		out.write((char*)pixelData.data(), pixelData.size());
+		out.close();
 	}
 
 }

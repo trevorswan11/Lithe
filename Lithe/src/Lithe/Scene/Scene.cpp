@@ -246,10 +246,10 @@ namespace Lithe {
 			{
 				LI_PROFILE_SCOPE("Runtime Draw Sprites");
 
-				auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
-				for (auto entity : group)
+				auto spriteView = m_Registry.view<TransformComponent, SpriteRendererComponent>();
+				for (auto entity : spriteView) // Intellisense may be angry here, but I swear it compiles
 				{
-					auto [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
+					auto [transform, sprite] = spriteView.get<TransformComponent, SpriteRendererComponent>(entity);
 
 					Renderer2D::DrawSpriteComponent(transform.GetTransform(), sprite, (int)entity);
 				}
@@ -264,6 +264,18 @@ namespace Lithe {
 					auto [transform, circle] = circleView.get<TransformComponent, CircleRendererComponent>(entity);
 
 					Renderer2D::DrawCircleComponent(transform.GetTransform(), circle, (int)entity);
+				}
+			}
+
+			{
+				LI_PROFILE_SCOPE("Runtime Draw Text");
+
+				auto textView = m_Registry.view<TransformComponent, TextComponent>();
+				for (auto entity : textView) // Intellisense may be angry here, but I swear it compiles
+				{
+					auto [transform, text] = textView.get<TransformComponent, TextComponent>(entity);
+
+					Renderer2D::DrawString(text.TextString, transform.GetTransform(), text, (int)entity);
 				}
 			}
 
@@ -408,10 +420,10 @@ namespace Lithe {
 
 		// Draw Sprites
 		{
-			auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
-			for (auto entity : group)
+			auto spriteView = m_Registry.view<TransformComponent, SpriteRendererComponent>();
+			for (auto entity : spriteView) // Intellisense may be angry here, but I swear it compiles
 			{
-				auto [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
+				auto [transform, sprite] = spriteView.get<TransformComponent, SpriteRendererComponent>(entity);
 
 				Renderer2D::DrawSpriteComponent(transform.GetTransform(), sprite, (int)entity);
 			}
@@ -425,6 +437,17 @@ namespace Lithe {
 				auto [transform, circle] = circleView.get<TransformComponent, CircleRendererComponent>(entity);
 
 				Renderer2D::DrawCircleComponent(transform.GetTransform(), circle, (int)entity);
+			}
+		}
+
+		// Draw Text
+		{
+			auto textView = m_Registry.view<TransformComponent, TextComponent>();
+			for (auto entity : textView) // Intellisense may be angry here, but I swear it compiles
+			{
+				auto [transform, text] = textView.get<TransformComponent, TextComponent>(entity);
+
+				Renderer2D::DrawString(text.TextString, transform.GetTransform(), text, (int)entity);
 			}
 		}
 
@@ -485,6 +508,11 @@ namespace Lithe {
 
 	template<>
 	void Scene::OnComponentAdded<CircleCollider2DComponent>(Entity entity, CircleCollider2DComponent& component)
+	{
+	}
+
+	template<>
+	void Scene::OnComponentAdded<TextComponent>(Entity entity, TextComponent& component)
 	{
 	}
 

@@ -32,6 +32,9 @@ namespace Lithe {
 			case RendererAPI::API::Vulkan:		return CreateRef<VulkanTexture2D>(specification);
 			case RendererAPI::API::DirectX:		return CreateRef<DirectXTexture2D>(specification);
 		}
+
+		LI_CORE_ASSERT(false, "Unknown RendererAPI!");
+		return nullptr;
 	}
 
 	Ref<Texture2D> Texture2D::Create(const std::string& path)

@@ -23,6 +23,7 @@ namespace Lithe {
 		virtual const std::string& GetPath() const override { return m_Path; }
 
 		virtual void SetData(void* data, uint32_t size) override;
+		virtual void ReadData(void* dst) override;
 
 		virtual void Bind(uint32_t slot = 0) const override;
 
@@ -39,6 +40,8 @@ namespace Lithe {
 		uint32_t m_Width, m_Height;
 		uint32_t m_RendererID;
 		GLenum m_InternalFormat, m_DataFormat;
+
+		std::vector<uint8_t> m_LocalCopy;
 	};
 
 }

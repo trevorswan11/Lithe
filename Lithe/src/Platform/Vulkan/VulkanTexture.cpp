@@ -42,6 +42,13 @@ namespace Lithe {
 		LI_CORE_ASSERT(false);
 	}
 
+	void VulkanTexture2D::ReadData(void* dst)
+	{
+		LI_PROFILE_FUNCTION();
+
+		LI_CORE_ASSERT(false);
+	}
+
 	void VulkanTexture2D::Bind(uint32_t slot) const
 	{
 		LI_PROFILE_FUNCTION();

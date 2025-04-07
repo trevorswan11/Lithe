@@ -21,6 +21,7 @@ namespace Lithe {
 		virtual const std::string& GetPath() const override { return m_Path; }
 
 		virtual void SetData(void* data, uint32_t size) override;
+		virtual void ReadData(void* dst) override;
 
 		virtual void Bind(uint32_t slot = 0) const override;
 

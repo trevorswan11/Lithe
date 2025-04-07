@@ -7,6 +7,7 @@
 
 #include "Lithe/Renderer/Texture.h"
 #include "Lithe/Renderer/SubTexture2D.h"
+#include "Lithe/Renderer/Font.h"
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/quaternion.hpp>
@@ -95,6 +96,15 @@ namespace Lithe {
 		CameraComponent(const CameraComponent&) = default;
 	};
 
+	struct TextComponent
+	{
+		std::string TextString;
+		Ref<Font> FontAsset = Font::GetDefault();
+		glm::vec4 Color{ 1.0f };
+		float Kerning = 0.0f;
+		float LineSpacing = 0.0f;
+	};
+
 	// Forward Declaration
 	class ScriptableEntity;
 
@@ -170,6 +180,6 @@ namespace Lithe {
 		ComponentGroup<TransformComponent, SpriteRendererComponent,
 		CameraComponent, NativeScriptComponent, RigidBody2DComponent,
 		CircleRendererComponent, BoxCollider2DComponent,
-		CircleCollider2DComponent>;
+		CircleCollider2DComponent, TextComponent>;
 
 }
