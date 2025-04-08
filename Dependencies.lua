@@ -19,6 +19,7 @@ IncludeDir["msdfgen"] = "%{wks.location}/Lithe/vendor/msdf-atlas-gen/msdfgen"
 IncludeDir["msdf_atlas_gen"] = "%{wks.location}/Lithe/vendor/msdf-atlas-gen/msdf-atlas-gen"
 IncludeDir["mono"] = "%{wks.location}/Lithe/vendor/mono/include"
 IncludeDir["filewatch"] = "%{wks.location}/Lithe/vendor/filewatch"
+IncludeDir["miniaudio"] = "%{wks.location}/Lithe/vendor/miniaudio"
 
 LibraryDir = {}
 

@@ -358,6 +358,10 @@ namespace Lithe {
 
 	bool EditorLayer::OnKeyPressed(KeyPressedEvent& e)
 	{
+		// TEMP FOR AUDIO
+		if (Input::IsKeyPressed(Key::RightAlt) && Input::IsKeyPressed(Key::P))
+			AudioEngine::Get().PlaySound("assets/sounds/SKINNY.mp3");
+
 		// Shortcuts
 		if (e.IsRepeat())
 			return false;

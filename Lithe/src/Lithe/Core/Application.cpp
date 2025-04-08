@@ -24,7 +24,6 @@ namespace Lithe {
 			std::filesystem::current_path(m_AppSpec.WorkingDirectory);
 
 		Renderer::Init();
-
 		m_ImGuiLayer = new ImGuiLayer();
 		PushOverlay(m_ImGuiLayer);
 	}

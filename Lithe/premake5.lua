@@ -24,7 +24,9 @@ project "Lithe"
 		"vendor/stb_image/**.h",
 		"vendor/stb_image/**.cpp",
 		"vendor/ImGuizmo/ImGuizmo.h",
-		"vendor/ImGuizmo/ImGuizmo.cpp"
+		"vendor/ImGuizmo/ImGuizmo.cpp",
+		"vendor/miniaudio/miniaudio.h",
+		"vendor/miniaudio/miniaudio.c"
 	}
 
 	defines
@@ -50,7 +52,8 @@ project "Lithe"
 		"%{IncludeDir.msdfgen}",
  		"%{IncludeDir.msdf_atlas_gen}",
 		"%{IncludeDir.mono}",
-		"%{IncludeDir.filewatch}"
+		"%{IncludeDir.filewatch}",
+		"%{IncludeDir.miniaudio}"
 	}
 
 	links
@@ -66,6 +69,9 @@ project "Lithe"
 	}
 
 	filter "files:vendor/ImGuizmo/**.cpp"
+		flags { "NoPCH" }
+
+	filter "files:vendor/miniaudio/**.c"
 		flags { "NoPCH" }
 
 	filter "system:windows"

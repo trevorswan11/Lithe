@@ -3,6 +3,7 @@
 // For use by Lithe applications
 
 #include "Lithe/Core/Application.h"
+#include "Lithe/Core/AudioEngine.h"
 #include "Lithe/Core/Layer.h"
 #include "Lithe/Core/Log.h"
 #include "Lithe/Math/Math.h"
