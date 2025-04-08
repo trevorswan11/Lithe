@@ -45,14 +45,6 @@ namespace Lithe {
 		: m_Data(new MSDFData())
 	{
 		LI_PROFILE_FUNCTION();
-#if 0
-		std::string cachePath = GetCachePath(filepath);
-		if (TryLoadFromCache(cachePath))
-		{
-			LI_CORE_INFO("Loaded font atlas from cache: {0}", cachePath);
-			return;
-		}
-#endif
 
 		Timer timer;
 		msdfgen::FreetypeHandle* ft = msdfgen::initializeFreetype();
@@ -135,9 +127,6 @@ namespace Lithe {
 		msdfgen::destroyFont(font);
 		msdfgen::deinitializeFreetype(ft);
 
-#if 0
-		SaveToCache(cachePath);
-#endif
 		LI_CORE_WARN("Font {0} loaded in {1}", filepath.filename().string(), timer.ElapsedMillis());
 	}
 
@@ -166,66 +155,5 @@ namespace Lithe {
 	}
 
 	// TODO: Font serialization/deserialization not functional
-
-	bool Font::TryLoadFromCache(const std::filesystem::path& filepath)
-	{
-		LI_PROFILE_FUNCTION();
-
-		if (!std::filesystem::exists(filepath))
-			return false;
-
-		std::ifstream in(filepath, std::ios::binary);
-		if (!in.is_open())
-			return false;
-
-		int width, height, glyphCount;
-		in.read((char*)&width, sizeof(int));
-		in.read((char*)&height, sizeof(int));
-		in.read((char*)&glyphCount, sizeof(int));
-
-		std::vector<msdf_atlas::GlyphGeometry> glyphs(glyphCount);
-		in.read((char*)glyphs.data(), glyphCount * sizeof(msdf_atlas::GlyphGeometry));
-
-		size_t pixelDataSize = width * height * 3;
-		std::vector<uint8_t> pixelData(pixelDataSize);
-		in.read((char*)pixelData.data(), pixelDataSize);
-
-		in.close();
-
-		TextureSpecification spec;
-		spec.Width = width;
-		spec.Height = height;
-		spec.Format = ImageFormat::RGB8;
-		spec.GenerateMips = false;
-
-		m_AtlasTexture = Texture2D::Create(spec);
-		m_AtlasTexture->SetData(pixelData.data(), (uint32_t)pixelDataSize);
-
-		m_Data->Glyphs = std::move(glyphs);
-
-		return true;
-	}
-
-	void Font::SaveToCache(const std::filesystem::path& filepath)
-	{
-		LI_PROFILE_FUNCTION();
-		
-		LI_CORE_INFO("Saving font atlas to cache: {0}", filepath.string());
-
-		int width = m_AtlasTexture->GetWidth();
-		int height = m_AtlasTexture->GetHeight();
-		int glyphCount = (int)m_Data->Glyphs.size();
-
-		std::vector<uint8_t> pixelData(width * height * 3);
-		m_AtlasTexture->ReadData(pixelData.data());
-
-		std::ofstream out(filepath, std::ios::binary);
-		out.write((char*)&width, sizeof(int));
-		out.write((char*)&height, sizeof(int));
-		out.write((char*)&glyphCount, sizeof(int));
-		out.write((char*)m_Data->Glyphs.data(), glyphCount * sizeof(msdf_atlas::GlyphGeometry));
-		out.write((char*)pixelData.data(), pixelData.size());
-		out.close();
-	}
 
 }
