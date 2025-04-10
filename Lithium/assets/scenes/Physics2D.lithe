@@ -1,71 +1,23 @@
 Scene: pretty sure.
 Entities:
-  - Entity: 7792816643978409320
+  - Entity: 7469278664554809218
     TagComponent:
-      Tag: Circle
+      Tag: Text
     TransformComponent:
-      Translation: [11.3908119, 6.83698463, 1.90734863e-06]
+      Translation: [-2.5, -3.5, 0]
       Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    CircleRendererComponent:
-      Color: [1, 1, 1, 1]
-      Thickness: 1
-      Fade: 0.00499999989
-    RigidBody2DComponent:
-      BodyType: Dynamic
-      FixedRotation: false
-    CircleCollider2DComponent:
-      Offset: [0, 0]
-      Radius: 0.5
-      Density: 1
-      Friction: 0.5
-      Restitution: 0.49000001
-      RestitutionThreshold: 0.5
-  - Entity: 7934038968327674915
+      Scale: [2, 2, 1]
+    TextComponent:
+      TextString: Hello World
+      Color: [0.537397742, 0.876447856, 0.368852526, 1]
+      Kerning: 0.275000006
+      LineSpacing: 0.625
+  - Entity: 17769540960988155115
     TagComponent:
-      Tag: WHERES OMNI MAN
+      Tag: Wall Left
     TransformComponent:
-      Translation: [-2.72042346, 6.71999979, 7.4505806e-09]
-      Rotation: [0, 0, 8.53438178e-06]
-      Scale: [6, 6, 1]
-    SpriteRendererComponent:
-      Color: [1, 0.876447856, 0.876447856, 1]
-      TexturePath: assets\textures\are_you_shore.png
-      TilingFactor: 1
-    RigidBody2DComponent:
-      BodyType: Dynamic
-      FixedRotation: false
-    BoxCollider2DComponent:
-      Offset: [0, 0]
-      Size: [0.5, 0.5]
-      Density: 0.129999995
-      Friction: 0.5
-      Restitution: 0.5
-      RestitutionThreshold: 0.5
-  - Entity: 8191811578362070338
-    TagComponent:
-      Tag: Camera
-    TransformComponent:
-      Translation: [2.65909576, 9.09000015, 28.6100006]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    CameraComponent:
-      Camera:
-        ProjectionType: 0
-        PerspectiveFOV: 0.785398185
-        PerspectiveNear: 0.00999999978
-        PerspectiveFar: 1000
-        OrthographicSize: 10
-        OrthographicNear: -1
-        OrthographicFar: 1
-      Primary: true
-      FixedAspectRatio: false
-  - Entity: 1104804548551890760
-    TagComponent:
-      Tag: Floor
-    TransformComponent:
-      Translation: [-1.37, -0.824707091, 0]
-      Rotation: [0, 0, 0]
+      Translation: [-13.0699997, 2.48000002, 0]
+      Rotation: [0, 0, -0.490437567]
       Scale: [13.8000002, 2.04999995, 0.99990952]
     SpriteRendererComponent:
       Color: [0.779922783, 0.331241369, 0.331241369, 1]
@@ -100,12 +52,12 @@ Entities:
       Friction: 0.5
       Restitution: 0
       RestitutionThreshold: 0.5
-  - Entity: 17769540960988155115
+  - Entity: 1104804548551890760
     TagComponent:
-      Tag: Wall Left
+      Tag: Floor
     TransformComponent:
-      Translation: [-13.0699997, 2.48000002, 0]
-      Rotation: [0, 0, -0.490437567]
+      Translation: [-1.37, -0.824707091, 0]
+      Rotation: [0, 0, 0]
       Scale: [13.8000002, 2.04999995, 0.99990952]
     SpriteRendererComponent:
       Color: [0.779922783, 0.331241369, 0.331241369, 1]
@@ -120,15 +72,68 @@ Entities:
       Friction: 0.5
       Restitution: 0
       RestitutionThreshold: 0.5
-  - Entity: 7469278664554809218
+  - Entity: 8191811578362070338
     TagComponent:
-      Tag: Text
+      Tag: Camera
     TransformComponent:
-      Translation: [-2.5, -3.5, 0]
+      Translation: [2.65909576, 9.09000015, 28.6100006]
       Rotation: [0, 0, 0]
-      Scale: [2, 2, 1]
-    TextComponent:
-      TextString: Hello World
-      Color: [0.537397742, 0.876447856, 0.368852526, 1]
-      Kerning: 0.275000006
-      LineSpacing: 0.625
+      Scale: [1, 1, 1]
+    CameraComponent:
+      Camera:
+        ProjectionType: 0
+        PerspectiveFOV: 0.785398185
+        PerspectiveNear: 0.00999999978
+        PerspectiveFar: 1000
+        OrthographicSize: 10
+        OrthographicNear: -1
+        OrthographicFar: 1
+      Primary: true
+      FixedAspectRatio: false
+  - Entity: 7934038968327674915
+    TagComponent:
+      Tag: WHERES OMNI MAN
+    TransformComponent:
+      Translation: [-2.72042346, 6.71999979, 7.4505806e-09]
+      Rotation: [0, 0, 8.53438178e-06]
+      Scale: [6, 6, 1]
+    SpriteRendererComponent:
+      Color: [1, 0.876447856, 0.876447856, 1]
+      TexturePath: assets\textures\are_you_shore.png
+      TilingFactor: 1
+    RigidBody2DComponent:
+      BodyType: Dynamic
+      FixedRotation: false
+    BoxCollider2DComponent:
+      Offset: [0, 0]
+      Size: [0.5, 0.5]
+      Density: 0.129999995
+      Friction: 0.5
+      Restitution: 0.5
+      RestitutionThreshold: 0.5
+  - Entity: 7792816643978409320
+    TagComponent:
+      Tag: Circle
+    TransformComponent:
+      Translation: [11.3908119, 6.83698463, 1.90734863e-06]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    CircleRendererComponent:
+      Color: [1, 1, 1, 1]
+      Thickness: 1
+      Fade: 0.00499999989
+    RigidBody2DComponent:
+      BodyType: Dynamic
+      FixedRotation: false
+    CircleCollider2DComponent:
+      Offset: [0, 0]
+      Radius: 0.5
+      Density: 1
+      Friction: 0.5
+      Restitution: 0.49000001
+      RestitutionThreshold: 0.5
+    AudioComponent:
+      Path: assets/sounds/SKINNY.mp3
+      Volume: 1
+      Looping: false
+      PlayOnStart: true

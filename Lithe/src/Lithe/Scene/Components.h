@@ -2,6 +2,7 @@
 
 #include "Lithe/Core/Base.h"
 #include "Lithe/Core/UUID.h"
+#include "Lithe/Core/AudioEngine.h"
 
 #include "Lithe/Scene/SceneCamera.h"
 
@@ -172,6 +173,36 @@ namespace Lithe {
 		CircleCollider2DComponent(const CircleCollider2DComponent&) = default;
 	};
 
+	struct AudioComponent
+	{
+		std::string Path = "assets/sounds/SKINNY.mp3"; // TODO: for test only
+		Ref<Sound> Sound;
+		float Volume = 1.0f;
+		bool Looping = false;
+		bool PlayOnStart = true;
+
+		void Init()
+		{
+			if (Initialized) return;
+			
+			Sound = AudioEngine::CreateSound(Path.c_str(), Volume, Looping);
+			if (Sound) Initialized = true;
+		}
+
+		AudioComponent() = default;
+		AudioComponent(const AudioComponent&) = default;
+
+		void Play() { Sound->Play(); Playing = true; }
+		void Stop() { Sound->Stop(); Playing = false; }
+		void SetVolume(float volume) { Sound->SetVolume(volume); Volume = volume; }
+		void SetLooping(bool looping) { Sound->SetLooping(looping); Looping = looping; }
+		bool IsValid() const { return Sound->IsValid(); }
+		bool IsPlaying() const { return Playing; }
+	private:
+		bool Initialized = false;
+		bool Playing = false;
+	};
+
 	template<typename... Component>
 	struct ComponentGroup
 	{};
@@ -180,6 +211,6 @@ namespace Lithe {
 		ComponentGroup<TransformComponent, SpriteRendererComponent,
 		CameraComponent, NativeScriptComponent, RigidBody2DComponent,
 		CircleRendererComponent, BoxCollider2DComponent,
-		CircleCollider2DComponent, TextComponent>;
+		CircleCollider2DComponent, TextComponent, AudioComponent>;
 
 }

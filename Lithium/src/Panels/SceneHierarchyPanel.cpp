@@ -240,6 +240,7 @@ namespace Lithe {
 			DisplayAddComponentEntry<CircleRendererComponent>("Circle Renderer");
 			DisplayAddComponentEntry<CircleCollider2DComponent>("Circle Collider 2D");
 			DisplayAddComponentEntry<TextComponent>("Text Component");
+			DisplayAddComponentEntry<AudioComponent>("Audio Component");
 
 			ImGui::EndPopup();
 		}
@@ -464,6 +465,13 @@ namespace Lithe {
 				ImGui::ColorEdit4("Color", glm::value_ptr(component.Color));
 				ImGui::DragFloat("Kerning", &component.Kerning, 0.025f);
 				ImGui::DragFloat("Line Spacing", &component.LineSpacing, 0.025f);
+			});
+
+		DrawComponent<AudioComponent>("Audio", entity, [](auto& component)
+			{
+				// TODO: expose audio component fields
+				if (ImGui::Button("Set play on start"))
+					component.PlayOnStart = true;
 			});
 	}
 

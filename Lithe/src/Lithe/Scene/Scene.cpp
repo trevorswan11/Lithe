@@ -238,6 +238,27 @@ namespace Lithe {
 			}
 		}
 
+		// Play designated audio
+		{
+			auto view = m_Registry.view<AudioComponent>();
+			for (auto entity : view)
+			{
+				auto& audio = view.get<AudioComponent>(entity);
+				audio.Init();
+
+				if (m_IsPaused)
+				{
+					if (audio.IsPlaying())
+						audio.Stop();
+				}
+				else
+				{
+					if (!audio.IsPlaying() || (audio.PlayOnStart && !audio.IsPlaying()))
+						audio.Play();
+				}
+			}
+		}
+
 		// Render from main camera
 		if (primaryCamera)
 		{
@@ -513,6 +534,11 @@ namespace Lithe {
 
 	template<>
 	void Scene::OnComponentAdded<TextComponent>(Entity entity, TextComponent& component)
+	{
+	}
+
+	template<>
+	void Scene::OnComponentAdded<AudioComponent>(Entity entity, AudioComponent& component)
 	{
 	}
 

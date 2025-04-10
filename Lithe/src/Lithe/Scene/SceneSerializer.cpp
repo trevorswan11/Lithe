@@ -309,6 +309,20 @@ namespace Lithe {
 			out << YAML::EndMap; // TextComponent
 		}
 
+		if (entity.HasComponent<AudioComponent>())
+		{
+			out << YAML::Key << "AudioComponent";
+			out << YAML::BeginMap; // AudioComponent
+
+			auto& audioComponent = entity.GetComponent<AudioComponent>();
+			out << YAML::Key << "Path" << YAML::Value << audioComponent.Path;
+			out << YAML::Key << "Volume" << YAML::Value << audioComponent.Volume;
+			out << YAML::Key << "Looping" << YAML::Value << audioComponent.Looping;
+			out << YAML::Key << "PlayOnStart" << YAML::Value << audioComponent.PlayOnStart;
+
+			out << YAML::EndMap; // AudioComponent
+		}
+
 		out << YAML::EndMap; // Entity
 	}
 
@@ -482,6 +496,16 @@ namespace Lithe {
 					tc.Color = textComponent["Color"].as<glm::vec4>();
 					tc.Kerning = textComponent["Kerning"].as<float>();
 					tc.LineSpacing = textComponent["LineSpacing"].as<float>();
+				}
+
+				auto audioComponent = entity["AudioComponent"];
+				if (audioComponent)
+				{
+					auto& ac = deserializedEntity.AddComponent<AudioComponent>();
+					ac.Path = audioComponent["Path"].as<std::string>();
+					ac.Volume = audioComponent["Volume"].as<float>();
+					ac.Looping = audioComponent["Looping"].as<bool>();
+					ac.PlayOnStart = audioComponent["PlayOnStart"].as<bool>();
 				}
 			}
 		}
