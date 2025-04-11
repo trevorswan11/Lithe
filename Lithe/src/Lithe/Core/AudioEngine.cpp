@@ -40,7 +40,8 @@ namespace Lithe {
 		LI_CORE_INFO("Shutdown miniaudio successfully.");
 	}
 
-	Ref<Sound> AudioEngine::CreateSound(const char* filepath, float volume, bool loop) {
+	Ref<Sound> AudioEngine::CreateSound(const char* filepath, float volume, bool loop)
+	{
 		if (auto& trackedSounds = s_Instance->m_TrackedSounds; (int)trackedSounds.size() > MAX_SOUNDS)
 		{
 			trackedSounds.erase(
@@ -101,28 +102,28 @@ namespace Lithe {
 			ma_sound_uninit(&m_Sound);
 	}
 
-	void Sound::Play()
-	{
-		if (m_Valid)
-			ma_sound_start(&m_Sound);
-	}
+    void Sound::Play(float offsetSeconds)  
+    {  
+       if (!m_Valid) return; 
+       ma_sound_start(&m_Sound);  
+    }
 
 	void Sound::Stop()
 	{
-		if (m_Valid)
-			ma_sound_stop(&m_Sound);
+		if (!m_Valid) return;
+		ma_sound_stop(&m_Sound);
 	}
 
 	void Sound::SetVolume(float volume)
 	{
-		if (m_Valid)
-			ma_sound_set_volume(&m_Sound, volume);
+		if (!m_Valid) return;
+		ma_sound_set_volume(&m_Sound, volume);
 	}
 
 	void Sound::SetLooping(bool looping)
 	{
-		if (m_Valid)
-			ma_sound_set_looping(&m_Sound, looping);
+		if (!m_Valid) return;
+		ma_sound_set_looping(&m_Sound, looping);
 	}
 
 }

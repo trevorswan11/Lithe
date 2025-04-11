@@ -469,9 +469,29 @@ namespace Lithe {
 
 		DrawComponent<AudioComponent>("Audio", entity, [](auto& component)
 			{
-				// TODO: expose audio component fields
-				if (ImGui::Button("Set play on start"))
-					component.PlayOnStart = true;
+				float width = ImGui::GetContentRegionAvail().x;
+				ImGui::Button("Audio", ImVec2(width / 1.4f, 0.0f));
+
+				if (ImGui::BeginDragDropTarget())
+				{
+					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
+					{
+						const wchar_t* path = (const wchar_t*)payload->Data;
+						std::filesystem::path audioPath = std::filesystem::path(g_AssetPath) / path;
+						component.Path = audioPath.string();
+					}
+					ImGui::EndDragDropTarget();
+				}
+				ImGui::SameLine();
+				
+				ImGui::Checkbox("Play on start", &component.PlayOnStart);
+				ImGui::DragFloat("Volume", &component.Volume, 0.01f, 0.0f, 1.0f);
+				if (ImGui::Button("Clear Path", ImVec2(width / 1.4f, 0.0f)))
+					component.Path = std::string();
+				ImGui::SameLine();
+				ImGui::Checkbox("Looping", &component.Looping);
+				std::filesystem::path audioPath = std::filesystem::path(component.Path);
+				ImGui::Text("Current path: %s", audioPath.filename().string().c_str());
 			});
 	}
 

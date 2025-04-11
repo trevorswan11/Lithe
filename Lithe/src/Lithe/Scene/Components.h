@@ -175,7 +175,7 @@ namespace Lithe {
 
 	struct AudioComponent
 	{
-		std::string Path = "assets/sounds/SKINNY.mp3"; // TODO: for test only
+		std::string Path;
 		Ref<Sound> Sound;
 		float Volume = 1.0f;
 		bool Looping = false;

@@ -253,7 +253,7 @@ namespace Lithe {
 				}
 				else
 				{
-					if (!audio.IsPlaying() || (audio.PlayOnStart && !audio.IsPlaying()))
+					if (audio.PlayOnStart && !audio.IsPlaying())
 						audio.Play();
 				}
 			}

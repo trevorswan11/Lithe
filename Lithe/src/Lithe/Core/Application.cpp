@@ -2,6 +2,8 @@
 #include "Application.h"
 
 #include "Lithe/Core/Input.h"
+#include "Lithe/Scripting/ScriptEngine.h"
+
 #include "Lithe/Utils/PlatformUtils.h"
 
 namespace Lithe {
@@ -24,6 +26,8 @@ namespace Lithe {
 			std::filesystem::current_path(m_AppSpec.WorkingDirectory);
 
 		Renderer::Init();
+		ScriptEngine::Init();
+
 		m_ImGuiLayer = new ImGuiLayer();
 		PushOverlay(m_ImGuiLayer);
 	}
@@ -32,6 +36,7 @@ namespace Lithe {
 	{
 		LI_PROFILE_FUNCTION();
 
+		ScriptEngine::Shutdown();
 		Renderer::Shutdown();
 	}
 

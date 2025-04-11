@@ -12,7 +12,7 @@ namespace Lithe {
 		Sound(ma_engine* engine, const char* filepath);
 		~Sound();
 
-		void Play();
+		void Play(float offsetSeconds = 0.0f);
 		void Stop();
 		void SetVolume(float volume);
 		void SetLooping(bool looping);

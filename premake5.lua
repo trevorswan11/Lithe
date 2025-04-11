@@ -39,6 +39,10 @@ group ""
 
 group "Core"
 	include "Lithe"
+	include "Lithe-ScriptCore"
+group ""
+
+group "Tools"
 	include "Lithium"
 group ""
 

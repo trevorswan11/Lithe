@@ -28,3 +28,7 @@
 [submodule "Lithe/vendor/mono"]
 	path = Lithe/vendor/mono
 	url = https://github.com/trevorswan11/mono
+[submodule "Lithium/mono/lib/mono/4.5"]
+	path = Lithium/mono/lib/mono/4.5
+	url = https://github.com/trevorswan11/mono
+	branch = 4.5

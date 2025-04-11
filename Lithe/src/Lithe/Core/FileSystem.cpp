@@ -2,6 +2,7 @@
 #include "FileSystem.h"
 
 namespace Lithe {
+
 	Buffer FileSystem::ReadFileBinary(const std::filesystem::path& filepath)
 	{
 		std::ifstream stream(filepath, std::ios::binary | std::ios::ate);
@@ -19,4 +20,5 @@ namespace Lithe {
 
 		return buffer;
 	}
+
 }

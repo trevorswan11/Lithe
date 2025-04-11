@@ -875,6 +875,14 @@ namespace Lithe {
 				ImGui::EndMenu();
 			}
 
+			if (ImGui::BeginMenu("Global Audio"))
+			{
+				float volume = AudioEngine::GetGlobalVolume();
+				if (ImGui::DragFloat("Volume", &volume, 0.01f, 0.0f, 1.0f))
+					AudioEngine::SetGlobalVolume(volume);
+				ImGui::EndMenu();
+			}
+
 			ImGui::EndMenuBar();
 		}
 	}
