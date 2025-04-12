@@ -6,6 +6,7 @@
 #include "Lithe/Scene/Components.h"
 
 #include "Lithe/Project/Project.h"
+#include "Lithe/Core/FileSystem.h"
 
 #include <fstream>
 #include <variant>
@@ -290,13 +291,16 @@ namespace Lithe {
 
 			if (auto& srcTexture = spriteRendererComponent.Texture)
 			{
+				namespace fs = std::filesystem;
 				if (auto texture2D = std::get_if<Ref<Texture2D>>(&*srcTexture))
 				{
-					out << YAML::Key << "TexturePath" << YAML::Value << texture2D->get()->GetPath();
+					fs::path& textureString = fs::path(texture2D->get()->GetPath());
+					out << YAML::Key << "TexturePath" << YAML::Value << FileSystem::MakeRelativePath(textureString).string();
 				}
 				else if (auto subTexture2D = std::get_if<Ref<SubTexture2D>>(&*srcTexture))
 				{
-					out << YAML::Key << "SubTexturePath" << YAML::Value << subTexture2D->get()->GetTexture()->GetPath();
+					fs::path& subTextureString = fs::path(subTexture2D->get()->GetTexture()->GetPath());
+					out << YAML::Key << "SubTexturePath" << YAML::Value << FileSystem::MakeRelativePath(subTextureString).string();
 					out << YAML::Key << "SubTextureCoords" << YAML::Value << subTexture2D->get()->GetRawTexCoords();
 					out << YAML::Key << "SubTextureCellSize" << YAML::Value << subTexture2D->get()->GetCellSize();
 					out << YAML::Key << "SubTextureSpriteSize" << YAML::Value << subTexture2D->get()->GetSpriteSize();
@@ -382,11 +386,13 @@ namespace Lithe {
 
 		if (entity.HasComponent<AudioComponent>())
 		{
+			namespace fs = std::filesystem;
 			out << YAML::Key << "AudioComponent";
 			out << YAML::BeginMap; // AudioComponent
 
 			auto& audioComponent = entity.GetComponent<AudioComponent>();
-			out << YAML::Key << "Path" << YAML::Value << audioComponent.Path;
+			fs::path& audioPath = fs::path(audioComponent.Path);
+			out << YAML::Key << "Path" << YAML::Value << FileSystem::MakeRelativePath(audioPath).string();
 			out << YAML::Key << "Volume" << YAML::Value << audioComponent.Volume;
 			out << YAML::Key << "Looping" << YAML::Value << audioComponent.Looping;
 			out << YAML::Key << "PlayOnStart" << YAML::Value << audioComponent.PlayOnStart;
@@ -634,7 +640,7 @@ namespace Lithe {
 				if (audioComponent)
 				{
 					auto& ac = deserializedEntity.AddComponent<AudioComponent>();
-					ac.Path = audioComponent["Path"].as<std::string>();
+					ac.Path = FileSystem::MakeAbsolutePath(audioComponent["Path"].as<std::string>()).string();
 					ac.Volume = audioComponent["Volume"].as<float>();
 					ac.Looping = audioComponent["Looping"].as<bool>();
 					ac.PlayOnStart = audioComponent["PlayOnStart"].as<bool>();

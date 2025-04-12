@@ -45,7 +45,7 @@ Entities:
       Scale: [1, 2.9000001, 1]
     SpriteRendererComponent:
       Color: [0.938223958, 0.862151742, 0.862151742, 1]
-      TexturePath: C:\dev\Lithe\Lithium\ExampleProject\Assets\Textures\CheckerboardExample.png
+      TexturePath: Textures\CheckerboardExample.png
       TilingFactor: 1.39999998
   - Entity: 15555271008214544321
     TagComponent:
@@ -56,5 +56,5 @@ Entities:
       Scale: [1, 1, 1]
     SpriteRendererComponent:
       Color: [0, 1, 0, 1]
-      TexturePath: C:\dev\Lithe\Lithium\ExampleProject\Assets\Textures\BTD6_YellowBalloon.png
+      TexturePath: Textures\BTD6_YellowBalloon.png
       TilingFactor: 1

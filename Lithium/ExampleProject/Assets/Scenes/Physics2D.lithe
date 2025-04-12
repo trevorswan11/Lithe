@@ -22,7 +22,7 @@ Entities:
       Restitution: 0.49000001
       RestitutionThreshold: 0.5
     AudioComponent:
-      Path: C:\dev\Lithe\Lithium\ExampleProject\Assets\Sounds\SKINNY.mp3
+      Path: Sounds\SKINNY.mp3
       Volume: 1
       Looping: false
       PlayOnStart: true
@@ -35,7 +35,7 @@ Entities:
       Scale: [6, 6, 1]
     SpriteRendererComponent:
       Color: [1, 0.876447856, 0.876447856, 1]
-      TexturePath: C:\dev\Lithe\Lithium\ExampleProject\Assets\Textures\are_you_shore.png
+      TexturePath: Textures\are_you_shore.png
       TilingFactor: 1
     RigidBody2DComponent:
       BodyType: Dynamic

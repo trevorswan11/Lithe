@@ -9,7 +9,7 @@ Entities:
       Scale: [200, 200, 1]
     SpriteRendererComponent:
       Color: [0.999989986, 0.999991953, 1, 1]
-      TexturePath: C:\dev\Lithe\Lithium\ExampleProject\Assets\Textures\are_you_shore.png
+      TexturePath: Textures\are_you_shore.png
       TilingFactor: 1
     RigidBody2DComponent:
       BodyType: Dynamic
@@ -30,7 +30,7 @@ Entities:
       Scale: [200, 200, 1]
     SpriteRendererComponent:
       Color: [0.999989986, 0.999991953, 1, 1]
-      TexturePath: C:\dev\Lithe\Lithium\ExampleProject\Assets\Textures\are_you_shore.png
+      TexturePath: Textures\are_you_shore.png
       TilingFactor: 1
     RigidBody2DComponent:
       BodyType: Dynamic
@@ -51,7 +51,7 @@ Entities:
       Scale: [200, 200, 1]
     SpriteRendererComponent:
       Color: [0.999989986, 0.999991953, 1, 1]
-      TexturePath: C:\dev\Lithe\Lithium\ExampleProject\Assets\Textures\are_you_shore.png
+      TexturePath: Textures\are_you_shore.png
       TilingFactor: 1
     RigidBody2DComponent:
       BodyType: Dynamic

@@ -891,7 +891,7 @@ namespace Lithe {
 			if (ImGui::BeginMenu("File"))
 			{
 				if (ImGui::MenuItem("Open Project...", "Ctrl+O"))
-					OpenScene();
+					OpenProject();
 				if (ImGui::MenuItem("New Scene", "Ctrl+N"))
 					NewScene();
 				if (ImGui::MenuItem("Save Scene As...", "Ctrl+Shift+S"))
