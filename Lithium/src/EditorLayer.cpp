@@ -936,7 +936,10 @@ namespace Lithe {
 			if (ImGui::BeginMenu("Scripting"))
 			{
 				if (ImGui::MenuItem("Reload assembly", "Ctrl+R"))
-					ScriptEngine::ReloadAssembly();
+				{
+					if (m_SceneState == SceneState::Edit)
+						ScriptEngine::ReloadAssembly();
+				}
 
 				ImGui::EndMenu();
 			}
