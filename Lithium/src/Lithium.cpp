@@ -11,6 +11,9 @@ namespace Lithe {
 		Lithium(ApplicationSpecification appSpec)
 			: Application(appSpec)
 		{
+#ifndef LI_DEBUG
+			Application::Get().GetWindow().SetVSync(false);
+#endif
 			PushLayer(new EditorLayer());
 		}
 

@@ -271,6 +271,174 @@ namespace Lithe {
 		return Input::IsMouseButtonPressed(mousecode);
 	}
 
+	static MonoString* AudioComponent_GetPath(UUID entityID)
+	{
+		Scene* scene = ScriptEngine::GetSceneContext();
+		LI_CORE_ASSERT(scene);
+		Entity entity = scene->GetEntityByUUID(entityID);
+		LI_CORE_ASSERT(entity);
+		LI_CORE_ASSERT(entity.HasComponent<AudioComponent>());
+
+		auto& ac = entity.GetComponent<AudioComponent>();
+		return ScriptEngine::CreateString(ac.Path.c_str());
+	}
+
+	static void AudioComponent_SetPath(UUID entityID, MonoString* textString)
+	{
+		Scene* scene = ScriptEngine::GetSceneContext();
+		LI_CORE_ASSERT(scene);
+		Entity entity = scene->GetEntityByUUID(entityID);
+		LI_CORE_ASSERT(entity);
+		LI_CORE_ASSERT(entity.HasComponent<AudioComponent>());
+	
+		auto& ac = entity.GetComponent<AudioComponent>();
+		ac.Path = Utils::MonoStringToString(textString);
+	}
+
+	static float AudioComponent_GetVolume(UUID entityID)
+	{
+		Scene* scene = ScriptEngine::GetSceneContext();
+		LI_CORE_ASSERT(scene);
+		Entity entity = scene->GetEntityByUUID(entityID);
+		LI_CORE_ASSERT(entity);
+		LI_CORE_ASSERT(entity.HasComponent<AudioComponent>());
+
+		auto& ac = entity.GetComponent<AudioComponent>();
+		return ac.Volume;
+	}
+
+	static void AudioComponent_SetVolume(UUID entityID, float volume)
+	{
+		Scene* scene = ScriptEngine::GetSceneContext();
+		LI_CORE_ASSERT(scene);
+		Entity entity = scene->GetEntityByUUID(entityID);
+		LI_CORE_ASSERT(entity);
+		LI_CORE_ASSERT(entity.HasComponent<AudioComponent>());
+
+		auto& ac = entity.GetComponent<AudioComponent>();
+		ac.Volume = volume;
+	}
+
+	static bool AudioComponent_GetLooping(UUID entityID)
+	{
+		Scene* scene = ScriptEngine::GetSceneContext();
+		LI_CORE_ASSERT(scene);
+		Entity entity = scene->GetEntityByUUID(entityID);
+		LI_CORE_ASSERT(entity);
+		LI_CORE_ASSERT(entity.HasComponent<AudioComponent>());
+
+		auto& ac = entity.GetComponent<AudioComponent>();
+		return ac.Looping;
+	}
+
+	static void AudioComponent_SetLooping(UUID entityID, bool looping)
+	{
+		Scene* scene = ScriptEngine::GetSceneContext();
+		LI_CORE_ASSERT(scene);
+		Entity entity = scene->GetEntityByUUID(entityID);
+		LI_CORE_ASSERT(entity);
+		LI_CORE_ASSERT(entity.HasComponent<AudioComponent>());
+
+		auto& ac = entity.GetComponent<AudioComponent>();
+		ac.Looping = looping;
+	}
+
+	static bool AudioComponent_GetPlayOnStart(UUID entityID)
+	{
+		Scene* scene = ScriptEngine::GetSceneContext();
+		LI_CORE_ASSERT(scene);
+		Entity entity = scene->GetEntityByUUID(entityID);
+		LI_CORE_ASSERT(entity);
+		LI_CORE_ASSERT(entity.HasComponent<AudioComponent>());
+
+		auto& ac = entity.GetComponent<AudioComponent>();
+		return ac.PlayOnStart;
+	}
+
+	static void AudioComponent_SetPlayOnStart(UUID entityID, bool playOnStart)
+	{
+		Scene* scene = ScriptEngine::GetSceneContext();
+		LI_CORE_ASSERT(scene);
+		Entity entity = scene->GetEntityByUUID(entityID);
+		LI_CORE_ASSERT(entity);
+		LI_CORE_ASSERT(entity.HasComponent<AudioComponent>());
+
+		auto& ac = entity.GetComponent<AudioComponent>();
+		ac.PlayOnStart = playOnStart;
+	}
+
+	static bool AudioComponent_IsValid(UUID entityID)
+	{
+		Scene* scene = ScriptEngine::GetSceneContext();
+		LI_CORE_ASSERT(scene);
+		Entity entity = scene->GetEntityByUUID(entityID);
+		LI_CORE_ASSERT(entity);
+		LI_CORE_ASSERT(entity.HasComponent<AudioComponent>());
+
+		auto& ac = entity.GetComponent<AudioComponent>();
+		return ac.IsValid();
+	}
+
+	static bool AudioComponent_IsPlaying(UUID entityID)
+	{
+		Scene* scene = ScriptEngine::GetSceneContext();
+		LI_CORE_ASSERT(scene);
+		Entity entity = scene->GetEntityByUUID(entityID);
+		LI_CORE_ASSERT(entity);
+		LI_CORE_ASSERT(entity.HasComponent<AudioComponent>());
+
+		auto& ac = entity.GetComponent<AudioComponent>();
+		return ac.IsPlaying();
+	}
+
+	static bool AudioComponent_IsInitialized(UUID entityID)
+	{
+		Scene* scene = ScriptEngine::GetSceneContext();
+		LI_CORE_ASSERT(scene);
+		Entity entity = scene->GetEntityByUUID(entityID);
+		LI_CORE_ASSERT(entity);
+		LI_CORE_ASSERT(entity.HasComponent<AudioComponent>());
+
+		auto& ac = entity.GetComponent<AudioComponent>();
+		return ac.IsInitialized();
+	}
+
+	static void AudioComponent_Init(UUID entityID)
+	{
+		Scene* scene = ScriptEngine::GetSceneContext();
+		LI_CORE_ASSERT(scene);
+		Entity entity = scene->GetEntityByUUID(entityID);
+		LI_CORE_ASSERT(entity);
+		LI_CORE_ASSERT(entity.HasComponent<AudioComponent>());
+
+		auto& ac = entity.GetComponent<AudioComponent>();
+		ac.Init();
+	}
+
+	static void AudioComponent_Play(UUID entityID)
+	{
+		Scene* scene = ScriptEngine::GetSceneContext();
+		LI_CORE_ASSERT(scene);
+		Entity entity = scene->GetEntityByUUID(entityID);
+		LI_CORE_ASSERT(entity);
+		LI_CORE_ASSERT(entity.HasComponent<AudioComponent>());
+
+		auto& ac = entity.GetComponent<AudioComponent>();
+		ac.Play();
+	}
+
+	static void AudioComponent_Stop(UUID entityID)
+	{
+		Scene* scene = ScriptEngine::GetSceneContext();
+		LI_CORE_ASSERT(scene);
+		Entity entity = scene->GetEntityByUUID(entityID);
+		LI_CORE_ASSERT(entity);
+		LI_CORE_ASSERT(entity.HasComponent<AudioComponent>());
+
+		auto& ac = entity.GetComponent<AudioComponent>();
+		ac.Stop();
+	}
+
 	template<typename... Component>
 	static void RegisterComponent()
 	{
@@ -334,6 +502,21 @@ namespace Lithe {
 
 		LI_ADD_INTERNAL_CALL(Input_IsKeyDown);
 		LI_ADD_INTERNAL_CALL(Input_IsMouseDown);
+
+		LI_ADD_INTERNAL_CALL(AudioComponent_GetPath);
+		LI_ADD_INTERNAL_CALL(AudioComponent_SetPath);
+		LI_ADD_INTERNAL_CALL(AudioComponent_GetVolume);
+		LI_ADD_INTERNAL_CALL(AudioComponent_SetVolume);
+		LI_ADD_INTERNAL_CALL(AudioComponent_GetLooping);
+		LI_ADD_INTERNAL_CALL(AudioComponent_SetLooping);
+		LI_ADD_INTERNAL_CALL(AudioComponent_GetPlayOnStart);
+		LI_ADD_INTERNAL_CALL(AudioComponent_SetPlayOnStart);
+		LI_ADD_INTERNAL_CALL(AudioComponent_IsValid);
+		LI_ADD_INTERNAL_CALL(AudioComponent_IsPlaying);
+		LI_ADD_INTERNAL_CALL(AudioComponent_IsInitialized);
+		LI_ADD_INTERNAL_CALL(AudioComponent_Init);
+		LI_ADD_INTERNAL_CALL(AudioComponent_Play);
+		LI_ADD_INTERNAL_CALL(AudioComponent_Stop);
 	}
 
 }

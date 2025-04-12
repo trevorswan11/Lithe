@@ -206,6 +206,7 @@ namespace Lithe {
 		void SetLooping(bool looping) { Sound->SetLooping(looping); Looping = looping; }
 		bool IsValid() const { return Sound->IsValid(); }
 		bool IsPlaying() const { return Playing; }
+		bool IsInitialized() const { return Initialized; }
 	private:
 		bool Initialized = false;
 		bool Playing = false;

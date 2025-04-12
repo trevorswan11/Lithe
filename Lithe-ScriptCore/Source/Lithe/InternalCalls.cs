@@ -54,11 +54,42 @@ namespace Lithe
 		internal extern static void TextComponent_SetLineSpacing(ulong entityID, float lineSpacing);
 		#endregion
 
-		#region RigidBody2DComponent
+		#region Input
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
 		internal extern static bool Input_IsKeyDown(KeyCode keycode);
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
 		internal extern static bool Input_IsMouseDown(MouseCode mousecode);
+		#endregion
+
+		#region AudioComponent
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static string AudioComponent_GetPath(ulong entityID);
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static void AudioComponent_SetPath(ulong entityID, string path);
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static float AudioComponent_GetVolume(ulong entityID);
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static void AudioComponent_SetVolume(ulong entityID, float volume);
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static bool AudioComponent_GetLooping(ulong entityID);
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static void AudioComponent_SetLooping(ulong entityID, bool looping);
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static bool AudioComponent_GetPlayOnStart(ulong entityID);
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static void AudioComponent_SetPlayOnStart(ulong entityID, bool playOnStart);
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static bool AudioComponent_IsValid(ulong entityID);
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static bool AudioComponent_IsPlaying(ulong entityID);
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static bool AudioComponent_IsInitialized(ulong entityID);
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static void AudioComponent_Init(ulong entityID);
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static void AudioComponent_Play(ulong entityID);
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static void AudioComponent_Stop(ulong entityID);
 		#endregion
 	}
 }
