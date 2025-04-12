@@ -554,6 +554,8 @@ namespace Lithe {
 			if (serializer.Deserialize(path.string()))
 			{
 				m_EditorScene = newScene;
+				if (m_ViewportSize.x > 0 && m_ViewportSize.y > 0)
+					m_EditorScene->OnViewportResize((uint32_t)m_ViewportSize.x > 0, (uint32_t)m_ViewportSize.y > 0);
 				m_SaveSceneCache = path.string();
 				m_SceneHierarchyPanel.SetContext(m_EditorScene);
 
