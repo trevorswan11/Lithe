@@ -328,7 +328,7 @@ namespace Lithe {
 
 	MonoObject* ScriptEngine::GetManagedInstance(UUID uuid)
 	{
-		if (s_Data->EntityInstances.find(uuid) != s_Data->EntityInstances.end()) return {};
+		if (s_Data->EntityInstances.find(uuid) == s_Data->EntityInstances.end()) return {};
 		return s_Data->EntityInstances.at(uuid)->GetManagedObject();
 	}
 

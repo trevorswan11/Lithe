@@ -415,19 +415,23 @@ namespace Lithe {
 
 			// Gizmo Shortcuts
 			case Key::Q:
-				m_GizmoType = -1;
+				if (m_SceneState == SceneState::Edit)
+					m_GizmoType = -1;
 				break;
 			case Key::W:
-				m_GizmoType = ImGuizmo::OPERATION::TRANSLATE;
+				if (m_SceneState == SceneState::Edit)
+					m_GizmoType = ImGuizmo::OPERATION::TRANSLATE;
 				break;
 			case Key::E:
-				m_GizmoType = ImGuizmo::OPERATION::ROTATE;
+				if (m_SceneState == SceneState::Edit)
+					m_GizmoType = ImGuizmo::OPERATION::ROTATE;
 				break;
 			case Key::R:
 			{
 				if (control && (m_SceneState == SceneState::Edit))
 					ScriptEngine::ReloadAssembly();
-				m_GizmoType = ImGuizmo::OPERATION::SCALE;
+				else if (m_SceneState == SceneState::Edit)
+					m_GizmoType = ImGuizmo::OPERATION::SCALE;
 				break;
 			}
 			default:
