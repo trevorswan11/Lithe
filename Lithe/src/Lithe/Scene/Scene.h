@@ -40,6 +40,9 @@ namespace Lithe {
 		Entity GetPrimaryCameraEntity();
 		uint32_t GetEntityCount() const { return m_EntityCount; }
 
+		Entity FindEntityByName(std::string_view name);
+		Entity GetEntityByUUID(UUID uuid);
+
 		bool Empty() const { return m_EntityCount == 0; }
 		bool IsRunning() const { return m_IsRunning; }
 		bool IsPaused() const { return m_IsPaused; }

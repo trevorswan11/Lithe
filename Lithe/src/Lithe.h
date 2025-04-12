@@ -22,6 +22,8 @@
 #include "Lithe/Scene/Entity.h"
 #include "Lithe/Scene/ScriptableEntity.h"
 
+#include "Lithe/Project/Project.h"
+
 // ---Rendering---
 #include "Lithe/Renderer/Renderer.h"
 #include "Lithe/Renderer/Renderer2D.h"

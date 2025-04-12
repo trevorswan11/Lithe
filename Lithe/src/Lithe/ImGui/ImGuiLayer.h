@@ -35,6 +35,8 @@ namespace Lithe {
 		void SetDarkThemeColors();
 
 		static float GetDefaultFontSize() { return s_DefaultFontSize; }
+
+		uint32_t GetActiveWidgetID() const;
 	private:
 		bool m_BlockEvents = true;
 		static float s_DefaultFontSize;

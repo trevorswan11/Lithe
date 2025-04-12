@@ -17,6 +17,7 @@ namespace Lithe {
 
 		std::string GetAndClearCurrentFile();
 	private:
+		std::filesystem::path m_BaseDirectory;
 		std::filesystem::path m_CurrentDirectory;
 		std::filesystem::path m_CurrentFile;
 

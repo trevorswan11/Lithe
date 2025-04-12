@@ -1,0 +1,60 @@
+Scene: TexturedExample
+Entities:
+  - Entity: 7826608672948602357
+    TagComponent:
+      Tag: Camera B
+    TransformComponent:
+      Translation: [2.5999999, 0, 0]
+      Rotation: [0.0261799395, 0, 0]
+      Scale: [1, 1, 1]
+    CameraComponent:
+      Camera:
+        ProjectionType: 1
+        PerspectiveFOV: 0.785398185
+        PerspectiveNear: 0.00999999978
+        PerspectiveFar: 1000
+        OrthographicSize: 10
+        OrthographicNear: -1
+        OrthographicFar: 1
+      Primary: false
+      FixedAspectRatio: false
+  - Entity: 5727249270501926999
+    TagComponent:
+      Tag: Camera A
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0.530580103]
+      Scale: [1, 1, 1]
+    CameraComponent:
+      Camera:
+        ProjectionType: 1
+        PerspectiveFOV: 0.785398185
+        PerspectiveNear: 0.00999999978
+        PerspectiveFar: 1000
+        OrthographicSize: 10
+        OrthographicNear: -1
+        OrthographicFar: 1
+      Primary: true
+      FixedAspectRatio: false
+  - Entity: 9020789200044146231
+    TagComponent:
+      Tag: Red Square
+    TransformComponent:
+      Translation: [-0.699999988, 1.10000002, 0]
+      Rotation: [0, 0, 0.532325447]
+      Scale: [1, 2.9000001, 1]
+    SpriteRendererComponent:
+      Color: [0.938223958, 0.862151742, 0.862151742, 1]
+      TexturePath: C:\dev\Lithe\Lithium\ExampleProject\Assets\Textures\CheckerboardExample.png
+      TilingFactor: 1.39999998
+  - Entity: 15555271008214544321
+    TagComponent:
+      Tag: Green Square
+    TransformComponent:
+      Translation: [2.4000001, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    SpriteRendererComponent:
+      Color: [0, 1, 0, 1]
+      TexturePath: C:\dev\Lithe\Lithium\ExampleProject\Assets\Textures\BTD6_YellowBalloon.png
+      TilingFactor: 1

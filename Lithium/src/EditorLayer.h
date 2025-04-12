@@ -37,6 +37,11 @@ namespace Lithe {
 		void SaveSceneAs();
 		void SaveScene();
 
+		void NewProject();
+		void OpenProject(const std::filesystem::path& path);
+		bool OpenProject();
+		void SaveProject();
+
 		void DuplicateSelectedEntity(bool switchSelectedEntity = false);
 
 		void OnScenePlay();
@@ -73,7 +78,7 @@ namespace Lithe {
 
 		// Panels
 		SceneHierarchyPanel m_SceneHierarchyPanel;
-		ContentBrowserPanel m_ContentBrowserPanel;
+		Scope<ContentBrowserPanel> m_ContentBrowserPanel;
 
 		enum class SceneState
 		{

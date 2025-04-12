@@ -1,0 +1,5 @@
+Project:
+  Name: Example
+  StartScene: "Scenes/Physics2D.lithe"
+  AssetDirectory: "Assets"
+  ScriptModulePath: "Scripts/Binaries/Example.dll"

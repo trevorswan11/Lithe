@@ -35,16 +35,31 @@ inline OStream& operator<<(OStream& os, const glm::vec<L, T, Q>& vector)
 	return os << glm::to_string(vector);
 }
 
+inline std::string format_as(const glm::vec2& vector)
+{
+	return glm::to_string(vector);
+}
+
 template<typename OStream, glm::length_t C, glm::length_t R, typename T, glm::qualifier Q>
 inline OStream& operator<<(OStream& os, const glm::mat<C, R, T, Q>& matrix)
 {
 	return os << glm::to_string(matrix);
 }
 
+inline std::string format_as(const glm::vec3& vector)
+{
+	return glm::to_string(vector);
+}
+
 template<typename OStream, typename T, glm::qualifier Q>
 inline OStream& operator<<(OStream& os, glm::qua<T, Q> quaternio)
 {
 	return os << glm::to_string(quaternio);
+}
+
+inline std::string format_as(const glm::vec4& vector)
+{
+	return glm::to_string(vector);
 }
 
 // Core log macros

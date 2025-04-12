@@ -124,6 +124,14 @@ namespace Lithe {
 		}
 	};
 
+	struct ScriptComponent
+	{
+		std::string ClassName;
+
+		ScriptComponent() = default;
+		ScriptComponent(const ScriptComponent&) = default;
+	};
+
 	// Physics
 	
 	struct RigidBody2DComponent
@@ -209,8 +217,8 @@ namespace Lithe {
 
 	using AllComponents =
 		ComponentGroup<TransformComponent, SpriteRendererComponent,
-		CameraComponent, NativeScriptComponent, RigidBody2DComponent,
-		CircleRendererComponent, BoxCollider2DComponent,
+		CameraComponent, NativeScriptComponent, ScriptComponent,
+		RigidBody2DComponent, CircleRendererComponent, BoxCollider2DComponent,
 		CircleCollider2DComponent, TextComponent, AudioComponent>;
 
 }

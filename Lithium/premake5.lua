@@ -30,7 +30,8 @@ project "Lithium"
 		"%{IncludeDir.entt}",
 		"%{IncludeDir.ImGuizmo}",
 		"%{IncludeDir.filewatch}",
-		"%{IncludeDir.miniaudio}"
+		"%{IncludeDir.miniaudio}",
+		"%{IncludeDir.ImGui}",
 	}
 
 	links

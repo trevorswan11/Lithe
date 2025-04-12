@@ -6,11 +6,8 @@
 
 namespace Lithe {
 
-	// Change once projects exist
-	extern const std::filesystem::path g_AssetPath = "assets";
-
 	ContentBrowserPanel::ContentBrowserPanel()
-		: m_CurrentDirectory(g_AssetPath)
+		: m_BaseDirectory(Project::GetAssetDirectory()), m_CurrentDirectory(m_BaseDirectory)
 	{
 		m_DirectoryIcon = Texture2D::Create("assets/resources/DirectoryIcon.png");
 		m_FileIcon = Texture2D::Create("assets/resources/FileIcon.png");
@@ -41,7 +38,7 @@ namespace Lithe {
 		for (auto& directoryEntry : std::filesystem::directory_iterator(m_CurrentDirectory))
 		{
 			const auto& path = directoryEntry.path();
-			auto relativePath = std::filesystem::relative(path, g_AssetPath);
+			std::filesystem::path relativePath(path);
 			std::string filenameString = relativePath.filename().string();
 
 			ImGui::PushID(filenameString.c_str());
@@ -82,7 +79,7 @@ namespace Lithe {
 				LITHIUM_INFO("Current Directory: {0}", m_CurrentDirectory.string());
 			if (ImGui::Button(".."))
 			{
-				if (m_CurrentDirectory != std::filesystem::path(g_AssetPath))
+				if (m_CurrentDirectory != std::filesystem::path(m_BaseDirectory))
 					m_CurrentDirectory = m_CurrentDirectory.parent_path();
 			}
 			ImGui::PopStyleColor();
@@ -98,7 +95,6 @@ namespace Lithe {
 			ImGui::Text("%s", m_CurrentDirectory.string().c_str());
 
 			ImGui::EndMenuBar();
-
 		}
 
 		ImGui::End();

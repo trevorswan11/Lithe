@@ -1,8 +1,11 @@
 #include "lipch.h"
 #include "Lithe/Scene/SceneSerializer.h"
 
+#include "Lithe/Scripting/ScriptEngine.h"
 #include "Lithe/Scene/Entity.h"
 #include "Lithe/Scene/Components.h"
+
+#include "Lithe/Project/Project.h"
 
 #include <fstream>
 #include <variant>
@@ -107,6 +110,19 @@ namespace YAML {
 }
 namespace Lithe {
 
+#define WRITE_SCRIPT_FIELD(FieldType, Type)           \
+			case ScriptFieldType::FieldType:          \
+				out << scriptField.GetValue<Type>();  \
+				break
+
+#define READ_SCRIPT_FIELD(FieldType, Type)             \
+	case ScriptFieldType::FieldType:                   \
+	{                                                  \
+		Type data = scriptField["Data"].as<Type>();    \
+		fieldInstance.SetValue(data);                  \
+		break;                                         \
+	}
+
 	YAML::Emitter& operator<<(YAML::Emitter& out, const glm::vec2& v)
 	{
 		out << YAML::Flow;
@@ -207,6 +223,61 @@ namespace Lithe {
 			out << YAML::Key << "FixedAspectRatio" << YAML::Value << cameraComponent.FixedAspectRatio;
 
 			out << YAML::EndMap; // CameraComponent
+		}
+
+		if (entity.HasComponent<ScriptComponent>())
+		{
+			auto& scriptComponent = entity.GetComponent<ScriptComponent>();
+
+			out << YAML::Key << "ScriptComponent";
+			out << YAML::BeginMap; // ScriptComponent
+			out << YAML::Key << "ClassName" << YAML::Value << scriptComponent.ClassName;
+
+			// Fields
+			Ref<ScriptClass> entityClass = ScriptEngine::GetEntityClass(scriptComponent.ClassName);
+			const auto& fields = entityClass->GetFields();
+			if (fields.size() > 0)
+			{
+				out << YAML::Key << "ScriptFields" << YAML::Value;
+				auto& entityFields = ScriptEngine::GetScriptFieldMap(entity);
+				out << YAML::BeginSeq;
+				for (const auto& [name, field] : fields)
+				{
+					if (entityFields.find(name) == entityFields.end())
+						continue;
+
+					out << YAML::BeginMap; // ScriptField
+					out << YAML::Key << "Name" << YAML::Value << name;
+					out << YAML::Key << "Type" << YAML::Value << Utils::ScriptFieldTypeToString(field.Type);
+
+					out << YAML::Key << "Data" << YAML::Value;
+					ScriptFieldInstance& scriptField = entityFields.at(name);
+
+					switch (field.Type)
+					{
+						WRITE_SCRIPT_FIELD(Float, float);
+						WRITE_SCRIPT_FIELD(Double, double);
+						WRITE_SCRIPT_FIELD(Bool, bool);
+						WRITE_SCRIPT_FIELD(Char, char);
+						WRITE_SCRIPT_FIELD(Byte, int8_t);
+						WRITE_SCRIPT_FIELD(Short, int16_t);
+						WRITE_SCRIPT_FIELD(Int, int32_t);
+						WRITE_SCRIPT_FIELD(Long, int64_t);
+						WRITE_SCRIPT_FIELD(UByte, uint8_t);
+						WRITE_SCRIPT_FIELD(UShort, uint16_t);
+						WRITE_SCRIPT_FIELD(UInt, uint32_t);
+						WRITE_SCRIPT_FIELD(ULong, uint64_t);
+						WRITE_SCRIPT_FIELD(Vector2, glm::vec2);
+						WRITE_SCRIPT_FIELD(Vector3, glm::vec3);
+						WRITE_SCRIPT_FIELD(Vector4, glm::vec4);
+						WRITE_SCRIPT_FIELD(Entity, UUID);
+					}
+					out << YAML::EndMap; // ScriptFields
+				}
+				out << YAML::EndSeq;
+			}
+
+			out << YAML::EndMap; // ScriptComponent
 		}
 
 		if (entity.HasComponent<SpriteRendererComponent>())
@@ -395,7 +466,6 @@ namespace Lithe {
 				auto transformComponent = entity["TransformComponent"];
 				if (transformComponent)
 				{
-					// Entities always have transforms
 					auto& tc = deserializedEntity.GetComponent<TransformComponent>();
 					tc.Translation = transformComponent["Translation"].as<glm::vec3>();
 					tc.Rotation = transformComponent["Rotation"].as<glm::vec3>();
@@ -422,6 +492,61 @@ namespace Lithe {
 					cc.FixedAspectRatio = cameraComponent["FixedAspectRatio"].as<bool>();
 				}
 
+				auto scriptComponent = entity["ScriptComponent"];
+				if (scriptComponent)
+				{
+					auto& sc = deserializedEntity.AddComponent<ScriptComponent>();
+					sc.ClassName = scriptComponent["ClassName"].as<std::string>();
+
+					auto scriptFields = scriptComponent["ScriptFields"];
+					if (scriptFields)
+					{
+						Ref<ScriptClass> entityClass = ScriptEngine::GetEntityClass(sc.ClassName);
+						if (entityClass)
+						{
+							const auto& fields = entityClass->GetFields();
+							auto& entityFields = ScriptEngine::GetScriptFieldMap(deserializedEntity);
+
+							for (auto scriptField : scriptFields)
+							{
+								std::string name = scriptField["Name"].as<std::string>();
+								std::string typeString = scriptField["Type"].as<std::string>();
+								ScriptFieldType type = Utils::ScriptFieldTypeFromString(typeString);
+
+								ScriptFieldInstance& fieldInstance = entityFields[name];
+
+								LI_CORE_ASSERT(fields.find(name) != fields.end());
+
+								if (fields.find(name) == fields.end())
+									continue;
+
+								fieldInstance.Field = fields.at(name);
+
+								switch (type)
+								{
+									READ_SCRIPT_FIELD(Float, float);
+									READ_SCRIPT_FIELD(Double, double);
+									READ_SCRIPT_FIELD(Bool, bool);
+									READ_SCRIPT_FIELD(Char, char);
+									READ_SCRIPT_FIELD(Byte, int8_t);
+									READ_SCRIPT_FIELD(Short, int16_t);
+									READ_SCRIPT_FIELD(Int, int32_t);
+									READ_SCRIPT_FIELD(Long, int64_t);
+									READ_SCRIPT_FIELD(UByte, uint8_t);
+									READ_SCRIPT_FIELD(UShort, uint16_t);
+									READ_SCRIPT_FIELD(UInt, uint32_t);
+									READ_SCRIPT_FIELD(ULong, uint64_t);
+									READ_SCRIPT_FIELD(Vector2, glm::vec2);
+									READ_SCRIPT_FIELD(Vector3, glm::vec3);
+									READ_SCRIPT_FIELD(Vector4, glm::vec4);
+									READ_SCRIPT_FIELD(Entity, UUID);
+								}
+							}
+						}
+					}
+
+				}
+
 				auto spriteRendererComponent = entity["SpriteRendererComponent"];
 				if (spriteRendererComponent)
 				{
@@ -429,7 +554,11 @@ namespace Lithe {
 					src.Color = spriteRendererComponent["Color"].as<glm::vec4>();
 
 					if (spriteRendererComponent["TexturePath"])
-						src.Texture = Texture2D::Create(spriteRendererComponent["TexturePath"].as<std::string>());
+					{
+						std::string texturePath = spriteRendererComponent["TexturePath"].as<std::string>();
+						auto path = Project::GetAssetFileSystemPath(texturePath);
+						src.Texture = Texture2D::Create(path.string());
+					}
 					
 					else if (spriteRendererComponent["SubTexturePath"])
 					{
@@ -437,9 +566,12 @@ namespace Lithe {
 						src.Coords = spriteRendererComponent["SubTextureCoords"].as<glm::vec2>();
 						src.CellSize = spriteRendererComponent["SubTextureCellSize"].as<glm::vec2>();
 						src.SpriteSize = spriteRendererComponent["SubTextureSpriteSize"].as<glm::vec2>();
+
+						std::string subTexturePath = spriteRendererComponent["SubTexturePath"].as<std::string>();
+						auto path = Project::GetAssetFileSystemPath(subTexturePath);
+
 						src.Texture = SubTexture2D::CreateFromCoords(
-						Texture2D::Create(spriteRendererComponent["SubTexturePath"].as<std::string>()),
-							src.Coords, src.CellSize, src.SpriteSize);
+						Texture2D::Create(path.string()), src.Coords, src.CellSize, src.SpriteSize);
 					}
 
 					if (spriteRendererComponent["TilingFactor"])

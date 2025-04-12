@@ -5,6 +5,8 @@
 #include "Lithe/Scene/Entity.h"
 #include "Lithe/Scene/ScriptableEntity.h"
 #include "Lithe/Renderer/Renderer2D.h"
+#include "Lithe/Utils/Physics2DUtils.h"
+#include "Lithe/Scripting/ScriptEngine.h"
 
 #include <glm/glm.hpp>
 
@@ -36,19 +38,6 @@ namespace Lithe {
 			return string_rtrim(string_ltrim(s));
 		}
 
-	}
-
-	static b2BodyType RigidBody2DTypeToBox2DBody(RigidBody2DComponent::BodyType bodyType)
-	{
-		switch (bodyType)
-		{
-		case RigidBody2DComponent::BodyType::Static: return b2_staticBody;
-		case RigidBody2DComponent::BodyType::Dynamic: return b2_dynamicBody;
-		case RigidBody2DComponent::BodyType::Kinematic: return b2_kinematicBody;
-		}
-
-		LI_CORE_ASSERT(false);
-		return b2_staticBody;
 	}
 
 	Scene::~Scene()
@@ -160,12 +149,25 @@ namespace Lithe {
 	{
 		m_IsRunning = true;
 		OnPhysics2DStart();
+
+		{
+			ScriptEngine::OnRuntimeStart(this);
+			// Instantiate all script entities
+
+			auto view = m_Registry.view<ScriptComponent>();
+			for (auto e : view)
+			{
+				Entity entity = { e, this };
+				ScriptEngine::OnCreateEntity(entity);
+			}
+		}
 	}
 
 	void Scene::OnRuntimeStop()
 	{
 		m_IsRunning = false;
 		OnPhysics2DStop();
+		ScriptEngine::OnRuntimeStop();
 	}
 
 	void Scene::OnSimulationStart()
@@ -184,6 +186,13 @@ namespace Lithe {
 		{
 			{
 				LI_PROFILE_SCOPE("Update Scripts Runtime");
+
+				auto view = m_Registry.view<ScriptComponent>();
+				for (auto e : view)
+				{
+					Entity entity = { e, this };
+					ScriptEngine::OnUpdateEntity(entity, ts);
+				}
 
 				m_Registry.view<NativeScriptComponent>().each([=](auto entity, auto& nsc)
 					{
@@ -370,6 +379,26 @@ namespace Lithe {
 		return {};
 	}
 
+	Entity Scene::FindEntityByName(std::string_view name)
+	{
+		auto view = m_Registry.view<TagComponent>();
+		for (auto entity : view)
+		{
+			const TagComponent& tc = view.get<TagComponent>(entity);
+			if (tc.Tag == name)
+				return Entity{ entity, this };
+		}
+		return {};
+	}
+
+	Entity Scene::GetEntityByUUID(UUID uuid)
+	{
+		if (m_EntityMap.find(uuid) != m_EntityMap.end())
+			return { m_EntityMap.at(uuid), this };
+		LI_CORE_ASSERT(false);
+		return {};
+	}
+
 	void Scene::Step(int frames)
 	{
 		m_StepFrames = frames;
@@ -386,7 +415,7 @@ namespace Lithe {
 			auto& rb2d = entity.GetComponent<RigidBody2DComponent>();
 
 			b2BodyDef bodyDef;
-			bodyDef.type = RigidBody2DTypeToBox2DBody(rb2d.Type);
+			bodyDef.type = Utils::RigidBody2DTypeToBox2DBody(rb2d.Type);
 			bodyDef.position.Set(transform.Translation.x, transform.Translation.y);
 			bodyDef.angle = transform.Rotation.z;
 
@@ -514,6 +543,11 @@ namespace Lithe {
 
 	template<>
 	void Scene::OnComponentAdded<NativeScriptComponent>(Entity entity, NativeScriptComponent& component)
+	{
+	}
+
+	template<>
+	void Scene::OnComponentAdded<ScriptComponent>(Entity entity, ScriptComponent& component)
 	{
 	}
 

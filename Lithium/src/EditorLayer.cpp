@@ -1,5 +1,7 @@
 #include "EditorLayer.h"
+
 #include "Lithe/Scene/SceneSerializer.h"
+#include "Lithe/Scripting/ScriptEngine.h"
 
 #include <imgui/imgui.h>
 #include <imgui/imgui_internal.h>
@@ -14,7 +16,6 @@
 
 namespace Lithe {
 
-	extern const std::filesystem::path g_AssetPath;
 	static Ref<Font> s_Font;
 
 	EditorLayer::EditorLayer()
@@ -51,12 +52,14 @@ namespace Lithe {
 		auto commandLineArgs = Application::Get().GetCommandLineArgs();
 		if (commandLineArgs.Count > 1)
 		{
-			auto sceneFilePath = commandLineArgs[1];
-			SceneSerializer serializer(m_EditorScene);
-			serializer.Deserialize(sceneFilePath);
+			auto projectFilePath = commandLineArgs[1];
+			OpenProject(projectFilePath);
 		}
 		else
-			NewScene();
+		{
+			if (!OpenProject())
+				Application::Get().Close();
+		}
 
 		m_EditorCamera = EditorCamera(30.0f, 1.778f, 0.1f, 1000.0f);
 
@@ -234,7 +237,7 @@ namespace Lithe {
 		style.WindowMinSize.x = minWinSizeX;
 
 		m_SceneHierarchyPanel.OnImGuiRender();
-		m_ContentBrowserPanel.OnImGuiRender();
+		m_ContentBrowserPanel->OnImGuiRender();
 
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{ 0, 0 });
 		ImGui::Begin("Viewport", NULL, ImGuiDockNodeFlags_NoTabBar);
@@ -262,12 +265,12 @@ namespace Lithe {
 			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
 			{
 				const wchar_t* path = (const wchar_t*)payload->Data;
-				OpenScene(std::filesystem::path(g_AssetPath) / path);
+				OpenScene(path);
 			}
 			ImGui::EndDragDropTarget();
 		}
 
-		std::string fileTarget = m_ContentBrowserPanel.GetAndClearCurrentFile();
+		std::string fileTarget = m_ContentBrowserPanel->GetAndClearCurrentFile();
 		if (!fileTarget.empty())
 			OpenScene(fileTarget);
 
@@ -376,7 +379,7 @@ namespace Lithe {
 			case Key::O:
 			{
 				if (control)
-					OpenScene();
+					OpenProject();
 				break;
 			}
 			case Key::S:
@@ -396,6 +399,20 @@ namespace Lithe {
 				break;
 			}
 
+			case Key::Delete:
+			{
+				if (Application::Get().GetImGuiLayer()->GetActiveWidgetID() == 0)
+				{
+					Entity selectedEntity = m_SceneHierarchyPanel.GetSelectedEntity();
+					if (selectedEntity)
+					{
+						m_SceneHierarchyPanel.SetSelectedEntity({});
+						m_ActiveScene->DestroyEntity(selectedEntity);
+					}
+				}
+				break;
+			}
+
 			// Gizmo Shortcuts
 			case Key::Q:
 				m_GizmoType = -1;
@@ -407,8 +424,12 @@ namespace Lithe {
 				m_GizmoType = ImGuizmo::OPERATION::ROTATE;
 				break;
 			case Key::R:
+			{
+				if (control && (m_SceneState == SceneState::Edit))
+					ScriptEngine::ReloadAssembly();
 				m_GizmoType = ImGuizmo::OPERATION::SCALE;
 				break;
+			}
 			default:
 				break;
 		}
@@ -529,11 +550,10 @@ namespace Lithe {
 		{
 			Ref<Scene> newScene = CreateRef<Scene>();
 			SceneSerializer serializer(newScene);
-			
+
 			if (serializer.Deserialize(path.string()))
 			{
 				m_EditorScene = newScene;
-				m_EditorScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
 				m_SaveSceneCache = path.string();
 				m_SceneHierarchyPanel.SetContext(m_EditorScene);
 
@@ -573,6 +593,33 @@ namespace Lithe {
 		}
 		else
 			SaveSceneAs();
+	}
+
+	void EditorLayer::NewProject()
+	{
+		Project::New();
+	}
+
+	void EditorLayer::OpenProject(const std::filesystem::path& path)
+	{
+		if (Project::Load(path))
+		{
+			ScriptEngine::Init();
+
+			auto startScenePath = Project::GetAssetFileSystemPath(Project::GetActive()->GetConfig().StartScene);
+			OpenScene(startScenePath);
+			m_ContentBrowserPanel = CreateScope<ContentBrowserPanel>();
+		}
+	}
+
+	bool EditorLayer::OpenProject()
+	{
+		auto filepath = FileDialogs::OpenFile("Lithe Project (*.liproj)\0*.liproj\0");
+		if (!filepath)
+			return false;
+
+		OpenProject(*filepath);
+		return true;
 	}
 
 	void EditorLayer::DuplicateSelectedEntity(bool switchSelectedEntity)
@@ -626,13 +673,14 @@ namespace Lithe {
 	void EditorLayer::OnSceneStop()
 	{
 		LI_CORE_ASSERT(m_SceneState == SceneState::Play || m_SceneState == SceneState::Simulate);
-		m_SceneState = SceneState::Edit;
-
-		m_SceneHierarchyPanel.SetContext(m_EditorScene);
+		
 		if (m_SceneState == SceneState::Play)
 			m_ActiveScene->OnRuntimeStop();
 		else if (m_SceneState == SceneState::Simulate)
 			m_ActiveScene->OnSimulationStop();
+
+		m_SceneState = SceneState::Edit;
+		m_SceneHierarchyPanel.SetContext(m_EditorScene);
 		m_ActiveScene = m_EditorScene;
 	}
 
@@ -840,13 +888,13 @@ namespace Lithe {
 		{
 			if (ImGui::BeginMenu("File"))
 			{
-				if (ImGui::MenuItem("New", "Ctrl+N"))
-					NewScene();
-				if (ImGui::MenuItem("Open...", "Ctrl+O"))
+				if (ImGui::MenuItem("Open Project...", "Ctrl+O"))
 					OpenScene();
-				if (ImGui::MenuItem("Save As...", "Ctrl+Shift+S"))
+				if (ImGui::MenuItem("New Scene", "Ctrl+N"))
+					NewScene();
+				if (ImGui::MenuItem("Save Scene As...", "Ctrl+Shift+S"))
 					SaveSceneAs();
-				if (ImGui::MenuItem("Save", "Ctrl+S"))
+				if (ImGui::MenuItem("Save Scene", "Ctrl+S"))
 					SaveScene();
 				if (ImGui::MenuItem("Revert Changes"))
 					if (m_SaveSceneCache) OpenScene(*m_SaveSceneCache);
@@ -880,6 +928,14 @@ namespace Lithe {
 				float volume = AudioEngine::GetGlobalVolume();
 				if (ImGui::DragFloat("Volume", &volume, 0.01f, 0.0f, 1.0f))
 					AudioEngine::SetGlobalVolume(volume);
+				ImGui::EndMenu();
+			}
+
+			if (ImGui::BeginMenu("Scripting"))
+			{
+				if (ImGui::MenuItem("Reload assembly", "Ctrl+R"))
+					ScriptEngine::ReloadAssembly();
+
 				ImGui::EndMenu();
 			}
 

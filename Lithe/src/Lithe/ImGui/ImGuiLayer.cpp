@@ -9,7 +9,6 @@
 
 #include "Lithe/Core/Application.h"
 
-// TEMPORARY
 #include <GLFW/glfw3.h>
 #include <glad/glad.h>
 
@@ -154,6 +153,11 @@ namespace Lithe {
 		colors[ImGuiCol_TitleBg] = ImVec4{ 0.15f, 0.1505f, 0.151f, 1.0f };
 		colors[ImGuiCol_TitleBgActive] = ImVec4{ 0.15f, 0.1505f, 0.151f, 1.0f };
 		colors[ImGuiCol_TitleBgCollapsed] = ImVec4{ 0.15f, 0.1505f, 0.151f, 1.0f };
+	}
+
+	uint32_t ImGuiLayer::GetActiveWidgetID() const
+	{
+		return GImGui->ActiveId;
 	}
 
 }
