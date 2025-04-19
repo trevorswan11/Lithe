@@ -128,7 +128,7 @@ namespace Lithe {
 		}
 	}
 
-	static void DrawVec3Control(const std::string& label, glm::vec3& values, float resetValue = 0.0f, float columnWidth = 100.0f)
+	static void DrawVec3Control(const std::string& label, glm::vec3& values, float resetValue = 0.0f, float columnWidth = 100.0f, bool disableX = false, bool disableY = false, bool disableZ = false)
 	{
 		ImGuiIO& io = ImGui::GetIO();
 		auto boldFont = io.Fonts->Fonts[(int)ImGuiFonts::Bold];
@@ -146,6 +146,7 @@ namespace Lithe {
 		float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
 		ImVec2 buttonSize = { lineHeight + 3.0f, lineHeight };
 
+		ImGui::PushItemFlag(ImGuiItemFlags_Disabled, disableX);
 		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f });
 		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.9f, 0.2f, 0.2f, 1.0f });
 		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f });
@@ -158,8 +159,11 @@ namespace Lithe {
 		ImGui::SameLine();
 		ImGui::DragFloat("##X", &values.x, 0.1f, 0.0f, 0.0f, "%.2f");
 		ImGui::PopItemWidth();
+		ImGui::PopItemFlag();
+
 		ImGui::SameLine();
 
+		ImGui::PushItemFlag(ImGuiItemFlags_Disabled, disableY);
 		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.2f, 0.7f, 0.2f, 1.0f });
 		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.3f, 0.8f, 0.3f, 1.0f });
 		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.2f, 0.7f, 0.2f, 1.0f });
@@ -172,8 +176,11 @@ namespace Lithe {
 		ImGui::SameLine();
 		ImGui::DragFloat("##Y", &values.y, 0.1f, 0.0f, 0.0f, "%.2f");
 		ImGui::PopItemWidth();
+		ImGui::PopItemFlag();
+
 		ImGui::SameLine();
 
+		ImGui::PushItemFlag(ImGuiItemFlags_Disabled, disableZ);
 		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.1f, 0.25f, 0.8f, 1.0f });
 		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.2f, 0.35f, 0.9f, 1.0f });
 		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.1f, 0.25f, 0.8f, 1.0f });
@@ -186,6 +193,7 @@ namespace Lithe {
 		ImGui::SameLine();
 		ImGui::DragFloat("##Z", &values.z, 0.1f, 0.0f, 0.0f, "%.2f");
 		ImGui::PopItemWidth();
+		ImGui::PopItemFlag();
 
 		ImGui::PopStyleVar();
 
@@ -273,9 +281,13 @@ namespace Lithe {
 
 		ImGui::PopItemWidth();
 
-		DrawComponent<TransformComponent>("Transform", entity, [](auto& component)
+		DrawComponent<TransformComponent>("Transform", entity, [&](auto& component)
 			{
-				DrawVec3Control("Translation", component.Translation);
+				bool isChild = false;
+				if (entity.HasComponent<RelationshipComponent>())
+					isChild = entity.GetComponent<RelationshipComponent>().Parent != 0;
+
+				DrawVec3Control("Translation", component.Translation, 0.0f, 100.0f, isChild, isChild);
 				glm::vec3 rotation = glm::degrees(component.Rotation);
 				DrawVec3Control("Rotation", rotation);
 				component.Rotation = glm::radians(rotation);
