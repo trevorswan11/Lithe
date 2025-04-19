@@ -68,7 +68,7 @@ namespace Lithe {
 			{
 				if (ImGui::MenuItem("Open in File Explorer"))
 				{
-					FileDialogs::RevealInExplorer(m_CurrentDirectory);
+					FileDialogs::OpenInExplorer(m_CurrentDirectory);
 				}
 
 				ImGui::EndPopup();

@@ -6,7 +6,7 @@
 
 #ifdef LI_ENABLE_ASSERTS
 	
-	#define LI_INTERNAL_ASSERT_IMPL(type, check, msg, ...) { if(!(check)) { LI##type##ERROR(msg, __VA_ARGS__); LI_DEBUGBREAK(); } }
+	#define LI_INTERNAL_ASSERT_IMPL(type, check, msg, ...) do { if(!(check)) { LI##type##ERROR(msg, __VA_ARGS__); LI_DEBUGBREAK(); } } while (0)
 	#define LI_INTERNAL_ASSERT_WITH_MSG(type, check, ...) LI_INTERNAL_ASSERT_IMPL(type, check, "Assertion failed: {0}", __VA_ARGS__)
 	#define LI_INTERNAL_ASSERT_NO_MSG(type, check) LI_INTERNAL_ASSERT_IMPL(type, check, "Assertion '{0}' failed at {1}:{2}", LI_STRINGIFY_MACRO(check), std::filesystem::path(__FILE__).filename().string(), __LINE__)
 	

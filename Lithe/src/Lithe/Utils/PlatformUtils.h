@@ -14,6 +14,7 @@ namespace Lithe {
 		static std::optional<std::string> SaveFile(const char* filter);
 
 		static void RevealInExplorer(const std::filesystem::path& filepath);
+		static void OpenInExplorer(const std::filesystem::path& filepath);
 	};
 
 	class Time

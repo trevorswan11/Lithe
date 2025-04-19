@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace Lithe
 {
+
 	public class RelationshipComponent : Component
 	{
 		public ulong Parent
@@ -32,4 +33,5 @@ namespace Lithe
 			set => InternalCalls.RelationshipComponent_SetPreviousSibling(Entity.ID, value);
 		}
 	}
+
 }
