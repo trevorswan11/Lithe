@@ -25,7 +25,7 @@ namespace Lithe {
 		Float, Double,
 		Bool, Char, Byte, Short, Int, Long,
 		UByte, UShort, UInt, ULong,
-		Vector2, Vector3, Vector4,
+		Vec2, Vec3, Vec4,
 		Entity
 	};
 
@@ -195,23 +195,23 @@ namespace Lithe {
 		{
 			switch (fieldType)
 			{
-			case ScriptFieldType::None:    return "None";
-			case ScriptFieldType::Float:   return "Float";
-			case ScriptFieldType::Double:  return "Double";
-			case ScriptFieldType::Bool:    return "Bool";
-			case ScriptFieldType::Char:    return "Char";
-			case ScriptFieldType::Byte:    return "Byte";
-			case ScriptFieldType::Short:   return "Short";
-			case ScriptFieldType::Int:     return "Int";
-			case ScriptFieldType::Long:    return "Long";
-			case ScriptFieldType::UByte:   return "UByte";
-			case ScriptFieldType::UShort:  return "UShort";
-			case ScriptFieldType::UInt:    return "UInt";
-			case ScriptFieldType::ULong:   return "ULong";
-			case ScriptFieldType::Vector2: return "Vector2";
-			case ScriptFieldType::Vector3: return "Vector3";
-			case ScriptFieldType::Vector4: return "Vector4";
-			case ScriptFieldType::Entity:  return "Entity";
+			case ScriptFieldType::None:		return "None";
+			case ScriptFieldType::Float:	return "Float";
+			case ScriptFieldType::Double:	return "Double";
+			case ScriptFieldType::Bool:		return "Bool";
+			case ScriptFieldType::Char:		return "Char";
+			case ScriptFieldType::Byte:		return "Byte";
+			case ScriptFieldType::Short:	return "Short";
+			case ScriptFieldType::Int:		return "Int";
+			case ScriptFieldType::Long:		return "Long";
+			case ScriptFieldType::UByte:	return "UByte";
+			case ScriptFieldType::UShort:	return "UShort";
+			case ScriptFieldType::UInt:		return "UInt";
+			case ScriptFieldType::ULong:	return "ULong";
+			case ScriptFieldType::Vec2:		return "Vec2";
+			case ScriptFieldType::Vec3:		return "Vec3";
+			case ScriptFieldType::Vec4:		return "Vec4";
+			case ScriptFieldType::Entity:	return "Entity";
 			}
 			LI_CORE_ASSERT(false, "Unknown ScriptFieldType");
 			return "None";
@@ -232,9 +232,9 @@ namespace Lithe {
 			if (fieldType == "UShort")  return ScriptFieldType::UShort;
 			if (fieldType == "UInt")    return ScriptFieldType::UInt;
 			if (fieldType == "ULong")   return ScriptFieldType::ULong;
-			if (fieldType == "Vector2") return ScriptFieldType::Vector2;
-			if (fieldType == "Vector3") return ScriptFieldType::Vector3;
-			if (fieldType == "Vector4") return ScriptFieldType::Vector4;
+			if (fieldType == "Vec2")	return ScriptFieldType::Vec2;
+			if (fieldType == "Vec3")	return ScriptFieldType::Vec3;
+			if (fieldType == "Vec4")	return ScriptFieldType::Vec4;
 			if (fieldType == "Entity")  return ScriptFieldType::Entity;
 
 			LI_CORE_ASSERT(false, "Unknown ScriptFieldType");

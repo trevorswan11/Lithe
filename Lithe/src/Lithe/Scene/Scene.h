@@ -27,6 +27,7 @@ namespace Lithe {
 		void DestroyEntity(Entity entity);
 
 		void AttachEntityToParent(Entity parent, Entity child);
+		void AttachEmptyChild(Entity parent);
 		void DetachEntityFromTree(Entity child);
 
 		void OnRuntimeStart();
@@ -103,7 +104,7 @@ namespace Lithe {
 	public:
 		static void UpdateTransforms(Scene* scene);
 	private:
-		static void Traverse(Entity entity, const glm::mat4& parentTransform);
+		static void Traverse(Entity entity);
 	};
 
 }

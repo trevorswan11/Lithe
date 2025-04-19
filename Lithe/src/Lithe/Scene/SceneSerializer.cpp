@@ -268,9 +268,9 @@ namespace Lithe {
 						WRITE_SCRIPT_FIELD(UShort, uint16_t);
 						WRITE_SCRIPT_FIELD(UInt, uint32_t);
 						WRITE_SCRIPT_FIELD(ULong, uint64_t);
-						WRITE_SCRIPT_FIELD(Vector2, glm::vec2);
-						WRITE_SCRIPT_FIELD(Vector3, glm::vec3);
-						WRITE_SCRIPT_FIELD(Vector4, glm::vec4);
+						WRITE_SCRIPT_FIELD(Vec2, glm::vec2);
+						WRITE_SCRIPT_FIELD(Vec3, glm::vec3);
+						WRITE_SCRIPT_FIELD(Vec4, glm::vec4);
 						WRITE_SCRIPT_FIELD(Entity, UUID);
 					}
 					out << YAML::EndMap; // ScriptFields
@@ -398,6 +398,20 @@ namespace Lithe {
 			out << YAML::Key << "PlayOnStart" << YAML::Value << audioComponent.PlayOnStart;
 
 			out << YAML::EndMap; // AudioComponent
+		}
+
+		if (entity.HasComponent<RelationshipComponent>())
+		{
+			out << YAML::Key << "RelationshipComponent";
+			out << YAML::BeginMap; // RelationshipComponent
+
+			auto& relComponent = entity.GetComponent<RelationshipComponent>();
+			out << YAML::Key << "Parent" << YAML::Value << relComponent.Parent;
+			out << YAML::Key << "FirstChild" << YAML::Value << relComponent.FirstChild;
+			out << YAML::Key << "NextSibling" << YAML::Value << relComponent.NextSibling;
+			out << YAML::Key << "PrevSibling" << YAML::Value << relComponent.PrevSibling;
+
+			out << YAML::EndMap; // RelationshipComponent
 		}
 
 		out << YAML::EndMap; // Entity
@@ -542,15 +556,14 @@ namespace Lithe {
 									READ_SCRIPT_FIELD(UShort, uint16_t);
 									READ_SCRIPT_FIELD(UInt, uint32_t);
 									READ_SCRIPT_FIELD(ULong, uint64_t);
-									READ_SCRIPT_FIELD(Vector2, glm::vec2);
-									READ_SCRIPT_FIELD(Vector3, glm::vec3);
-									READ_SCRIPT_FIELD(Vector4, glm::vec4);
+									READ_SCRIPT_FIELD(Vec2, glm::vec2);
+									READ_SCRIPT_FIELD(Vec3, glm::vec3);
+									READ_SCRIPT_FIELD(Vec4, glm::vec4);
 									READ_SCRIPT_FIELD(Entity, UUID);
 								}
 							}
 						}
 					}
-
 				}
 
 				auto spriteRendererComponent = entity["SpriteRendererComponent"];
@@ -644,6 +657,16 @@ namespace Lithe {
 					ac.Volume = audioComponent["Volume"].as<float>();
 					ac.Looping = audioComponent["Looping"].as<bool>();
 					ac.PlayOnStart = audioComponent["PlayOnStart"].as<bool>();
+				}
+
+				auto relComponent = entity["RelationshipComponent"];
+				if (relComponent)
+				{
+					auto& rc = deserializedEntity.AddComponent<RelationshipComponent>();
+					rc.Parent = relComponent["Parent"].as<UUID>(); 
+					rc.FirstChild = relComponent["FirstChild"].as<UUID>();
+					rc.NextSibling = relComponent["NextSibling"].as<UUID>();
+					rc.PrevSibling = relComponent["PrevSibling"].as<UUID>();
 				}
 			}
 		}

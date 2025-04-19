@@ -72,8 +72,12 @@ namespace Lithe {
 
 		bool operator!=(const Entity& other) const { return !(*this == other); }
 	private:
+		Scene* GetScene() const { return m_Scene; }
+	private:
 		entt::entity m_EntityHandle{ entt::null };
 		Scene* m_Scene = nullptr;
+
+		friend class SceneGraph;
 	};
 
 }

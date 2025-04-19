@@ -140,6 +140,38 @@ namespace Lithe {
 
 	void Scene::DestroyEntity(Entity entity)
 	{
+		if (entity.HasComponent<RelationshipComponent>())
+		{
+			auto& rel = entity.GetComponent<RelationshipComponent>();
+			UUID childUUID = rel.FirstChild;
+
+			while (childUUID != 0)
+			{
+				Entity child = GetEntityByUUID(childUUID);
+				UUID next = child.GetComponent<RelationshipComponent>().NextSibling;
+				DestroyEntity(child);
+				childUUID = next;
+			}
+
+			if (rel.Parent != 0)
+			{
+				Entity parent = GetEntityByUUID(rel.Parent);
+				auto& parentRel = parent.GetComponent<RelationshipComponent>();
+
+				UUID* current = &parentRel.FirstChild;
+				while (*current != 0)
+				{
+					if (*current == entity.GetUUID())
+					{
+						*current = rel.NextSibling;
+						break;
+					}
+					Entity sibling = GetEntityByUUID(*current);
+					current = &sibling.GetComponent<RelationshipComponent>().NextSibling;
+				}
+			}
+		}
+
 		m_EntityMap.erase(entity.GetUUID());
 		m_EntityCount--;
 		m_Registry.destroy(entity);
@@ -163,6 +195,14 @@ namespace Lithe {
 		}
 
 		parentRel.FirstChild = child.GetUUID();
+	}
+
+	void Scene::AttachEmptyChild(Entity parent)
+	{
+		if (!parent.HasComponent<RelationshipComponent>())
+			parent.AddComponent<RelationshipComponent>();
+		Entity child = CreateEntityWithUUID(UUID(), Utils::string_trim(parent.GetName()) + " - Child");
+		AttachEntityToParent(parent, child);
 	}
 
 	void Scene::DetachEntityFromTree(Entity child)
@@ -227,6 +267,7 @@ namespace Lithe {
 
 	void Scene::OnUpdateRuntime(Timestep ts)
 	{
+		SceneGraph::UpdateTransforms(this);
 		if (!m_IsPaused || m_StepFrames-- > 0)
 		{
 			{
@@ -360,11 +401,13 @@ namespace Lithe {
 
 	void Scene::OnUpdateEditor(Timestep ts, EditorCamera& camera)
 	{
+		SceneGraph::UpdateTransforms(this);
 		RenderScene(camera);
 	}
 
 	void Scene::OnUpdateSimulation(Timestep ts, EditorCamera& camera, bool onlyRenderColliders)
 	{
+		SceneGraph::UpdateTransforms(this);
 		if (!m_IsPaused || m_StepFrames-- > 0)
 		{
 			LI_PROFILE_SCOPE("2D Physics Runtime");
@@ -549,6 +592,51 @@ namespace Lithe {
 		Renderer2D::EndScene();
 	}
 
+	void SceneGraph::UpdateTransforms(Scene* scene)
+	{
+		for (auto& [uuid, handle] : scene->m_EntityMap)
+		{
+			Entity entity(handle, scene);
+			if (!entity.HasComponent<TransformComponent>() || !entity.HasComponent<RelationshipComponent>())
+				continue;
+
+			auto& rel = entity.GetComponent<RelationshipComponent>();
+			if (rel.Parent == 0)
+				Traverse(entity);
+		}
+	}
+
+	void SceneGraph::Traverse(Entity entity)
+	{
+		if (!entity.HasComponent<RelationshipComponent>())
+			return;
+
+		const auto& parentTransform = entity.GetComponent<TransformComponent>();
+		auto& rel = entity.GetComponent<RelationshipComponent>();
+		UUID childUUID = rel.FirstChild;
+
+		while (childUUID != 0)
+		{
+			Entity child = entity.GetScene()->GetEntityByUUID(childUUID);
+			childUUID = child.GetComponent<RelationshipComponent>().NextSibling;
+
+			if (child.HasComponent<TransformComponent>())
+			{
+				auto& childTransform = child.GetComponent<TransformComponent>();
+
+				childTransform.Translation.x = parentTransform.Translation.x;
+				childTransform.Translation.y = parentTransform.Translation.y;
+
+				childTransform.Rotation.x = parentTransform.Rotation.x;
+				childTransform.Rotation.y = parentTransform.Rotation.y;
+
+				childTransform.Scale.z = parentTransform.Scale.z;
+			}
+
+			Traverse(child);
+		}
+	}
+
 }
 
 // Fucking Slop -- do not touch unless you know EXACTLY what you are doing
@@ -624,6 +712,8 @@ namespace Lithe {
 	template<>
 	void Scene::OnComponentAdded<RelationshipComponent>(Entity entity, RelationshipComponent& component)
 	{
+		if (component.Parent != 0)
+			entity.GetComponent<TransformComponent>() = GetEntityByUUID(component.Parent).GetComponent<TransformComponent>();
 	}
 
 }

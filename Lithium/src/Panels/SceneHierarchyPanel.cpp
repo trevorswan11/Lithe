@@ -32,14 +32,24 @@ namespace Lithe {
 		m_Context->m_Registry.view<entt::entity>().each([&](auto entityID)
 			{
 				Entity entity{ entityID, m_Context.get() };
-				DrawEntityNode(entity);
+
+				if (entity.HasComponent<RelationshipComponent>())
+				{
+					auto& rel = entity.GetComponent<RelationshipComponent>();
+					if (rel.Parent == 0)
+						DrawEntityNode(entity);
+				}
+				else
+				{
+					DrawEntityNode(entity);
+				}
 			});
 
 		if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
 			m_SelectionContext = {};
 
 		// Right-click on blank space
-		if (ImGui::BeginPopupContextWindow(0, 1, false))
+		if (!m_Context->IsRunning() && ImGui::BeginPopupContextWindow(0, 1, false))
 		{
 			if (ImGui::MenuItem("Create Empty Entity"))
 				m_Context->CreateEntity("Empty Entity");
@@ -67,8 +77,14 @@ namespace Lithe {
 	{
 		auto& tag = entity.GetComponent<TagComponent>().Tag;
 
-		ImGuiTreeNodeFlags flags = ((m_SelectionContext == entity) ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow;
-		flags |= ImGuiTreeNodeFlags_SpanAvailWidth;
+		ImGuiTreeNodeFlags flags = ((m_SelectionContext == entity) ? ImGuiTreeNodeFlags_Selected : 0)
+			| ImGuiTreeNodeFlags_OpenOnArrow
+			| ImGuiTreeNodeFlags_SpanAvailWidth;
+
+		bool hasChildren = entity.HasComponent<RelationshipComponent>() && entity.GetComponent<RelationshipComponent>().FirstChild != 0;
+		if (!hasChildren)
+			flags |= ImGuiTreeNodeFlags_Leaf;
+
 		bool opened = ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)entity, flags, tag.c_str());
 		if (ImGui::IsItemClicked())
 		{
@@ -76,22 +92,31 @@ namespace Lithe {
 		}
 
 		bool entityDeleted = false;
-		if (ImGui::BeginPopupContextItem())
+		if (!m_Context->IsRunning() && ImGui::BeginPopupContextItem())
 		{
 			if (ImGui::MenuItem("Delete"))
 				entityDeleted = true;
 			if (ImGui::MenuItem("Duplicate"))
 				m_Context->CloneEntity(entity);
+			if (ImGui::MenuItem("Add Child"))
+				m_Context->AttachEmptyChild(entity);
 
 			ImGui::EndPopup();
 		}
 
 		if (opened)
 		{
-			ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
-			bool opened = ImGui::TreeNodeEx((void*)9817239, flags, tag.c_str());
-			if (opened)
-				ImGui::TreePop();
+			if (hasChildren)
+			{
+				auto& rel = entity.GetComponent<RelationshipComponent>();
+				UUID childUUID = rel.FirstChild;
+				while (childUUID != 0)
+				{
+					Entity child = m_Context->GetEntityByUUID(childUUID);
+					childUUID = child.GetComponent<RelationshipComponent>().NextSibling;
+					DrawEntityNode(child);
+				}
+			}
 			ImGui::TreePop();
 		}
 

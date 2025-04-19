@@ -33,9 +33,9 @@ namespace Lithe {
 		{ "System.UInt32", ScriptFieldType::UInt },
 		{ "System.UInt64", ScriptFieldType::ULong },
 
-		{ "Lithe.Vector2", ScriptFieldType::Vector2 },
-		{ "Lithe.Vector3", ScriptFieldType::Vector3 },
-		{ "Lithe.Vector4", ScriptFieldType::Vector4 },
+		{ "Lithe.Vec2", ScriptFieldType::Vec2 },
+		{ "Lithe.Vec3", ScriptFieldType::Vec3 },
+		{ "Lithe.Vec4", ScriptFieldType::Vec4 },
 
 		{ "Lithe.Entity", ScriptFieldType::Entity },
 	};
@@ -443,7 +443,6 @@ namespace Lithe {
 				}
 			}
 		}
-		auto& entityClasses = s_Data->EntityClasses;
 	}
 
 	// === ScriptClass ===

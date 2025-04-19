@@ -89,6 +89,11 @@ Entities:
       Friction: 0.5
       Restitution: 0
       RestitutionThreshold: 0.5
+    RelationshipComponent:
+      Parent: 0
+      FirstChild: 0
+      NextSibling: 0
+      PrevSibling: 0
   - Entity: 8799951188608098164
     TagComponent:
       Tag: Wall Right
@@ -167,3 +172,24 @@ Entities:
       Friction: 0.5
       Restitution: 0
       RestitutionThreshold: 0.5
+    RelationshipComponent:
+      Parent: 0
+      FirstChild: 6519928898789095758
+      NextSibling: 0
+      PrevSibling: 0
+  - Entity: 6519928898789095758
+    TagComponent:
+      Tag: Scripted Entity - Child
+    TransformComponent:
+      Translation: [3, 8.5, 0]
+      Rotation: [0, 0, 0]
+      Scale: [2, 2, 1]
+    CircleRendererComponent:
+      Color: [0.862745106, 0.337254912, 0.337254912, 0.568627477]
+      Thickness: 1
+      Fade: 0.518000007
+    RelationshipComponent:
+      Parent: 390647726435390199
+      FirstChild: 0
+      NextSibling: 0
+      PrevSibling: 0

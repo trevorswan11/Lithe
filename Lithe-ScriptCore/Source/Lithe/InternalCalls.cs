@@ -235,5 +235,24 @@ namespace Lithe
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
 		internal static extern void CircleCollider2DComponent_SetRestitutionThreshold(ulong entityID, float threshold);
 		#endregion
+
+		#region RelationshipComponent
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal static extern ulong RelationshipComponent_GetParent(ulong entityID);
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal static extern void RelationshipComponent_SetParent(ulong entityID, ulong parentUUID);
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal static extern ulong RelationshipComponent_GetFirstChild(ulong entityID);
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal static extern void RelationshipComponent_SetFirstChild(ulong entityID, ulong childUUID);
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal static extern ulong RelationshipComponent_GetNextSibling(ulong entityID);
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal static extern void RelationshipComponent_SetNextSibling(ulong entityID, ulong siblingUUID);
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal static extern ulong RelationshipComponent_GetPreviousSibling(ulong entityID);
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal static extern void RelationshipComponent_SetPreviousSibling(ulong entityID, ulong siblingUUID);
+		#endregion
 	}
 }

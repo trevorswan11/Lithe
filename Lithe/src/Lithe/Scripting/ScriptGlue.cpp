@@ -22,6 +22,7 @@
 #include "Lithe/Scripting/Glue/TextComponentGlue.h"
 #include "Lithe/Scripting/Glue/AudioComponentGlue.h"
 #include "Lithe/Scripting/Glue/RendererComponentGlue.h"
+#include "Lithe/Scripting/Glue/RelationshipComponentGlue.h"
 
 #include <mono/metadata/object.h>
 #include <mono/metadata/reflection.h>
@@ -214,6 +215,15 @@ namespace Lithe {
 		LI_ADD_INTERNAL_CALL(CircleCollider2DComponent_SetRestitution);
 		LI_ADD_INTERNAL_CALL(CircleCollider2DComponent_GetRestitutionThreshold);
 		LI_ADD_INTERNAL_CALL(CircleCollider2DComponent_SetRestitutionThreshold);
+
+		LI_ADD_INTERNAL_CALL(RelationshipComponent_GetParent);
+		LI_ADD_INTERNAL_CALL(RelationshipComponent_SetParent);
+		LI_ADD_INTERNAL_CALL(RelationshipComponent_GetFirstChild);
+		LI_ADD_INTERNAL_CALL(RelationshipComponent_SetFirstChild);
+		LI_ADD_INTERNAL_CALL(RelationshipComponent_GetNextSibling);
+		LI_ADD_INTERNAL_CALL(RelationshipComponent_SetNextSibling);
+		LI_ADD_INTERNAL_CALL(RelationshipComponent_GetPrevSibling);
+		LI_ADD_INTERNAL_CALL(RelationshipComponent_SetPrevSibling);
 	}
 
 }
