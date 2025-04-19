@@ -626,11 +626,6 @@ namespace Lithe {
 
 				childTransform.Translation.x = parentTransform.Translation.x;
 				childTransform.Translation.y = parentTransform.Translation.y;
-
-				childTransform.Rotation.x = parentTransform.Rotation.x;
-				childTransform.Rotation.y = parentTransform.Rotation.y;
-
-				childTransform.Scale.z = parentTransform.Scale.z;
 			}
 
 			Traverse(child);
