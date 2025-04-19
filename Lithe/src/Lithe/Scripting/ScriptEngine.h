@@ -168,12 +168,22 @@ namespace Lithe {
 		static MonoObject* GetManagedInstance(UUID uuid);
 
 		static MonoString* CreateString(const char* string);
+		static std::string CreateString(MonoString* string);
+
+		static void SetEntityContext(UUID uuid) { s_GlobalSelectedContext = uuid; }
+		static UUID GetEntityContext() { return s_GlobalSelectedContext; }
+
+		static void SetMouseWorldPosition(int mx, int my) { s_MouseWorldPosition = glm::vec2((float)mx, (float)my); }
+		static glm::vec2 GetMouseWorldPosition() { return s_MouseWorldPosition; }
 	private:
 		static void InitMono();
 		static void ShutdownMono();
 
 		static MonoObject* InstantiateClass(MonoClass* monoClass);
 		static void LoadAssemblyClasses();
+	private:
+		inline static uint64_t s_GlobalSelectedContext = 0;
+		inline static glm::vec2 s_MouseWorldPosition{};
 
 		friend class ScriptClass;
 		friend class ScriptGlue;

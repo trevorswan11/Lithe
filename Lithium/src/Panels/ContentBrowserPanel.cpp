@@ -1,6 +1,8 @@
 #include "lipch.h"
 #include "ContentBrowserPanel.h"
 
+#include "Lithe/Utils/PlatformUtils.h"
+
 #include <imgui/imgui.h>
 #include <imgui/imgui_internal.h>
 
@@ -61,6 +63,15 @@ namespace Lithe {
 					m_CurrentDirectory /= path.filename();
 				else
 					m_CurrentFile = path;
+			}
+			if (ImGui::BeginPopupContextWindow(0, 1, false))
+			{
+				if (ImGui::MenuItem("Open in File Explorer"))
+				{
+					FileDialogs::RevealInExplorer(m_CurrentDirectory);
+				}
+
+				ImGui::EndPopup();
 			}
 			ImGui::TextWrapped(filenameString.c_str());
 

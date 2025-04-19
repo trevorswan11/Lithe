@@ -139,6 +139,7 @@ namespace Lithe {
 		#endif
 
 		Scene* SceneContext = nullptr;
+		bool Running = false;
 	};
 
 	static ScriptEngineData* s_Data = nullptr;
@@ -176,12 +177,13 @@ namespace Lithe {
 		status = LoadAppAssembly(scriptModulePath);
 		if (!status)
 		{
-			LI_CORE_ERROR("[ScriptEngine] Could not load app assembly.");
+			LI_CORE_ERROR("[ScriptEngine] Could not load app assembly: {}", scriptModulePath.string());
 			return;
 		}
 
 		LoadAssemblyClasses();
 		ScriptGlue::RegisterComponents();
+		ScriptGlue::RegisterExternalComponents();
 		s_Data->EntityClass = ScriptClass("Lithe", "Entity", true);
 	}
 
@@ -222,6 +224,7 @@ namespace Lithe {
 
 	void ScriptEngine::ReloadAssembly()
 	{
+		if (s_Data->Running) return;
 		mono_domain_set(mono_get_root_domain(), false);
 
 		mono_domain_unload(s_Data->AppDomain);
@@ -238,12 +241,15 @@ namespace Lithe {
 	void ScriptEngine::OnRuntimeStart(Scene* scene)
 	{
 		s_Data->SceneContext = scene;
+		s_Data->Running = true;
 	}
 
 	void ScriptEngine::OnRuntimeStop()
 	{
 		s_Data->SceneContext = nullptr;
 		s_Data->EntityInstances.clear();
+
+		s_Data->Running = false;
 	}
 
 	bool ScriptEngine::EntityClassExists(const std::string& fullClassName)
@@ -335,6 +341,14 @@ namespace Lithe {
 	MonoString* ScriptEngine::CreateString(const char* string)
 	{
 		return mono_string_new(s_Data->AppDomain, string);
+	}
+
+	std::string ScriptEngine::CreateString(MonoString* string)
+	{
+		char* cStr = mono_string_to_utf8(string);
+		std::string str(cStr);
+		mono_free(cStr);
+		return str;
 	}
 
 	void ScriptEngine::InitMono()

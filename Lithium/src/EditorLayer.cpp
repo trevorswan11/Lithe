@@ -651,7 +651,7 @@ namespace Lithe {
 			if (cameraEntity)
 			{
 				auto& camera = cameraEntity.GetComponent<CameraComponent>().Camera;
-				camera.SetViewportSize(m_ViewportSize.x, m_ViewportSize.y);
+				camera.SetViewportSize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
 			}
 			m_ActiveScene = Scene::Copy(m_EditorScene);
 			m_SceneState = SceneState::Play;

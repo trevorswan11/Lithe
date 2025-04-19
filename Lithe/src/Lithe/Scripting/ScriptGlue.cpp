@@ -1,56 +1,36 @@
 #include "lipch.h"
 #include "ScriptGlue.h"
-#include "ScriptEngine.h"
 
-#include "Lithe/Core/UUID.h"
-#include "Lithe/Core/KeyCodes.h"
+#include "Lithe/Scripting/ScriptEngine.h"
+
 #include "Lithe/Core/Input.h"
+#include "Lithe/Core/KeyCodes.h"
+#include "Lithe/Core/MouseCodes.h"
+#include "Lithe/Core/UUID.h"
 
 #include "Lithe/Scene/Scene.h"
 #include "Lithe/Scene/Entity.h"
 
-#include "Lithe/Utils/Physics2DUtils.h"
+#include "Lithe/Core/FileSystem.h"
+#include "Lithe/Project/Project.h"
+#include "Lithe/Utils/StringUtils.h"
+
+#include "Lithe/Scripting/Glue/UtilsGlue.h"
+#include "Lithe/Scripting/Glue/CameraComponentGlue.h"
+#include "Lithe/Scripting/Glue/TransformComponentGlue.h"
+#include "Lithe/Scripting/Glue/PhysicsComponentGlue.h"
+#include "Lithe/Scripting/Glue/TextComponentGlue.h"
+#include "Lithe/Scripting/Glue/AudioComponentGlue.h"
+#include "Lithe/Scripting/Glue/RendererComponentGlue.h"
 
 #include <mono/metadata/object.h>
 #include <mono/metadata/reflection.h>
 
-#include <box2d/b2_body.h>
-
 namespace Lithe {
-
-	namespace Utils {
-
-		static std::string MonoStringToString(MonoString* string)
-		{
-			char* cStr = mono_string_to_utf8(string);
-			std::string str(cStr);
-			mono_free(cStr);
-			return str;
-		}
-
-	}
 
 	static std::unordered_map<MonoType*, std::function<bool(Entity)>> s_EntityHasComponentFuncs;
 
 #define LI_ADD_INTERNAL_CALL(Name) mono_add_internal_call("Lithe.InternalCalls::" #Name, Name)
-
-	static void NativeLog(MonoString* string, int parameter)
-	{
-		std::string str = Utils::MonoStringToString(string);
-		std::cout << str << ", " << parameter << std::endl;
-	}
-
-	static void NativeLog_Vector(glm::vec3* parameter, glm::vec3* outResult)
-	{
-		LI_CORE_WARN("Value: [{0}, {1}, {2}]", (*parameter).x, (*parameter).y, (*parameter).z);
-		*outResult = glm::normalize(*parameter);
-	}
-
-	static float NativeLog_VectorDot(glm::vec3* parameter)
-	{
-		LI_CORE_WARN("Value: [{0}, {1}, {2}]", (*parameter).x, (*parameter).y, (*parameter).z);
-		return glm::dot(*parameter, *parameter);
-	}
 
 	static MonoObject* GetScriptInstance(UUID entityID)
 	{
@@ -84,359 +64,10 @@ namespace Lithe {
 		return entity.GetUUID();
 	}
 
-	static void TransformComponent_GetTranslation(UUID entityID, glm::vec3* outTranslation)
+	static uint64_t Entity_GetGlobalEntity()
 	{
-		Scene* scene = ScriptEngine::GetSceneContext();
-		LI_CORE_ASSERT(scene);
-		Entity entity = scene->GetEntityByUUID(entityID);
-		LI_CORE_ASSERT(entity);
-
-		*outTranslation = entity.GetComponent<TransformComponent>().Translation;
-	}
-
-	static void TransformComponent_SetTranslation(UUID entityID, glm::vec3* translation)
-	{
-		Scene* scene = ScriptEngine::GetSceneContext();
-		LI_CORE_ASSERT(scene);
-		Entity entity = scene->GetEntityByUUID(entityID);
-		LI_CORE_ASSERT(entity);
-
-		entity.GetComponent<TransformComponent>().Translation = *translation;
-	}
-
-	static void RigidBody2DComponent_ApplyLinearImpulse(UUID entityID, glm::vec2* impulse, glm::vec2* point, bool wake)
-	{
-		Scene* scene = ScriptEngine::GetSceneContext();
-		LI_CORE_ASSERT(scene);
-		Entity entity = scene->GetEntityByUUID(entityID);
-		LI_CORE_ASSERT(entity);
-
-		auto& rb2d = entity.GetComponent<RigidBody2DComponent>();
-		b2Body* body = (b2Body*)rb2d.RuntimeBody;
-		body->ApplyLinearImpulse(b2Vec2(impulse->x, impulse->y), b2Vec2(point->x, point->y), wake);
-	}
-
-	static void RigidBody2DComponent_ApplyLinearImpulseToCenter(UUID entityID, glm::vec2* impulse, bool wake)
-	{
-		Scene* scene = ScriptEngine::GetSceneContext();
-		LI_CORE_ASSERT(scene);
-		Entity entity = scene->GetEntityByUUID(entityID);
-		LI_CORE_ASSERT(entity);
-
-		auto& rb2d = entity.GetComponent<RigidBody2DComponent>();
-		b2Body* body = (b2Body*)rb2d.RuntimeBody;
-		body->ApplyLinearImpulseToCenter(b2Vec2(impulse->x, impulse->y), wake);
-	}
-
-	static void RigidBody2DComponent_GetLinearVelocity(UUID entityID, glm::vec2* outLinearVelocity)
-	{
-		Scene* scene = ScriptEngine::GetSceneContext();
-		LI_CORE_ASSERT(scene);
-		Entity entity = scene->GetEntityByUUID(entityID);
-		LI_CORE_ASSERT(entity);
-
-		auto& rb2d = entity.GetComponent<RigidBody2DComponent>();
-		b2Body* body = (b2Body*)rb2d.RuntimeBody;
-		const b2Vec2& linearVelocity = body->GetLinearVelocity();
-		*outLinearVelocity = glm::vec2(linearVelocity.x, linearVelocity.y);
-	}
-
-	static RigidBody2DComponent::BodyType RigidBody2DComponent_GetType(UUID entityID)
-	{
-		Scene* scene = ScriptEngine::GetSceneContext();
-		LI_CORE_ASSERT(scene);
-		Entity entity = scene->GetEntityByUUID(entityID);
-		LI_CORE_ASSERT(entity);
-
-		auto& rb2d = entity.GetComponent<RigidBody2DComponent>();
-		b2Body* body = (b2Body*)rb2d.RuntimeBody;
-		return Utils::RigidBody2DTypeFromBox2DBody(body->GetType());
-	}
-
-	static void RigidBody2DComponent_SetType(UUID entityID, RigidBody2DComponent::BodyType bodyType)
-	{
-		Scene* scene = ScriptEngine::GetSceneContext();
-		LI_CORE_ASSERT(scene);
-		Entity entity = scene->GetEntityByUUID(entityID);
-		LI_CORE_ASSERT(entity);
-
-		auto& rb2d = entity.GetComponent<RigidBody2DComponent>();
-		b2Body* body = (b2Body*)rb2d.RuntimeBody;
-		body->SetType(Utils::RigidBody2DTypeToBox2DBody(bodyType));
-	}
-
-	static MonoString* TextComponent_GetText(UUID entityID)
-	{
-		Scene* scene = ScriptEngine::GetSceneContext();
-		LI_CORE_ASSERT(scene);
-		Entity entity = scene->GetEntityByUUID(entityID);
-		LI_CORE_ASSERT(entity);
-		LI_CORE_ASSERT(entity.HasComponent<TextComponent>());
-
-		auto& tc = entity.GetComponent<TextComponent>();
-		return ScriptEngine::CreateString(tc.TextString.c_str());
-	}
-
-	static void TextComponent_SetText(UUID entityID, MonoString* textString)
-	{
-		Scene* scene = ScriptEngine::GetSceneContext();
-		LI_CORE_ASSERT(scene);
-		Entity entity = scene->GetEntityByUUID(entityID);
-		LI_CORE_ASSERT(entity);
-		LI_CORE_ASSERT(entity.HasComponent<TextComponent>());
-
-		auto& tc = entity.GetComponent<TextComponent>();
-		tc.TextString = Utils::MonoStringToString(textString);
-	}
-
-	static void TextComponent_GetColor(UUID entityID, glm::vec4* color)
-	{
-		Scene* scene = ScriptEngine::GetSceneContext();
-		LI_CORE_ASSERT(scene);
-		Entity entity = scene->GetEntityByUUID(entityID);
-		LI_CORE_ASSERT(entity);
-		LI_CORE_ASSERT(entity.HasComponent<TextComponent>());
-
-		auto& tc = entity.GetComponent<TextComponent>();
-		*color = tc.Color;
-	}
-
-	static void TextComponent_SetColor(UUID entityID, glm::vec4* color)
-	{
-		Scene* scene = ScriptEngine::GetSceneContext();
-		LI_CORE_ASSERT(scene);
-		Entity entity = scene->GetEntityByUUID(entityID);
-		LI_CORE_ASSERT(entity);
-		LI_CORE_ASSERT(entity.HasComponent<TextComponent>());
-
-		auto& tc = entity.GetComponent<TextComponent>();
-		tc.Color = *color;
-	}
-
-	static float TextComponent_GetKerning(UUID entityID)
-	{
-		Scene* scene = ScriptEngine::GetSceneContext();
-		LI_CORE_ASSERT(scene);
-		Entity entity = scene->GetEntityByUUID(entityID);
-		LI_CORE_ASSERT(entity);
-		LI_CORE_ASSERT(entity.HasComponent<TextComponent>());
-
-		auto& tc = entity.GetComponent<TextComponent>();
-		return tc.Kerning;
-	}
-
-	static void TextComponent_SetKerning(UUID entityID, float kerning)
-	{
-		Scene* scene = ScriptEngine::GetSceneContext();
-		LI_CORE_ASSERT(scene);
-		Entity entity = scene->GetEntityByUUID(entityID);
-		LI_CORE_ASSERT(entity);
-		LI_CORE_ASSERT(entity.HasComponent<TextComponent>());
-
-		auto& tc = entity.GetComponent<TextComponent>();
-		tc.Kerning = kerning;
-	}
-
-	static float TextComponent_GetLineSpacing(UUID entityID)
-	{
-		Scene* scene = ScriptEngine::GetSceneContext();
-		LI_CORE_ASSERT(scene);
-		Entity entity = scene->GetEntityByUUID(entityID);
-		LI_CORE_ASSERT(entity);
-		LI_CORE_ASSERT(entity.HasComponent<TextComponent>());
-
-		auto& tc = entity.GetComponent<TextComponent>();
-		return tc.LineSpacing;
-	}
-
-	static void TextComponent_SetLineSpacing(UUID entityID, float lineSpacing)
-	{
-		Scene* scene = ScriptEngine::GetSceneContext();
-		LI_CORE_ASSERT(scene);
-		Entity entity = scene->GetEntityByUUID(entityID);
-		LI_CORE_ASSERT(entity);
-		LI_CORE_ASSERT(entity.HasComponent<TextComponent>());
-
-		auto& tc = entity.GetComponent<TextComponent>();
-		tc.LineSpacing = lineSpacing;
-	}
-
-	static bool Input_IsKeyDown(KeyCode keycode)
-	{
-		return Input::IsKeyPressed(keycode);
-	}
-
-	static bool Input_IsMouseDown(MouseCode mousecode)
-	{
-		return Input::IsMouseButtonPressed(mousecode);
-	}
-
-	static MonoString* AudioComponent_GetPath(UUID entityID)
-	{
-		Scene* scene = ScriptEngine::GetSceneContext();
-		LI_CORE_ASSERT(scene);
-		Entity entity = scene->GetEntityByUUID(entityID);
-		LI_CORE_ASSERT(entity);
-		LI_CORE_ASSERT(entity.HasComponent<AudioComponent>());
-
-		auto& ac = entity.GetComponent<AudioComponent>();
-		return ScriptEngine::CreateString(ac.Path.c_str());
-	}
-
-	static void AudioComponent_SetPath(UUID entityID, MonoString* textString)
-	{
-		Scene* scene = ScriptEngine::GetSceneContext();
-		LI_CORE_ASSERT(scene);
-		Entity entity = scene->GetEntityByUUID(entityID);
-		LI_CORE_ASSERT(entity);
-		LI_CORE_ASSERT(entity.HasComponent<AudioComponent>());
-	
-		auto& ac = entity.GetComponent<AudioComponent>();
-		ac.Path = Utils::MonoStringToString(textString);
-	}
-
-	static float AudioComponent_GetVolume(UUID entityID)
-	{
-		Scene* scene = ScriptEngine::GetSceneContext();
-		LI_CORE_ASSERT(scene);
-		Entity entity = scene->GetEntityByUUID(entityID);
-		LI_CORE_ASSERT(entity);
-		LI_CORE_ASSERT(entity.HasComponent<AudioComponent>());
-
-		auto& ac = entity.GetComponent<AudioComponent>();
-		return ac.Volume;
-	}
-
-	static void AudioComponent_SetVolume(UUID entityID, float volume)
-	{
-		Scene* scene = ScriptEngine::GetSceneContext();
-		LI_CORE_ASSERT(scene);
-		Entity entity = scene->GetEntityByUUID(entityID);
-		LI_CORE_ASSERT(entity);
-		LI_CORE_ASSERT(entity.HasComponent<AudioComponent>());
-
-		auto& ac = entity.GetComponent<AudioComponent>();
-		ac.Volume = volume;
-	}
-
-	static bool AudioComponent_GetLooping(UUID entityID)
-	{
-		Scene* scene = ScriptEngine::GetSceneContext();
-		LI_CORE_ASSERT(scene);
-		Entity entity = scene->GetEntityByUUID(entityID);
-		LI_CORE_ASSERT(entity);
-		LI_CORE_ASSERT(entity.HasComponent<AudioComponent>());
-
-		auto& ac = entity.GetComponent<AudioComponent>();
-		return ac.Looping;
-	}
-
-	static void AudioComponent_SetLooping(UUID entityID, bool looping)
-	{
-		Scene* scene = ScriptEngine::GetSceneContext();
-		LI_CORE_ASSERT(scene);
-		Entity entity = scene->GetEntityByUUID(entityID);
-		LI_CORE_ASSERT(entity);
-		LI_CORE_ASSERT(entity.HasComponent<AudioComponent>());
-
-		auto& ac = entity.GetComponent<AudioComponent>();
-		ac.Looping = looping;
-	}
-
-	static bool AudioComponent_GetPlayOnStart(UUID entityID)
-	{
-		Scene* scene = ScriptEngine::GetSceneContext();
-		LI_CORE_ASSERT(scene);
-		Entity entity = scene->GetEntityByUUID(entityID);
-		LI_CORE_ASSERT(entity);
-		LI_CORE_ASSERT(entity.HasComponent<AudioComponent>());
-
-		auto& ac = entity.GetComponent<AudioComponent>();
-		return ac.PlayOnStart;
-	}
-
-	static void AudioComponent_SetPlayOnStart(UUID entityID, bool playOnStart)
-	{
-		Scene* scene = ScriptEngine::GetSceneContext();
-		LI_CORE_ASSERT(scene);
-		Entity entity = scene->GetEntityByUUID(entityID);
-		LI_CORE_ASSERT(entity);
-		LI_CORE_ASSERT(entity.HasComponent<AudioComponent>());
-
-		auto& ac = entity.GetComponent<AudioComponent>();
-		ac.PlayOnStart = playOnStart;
-	}
-
-	static bool AudioComponent_IsValid(UUID entityID)
-	{
-		Scene* scene = ScriptEngine::GetSceneContext();
-		LI_CORE_ASSERT(scene);
-		Entity entity = scene->GetEntityByUUID(entityID);
-		LI_CORE_ASSERT(entity);
-		LI_CORE_ASSERT(entity.HasComponent<AudioComponent>());
-
-		auto& ac = entity.GetComponent<AudioComponent>();
-		return ac.IsValid();
-	}
-
-	static bool AudioComponent_IsPlaying(UUID entityID)
-	{
-		Scene* scene = ScriptEngine::GetSceneContext();
-		LI_CORE_ASSERT(scene);
-		Entity entity = scene->GetEntityByUUID(entityID);
-		LI_CORE_ASSERT(entity);
-		LI_CORE_ASSERT(entity.HasComponent<AudioComponent>());
-
-		auto& ac = entity.GetComponent<AudioComponent>();
-		return ac.IsPlaying();
-	}
-
-	static bool AudioComponent_IsInitialized(UUID entityID)
-	{
-		Scene* scene = ScriptEngine::GetSceneContext();
-		LI_CORE_ASSERT(scene);
-		Entity entity = scene->GetEntityByUUID(entityID);
-		LI_CORE_ASSERT(entity);
-		LI_CORE_ASSERT(entity.HasComponent<AudioComponent>());
-
-		auto& ac = entity.GetComponent<AudioComponent>();
-		return ac.IsInitialized();
-	}
-
-	static void AudioComponent_Init(UUID entityID)
-	{
-		Scene* scene = ScriptEngine::GetSceneContext();
-		LI_CORE_ASSERT(scene);
-		Entity entity = scene->GetEntityByUUID(entityID);
-		LI_CORE_ASSERT(entity);
-		LI_CORE_ASSERT(entity.HasComponent<AudioComponent>());
-
-		auto& ac = entity.GetComponent<AudioComponent>();
-		ac.Init();
-	}
-
-	static void AudioComponent_Play(UUID entityID)
-	{
-		Scene* scene = ScriptEngine::GetSceneContext();
-		LI_CORE_ASSERT(scene);
-		Entity entity = scene->GetEntityByUUID(entityID);
-		LI_CORE_ASSERT(entity);
-		LI_CORE_ASSERT(entity.HasComponent<AudioComponent>());
-
-		auto& ac = entity.GetComponent<AudioComponent>();
-		ac.Play();
-	}
-
-	static void AudioComponent_Stop(UUID entityID)
-	{
-		Scene* scene = ScriptEngine::GetSceneContext();
-		LI_CORE_ASSERT(scene);
-		Entity entity = scene->GetEntityByUUID(entityID);
-		LI_CORE_ASSERT(entity);
-		LI_CORE_ASSERT(entity.HasComponent<AudioComponent>());
-
-		auto& ac = entity.GetComponent<AudioComponent>();
-		ac.Stop();
+		auto id = ScriptEngine::GetEntityContext();
+		return id ? id : 0;
 	}
 
 	template<typename... Component>
@@ -452,7 +83,8 @@ namespace Lithe {
 				MonoType* managedType = mono_reflection_type_from_name(managedTypename.data(), ScriptEngine::GetCoreAssemblyImage());
 				if (!managedType)
 				{
-					LI_CORE_ERROR("Could not find component type {}", managedTypename);
+					if (!Utils::StringContains(managedTypename, "ScriptComponent"))
+						LI_CORE_ERROR("Could not find component type {}", managedTypename);
 					return;
 				}
 				s_EntityHasComponentFuncs[managedType] = [](Entity entity) { return entity.HasComponent<Component>(); };
@@ -473,17 +105,22 @@ namespace Lithe {
 
 	void ScriptGlue::RegisterFunctions()
 	{
-		LI_ADD_INTERNAL_CALL(NativeLog);
-		LI_ADD_INTERNAL_CALL(NativeLog_Vector);
-		LI_ADD_INTERNAL_CALL(NativeLog_VectorDot);
+		LI_ADD_INTERNAL_CALL(Logger_LogTrace);
+		LI_ADD_INTERNAL_CALL(Logger_LogInfo);
+		LI_ADD_INTERNAL_CALL(Logger_LogWarn);
+		LI_ADD_INTERNAL_CALL(Logger_LogError);
+		LI_ADD_INTERNAL_CALL(Logger_LogCritical);
 
 		LI_ADD_INTERNAL_CALL(GetScriptInstance);
 
 		LI_ADD_INTERNAL_CALL(Entity_HasComponent);
 		LI_ADD_INTERNAL_CALL(Entity_FindEntityByName);
+		LI_ADD_INTERNAL_CALL(Entity_GetGlobalEntity);
 
 		LI_ADD_INTERNAL_CALL(TransformComponent_GetTranslation);
 		LI_ADD_INTERNAL_CALL(TransformComponent_SetTranslation);
+		LI_ADD_INTERNAL_CALL(TransformComponent_GetRotation);
+		LI_ADD_INTERNAL_CALL(TransformComponent_SetRotation);
 
 		LI_ADD_INTERNAL_CALL(RigidBody2DComponent_ApplyLinearImpulse);
 		LI_ADD_INTERNAL_CALL(RigidBody2DComponent_ApplyLinearImpulseToCenter);
@@ -502,6 +139,8 @@ namespace Lithe {
 
 		LI_ADD_INTERNAL_CALL(Input_IsKeyDown);
 		LI_ADD_INTERNAL_CALL(Input_IsMouseDown);
+		LI_ADD_INTERNAL_CALL(Input_GetMousePosition);
+		LI_ADD_INTERNAL_CALL(Input_GetMouseWorldPosition);
 
 		LI_ADD_INTERNAL_CALL(AudioComponent_GetPath);
 		LI_ADD_INTERNAL_CALL(AudioComponent_SetPath);
@@ -517,6 +156,64 @@ namespace Lithe {
 		LI_ADD_INTERNAL_CALL(AudioComponent_Init);
 		LI_ADD_INTERNAL_CALL(AudioComponent_Play);
 		LI_ADD_INTERNAL_CALL(AudioComponent_Stop);
+
+		LI_ADD_INTERNAL_CALL(SpriteRendererComponent_GetColor);
+		LI_ADD_INTERNAL_CALL(SpriteRendererComponent_SetColor);
+		LI_ADD_INTERNAL_CALL(SpriteRendererComponent_EnableSubtexture);
+		LI_ADD_INTERNAL_CALL(SpriteRendererComponent_DisableSubtexture);
+		LI_ADD_INTERNAL_CALL(SpriteRendererComponent_SubtextureUsed);
+		LI_ADD_INTERNAL_CALL(SpriteRendererComponent_GetCoords);
+		LI_ADD_INTERNAL_CALL(SpriteRendererComponent_SetCoords);
+		LI_ADD_INTERNAL_CALL(SpriteRendererComponent_GetCellSize);
+		LI_ADD_INTERNAL_CALL(SpriteRendererComponent_SetCellSize);
+		LI_ADD_INTERNAL_CALL(SpriteRendererComponent_GetSpriteSize);
+		LI_ADD_INTERNAL_CALL(SpriteRendererComponent_SetSpriteSize);
+		LI_ADD_INTERNAL_CALL(SpriteRendererComponent_GetTextureAbsolutePath);
+		LI_ADD_INTERNAL_CALL(SpriteRendererComponent_GetTextureRelativePath);
+		LI_ADD_INTERNAL_CALL(SpriteRendererComponent_SetTexturePath);
+		LI_ADD_INTERNAL_CALL(SpriteRendererComponent_IsLoaded);
+
+		LI_ADD_INTERNAL_CALL(CircleRendererComponent_GetColor);
+		LI_ADD_INTERNAL_CALL(CircleRendererComponent_SetColor);
+		LI_ADD_INTERNAL_CALL(CircleRendererComponent_GetRadius);
+		LI_ADD_INTERNAL_CALL(CircleRendererComponent_SetRadius);
+		LI_ADD_INTERNAL_CALL(CircleRendererComponent_GetThickness);
+		LI_ADD_INTERNAL_CALL(CircleRendererComponent_SetThickness);
+		LI_ADD_INTERNAL_CALL(CircleRendererComponent_GetFade);
+		LI_ADD_INTERNAL_CALL(CircleRendererComponent_SetFade);
+
+		LI_ADD_INTERNAL_CALL(CameraComponent_GetPrimary);
+		LI_ADD_INTERNAL_CALL(CameraComponent_SetPrimary);
+		LI_ADD_INTERNAL_CALL(CameraComponent_IsPrimary);
+		LI_ADD_INTERNAL_CALL(CameraComponent_GetFixedAspectRatio);
+		LI_ADD_INTERNAL_CALL(CameraComponent_SetFixedAspectRatio);
+		LI_ADD_INTERNAL_CALL(CameraComponent_IsFixedAspectRatio);
+
+		LI_ADD_INTERNAL_CALL(BoxCollider2DComponent_GetOffset);
+		LI_ADD_INTERNAL_CALL(BoxCollider2DComponent_SetOffset);
+		LI_ADD_INTERNAL_CALL(BoxCollider2DComponent_GetSize);
+		LI_ADD_INTERNAL_CALL(BoxCollider2DComponent_SetSize);
+		LI_ADD_INTERNAL_CALL(BoxCollider2DComponent_GetDensity);
+		LI_ADD_INTERNAL_CALL(BoxCollider2DComponent_SetDensity);
+		LI_ADD_INTERNAL_CALL(BoxCollider2DComponent_GetFriction);
+		LI_ADD_INTERNAL_CALL(BoxCollider2DComponent_SetFriction);
+		LI_ADD_INTERNAL_CALL(BoxCollider2DComponent_GetRestitution);
+		LI_ADD_INTERNAL_CALL(BoxCollider2DComponent_SetRestitution);
+		LI_ADD_INTERNAL_CALL(BoxCollider2DComponent_GetRestitutionThreshold);
+		LI_ADD_INTERNAL_CALL(BoxCollider2DComponent_SetRestitutionThreshold);
+
+		LI_ADD_INTERNAL_CALL(CircleCollider2DComponent_GetOffset);
+		LI_ADD_INTERNAL_CALL(CircleCollider2DComponent_SetOffset);
+		LI_ADD_INTERNAL_CALL(CircleCollider2DComponent_GetRadius);
+		LI_ADD_INTERNAL_CALL(CircleCollider2DComponent_SetRadius);
+		LI_ADD_INTERNAL_CALL(CircleCollider2DComponent_GetDensity);
+		LI_ADD_INTERNAL_CALL(CircleCollider2DComponent_SetDensity);
+		LI_ADD_INTERNAL_CALL(CircleCollider2DComponent_GetFriction);
+		LI_ADD_INTERNAL_CALL(CircleCollider2DComponent_SetFriction);
+		LI_ADD_INTERNAL_CALL(CircleCollider2DComponent_GetRestitution);
+		LI_ADD_INTERNAL_CALL(CircleCollider2DComponent_SetRestitution);
+		LI_ADD_INTERNAL_CALL(CircleCollider2DComponent_GetRestitutionThreshold);
+		LI_ADD_INTERNAL_CALL(CircleCollider2DComponent_SetRestitutionThreshold);
 	}
 
 }

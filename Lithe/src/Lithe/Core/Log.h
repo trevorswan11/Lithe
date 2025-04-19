@@ -75,7 +75,7 @@ inline std::string format_as(const glm::vec4& vector)
 #define LITHIUM_INFO(...)		::Lithe::Log::GetEditorLogger()->info(__VA_ARGS__)
 #define LITHIUM_WARN(...)		::Lithe::Log::GetEditorLogger()->warn(__VA_ARGS__)
 #define LITHIUM_ERROR(...)		::Lithe::Log::GetEditorLogger()->error(__VA_ARGS__)
-#define LITHIUM_CRTITICAL(...)	::Lithe::Log::GetEditorLogger()->critical(__VA_ARGS__)
+#define LITHIUM_CRITICAL(...)	::Lithe::Log::GetEditorLogger()->critical(__VA_ARGS__)
 
 // Client log macros
 
@@ -83,7 +83,7 @@ inline std::string format_as(const glm::vec4& vector)
 #define LI_INFO(...)			::Lithe::Log::GetClientLogger()->info(__VA_ARGS__)
 #define LI_WARN(...)			::Lithe::Log::GetClientLogger()->warn(__VA_ARGS__)
 #define LI_ERROR(...)			::Lithe::Log::GetClientLogger()->error(__VA_ARGS__)
-#define LI_CRTITICAL(...)		::Lithe::Log::GetClientLogger()->critical(__VA_ARGS__)
+#define LI_CRITICAL(...)		::Lithe::Log::GetClientLogger()->critical(__VA_ARGS__)
 
 // if dist build -- Prevents core logging
 // 

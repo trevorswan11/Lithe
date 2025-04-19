@@ -49,6 +49,18 @@ namespace Lithe {
 		return std::nullopt;
 	}
 
+	void FileDialogs::RevealInExplorer(const std::filesystem::path& path)
+	{
+		std::thread([path]()
+			{
+				if (!std::filesystem::exists(path))
+					return;
+				std::wstring widePath = path.wstring();
+				std::wstring command = L"explorer /select,\"" + widePath + L"\"";
+				_wsystem(command.c_str());
+			}).detach();
+	}
+
 	float Time::GetTime()
 	{
 		return (float)glfwGetTime();

@@ -26,7 +26,17 @@ namespace Lithe
 			return new Vec2(a.x + b.x, a.y + b.y);
 		}
 
+		public static Vec2 operator -(Vec2 a, Vec2 b)
+		{
+			return new Vec2(a.x - b.x, a.y - b.y);
+		}
+
 		public static Vec2 operator *(Vec2 vector, float scalar)
+		{
+			return new Vec2(vector.x * scalar, vector.y * scalar);
+		}
+
+		public static Vec2 operator *(float scalar, Vec2 vector)
 		{
 			return new Vec2(vector.x * scalar, vector.y * scalar);
 		}

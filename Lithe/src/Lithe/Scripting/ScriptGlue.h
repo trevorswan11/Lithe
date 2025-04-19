@@ -6,6 +6,7 @@ namespace Lithe {
 	{
 	public:
 		static void RegisterComponents();
+		static void RegisterExternalComponents() {};
 		static void RegisterFunctions();
 	};
 
