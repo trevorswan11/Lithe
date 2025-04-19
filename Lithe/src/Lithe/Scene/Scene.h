@@ -26,6 +26,9 @@ namespace Lithe {
 		Entity CloneEntity(Entity entity);
 		void DestroyEntity(Entity entity);
 
+		void AttachEntityToParent(Entity parent, Entity child);
+		void DetachEntityFromTree(Entity child);
+
 		void OnRuntimeStart();
 		void OnRuntimeStop();
 
@@ -90,8 +93,17 @@ namespace Lithe {
 		uint32_t m_EntityCount = 0;
 
 		friend class Entity;
+		friend class SceneGraph;
 		friend class SceneSerializer;
 		friend class SceneHierarchyPanel;
+	};
+
+	class SceneGraph
+	{
+	public:
+		static void UpdateTransforms(Scene* scene);
+	private:
+		static void Traverse(Entity entity, const glm::mat4& parentTransform);
 	};
 
 }

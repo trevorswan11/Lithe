@@ -145,6 +145,51 @@ namespace Lithe {
 		m_Registry.destroy(entity);
 	}
 
+	void Scene::AttachEntityToParent(Entity parent, Entity child)
+	{
+		auto& rel = child.AddOrReplaceComponent<RelationshipComponent>();
+		rel.Parent = parent.GetUUID();
+
+		auto& parentRel = parent.HasComponent<RelationshipComponent>()
+			? parent.GetComponent<RelationshipComponent>()
+			: parent.AddComponent<RelationshipComponent>();
+
+		if (parentRel.FirstChild != 0)
+		{
+			Entity firstChild = GetEntityByUUID(parentRel.FirstChild);
+			auto& firstChildRel = firstChild.GetComponent<RelationshipComponent>();
+			firstChildRel.PrevSibling = child.GetUUID();
+			rel.NextSibling = firstChild.GetUUID();
+		}
+
+		parentRel.FirstChild = child.GetUUID();
+	}
+
+	void Scene::DetachEntityFromTree(Entity child)
+	{
+		if (!child.HasComponent<RelationshipComponent>())
+			return;
+
+		auto& rel = child.GetComponent<RelationshipComponent>();
+
+		if (rel.Parent != 0)
+		{
+			Entity parent = GetEntityByUUID(rel.Parent);
+			auto& parentRel = parent.GetComponent<RelationshipComponent>();
+
+			if (parentRel.FirstChild == child.GetUUID())
+				parentRel.FirstChild = rel.NextSibling;
+		}
+
+		if (rel.PrevSibling != 0)
+			GetEntityByUUID(rel.PrevSibling).GetComponent<RelationshipComponent>().NextSibling = rel.NextSibling;
+
+		if (rel.NextSibling != 0)
+			GetEntityByUUID(rel.NextSibling).GetComponent<RelationshipComponent>().PrevSibling = rel.PrevSibling;
+
+		rel = {};
+	}
+
 	void Scene::OnRuntimeStart()
 	{
 		m_IsRunning = true;
@@ -573,6 +618,11 @@ namespace Lithe {
 
 	template<>
 	void Scene::OnComponentAdded<AudioComponent>(Entity entity, AudioComponent& component)
+	{
+	}
+
+	template<>
+	void Scene::OnComponentAdded<RelationshipComponent>(Entity entity, RelationshipComponent& component)
 	{
 	}
 

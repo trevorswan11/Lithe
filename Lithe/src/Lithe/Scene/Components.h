@@ -212,6 +212,15 @@ namespace Lithe {
 		bool Playing = false;
 	};
 
+	struct RelationshipComponent
+	{
+		UUID Parent = 0;
+		UUID FirstChild = 0;
+		UUID NextSibling = 0;
+		UUID PrevSibling = 0;
+	};
+
+
 	template<typename... Component>
 	struct ComponentGroup
 	{};
@@ -220,6 +229,6 @@ namespace Lithe {
 		ComponentGroup<TransformComponent, SpriteRendererComponent,
 		CameraComponent, NativeScriptComponent, ScriptComponent,
 		RigidBody2DComponent, CircleRendererComponent, BoxCollider2DComponent,
-		CircleCollider2DComponent, TextComponent, AudioComponent>;
+		CircleCollider2DComponent, TextComponent, AudioComponent, RelationshipComponent>;
 
 }
